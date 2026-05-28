@@ -31,7 +31,7 @@ export default function Cart() {
   // Cart: direct array
   const items = data?.data || [];
 
-  const subtotal = items.reduce((s, i) => s + i.product.gia * i.quantity, 0);
+  const subtotal = items.reduce((s, i) => s + (i.product?.gia || 0) * i.quantity, 0);
   const total = subtotal + SHIPPING_FEE;
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["cart"] });

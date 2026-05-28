@@ -42,7 +42,7 @@ export default function Checkout() {
   // Addresses: direct array
   const addresses = addrData?.data || [];
 
-  const subtotal = items.reduce((s, i) => s + i.product.gia * i.quantity, 0);
+  const subtotal = items.reduce((s, i) => s + (i.product?.gia || 0) * i.quantity, 0);
   const total = subtotal + SHIPPING_FEE;
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({
@@ -75,6 +75,17 @@ export default function Checkout() {
   };
 
   if (cartLoading) return <LoadingSpinner />;
+
+  if (!cartLoading && items.length === 0) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-20 text-center">
+        <p className="text-gray-500 text-lg mb-4">Giỏ hàng của bạn đang trống</p>
+        <a href="/cart" className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-colors inline-block">
+          Quay Lại Giỏ Hàng
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -140,7 +151,7 @@ export default function Checkout() {
 
             <button
               type="submit"
-              disabled={loading || items.length === 0}
+              disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3.5 rounded-xl transition-colors"
             >
               {loading ? "Đang đặt hàng..." : `Đặt Hàng — ${formatCurrency(total)}`}
@@ -154,17 +165,17 @@ export default function Checkout() {
             <h2 className="font-bold text-gray-800 mb-4">Đơn Hàng ({items.length} sản phẩm)</h2>
             <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
               {items.map((item) => {
-                const img = item.product.hinh_anh
+                const img = item.product?.hinh_anh
                   ? `${IMG_BASE}${item.product.hinh_anh}`
                   : "https://placehold.co/60x60?text=SP";
                 return (
                   <div key={item.id} className="flex gap-3 items-center">
-                    <img src={img} alt={item.product.ten_sp} className="w-12 h-12 object-cover rounded-lg border" />
+                    <img src={img} alt={item.product?.ten_sp} className="w-12 h-12 object-cover rounded-lg border" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-800 line-clamp-2">{item.product.ten_sp}</p>
+                      <p className="text-xs font-medium text-gray-800 line-clamp-2">{item.product?.ten_sp}</p>
                       <p className="text-xs text-gray-400">Size: {item.size} × {item.quantity}</p>
                     </div>
-                    <p className="text-xs font-bold text-gray-700">{formatCurrency(item.product.gia * item.quantity)}</p>
+                    <p className="text-xs font-bold text-gray-700">{formatCurrency((item.product?.gia || 0) * item.quantity)}</p>
                   </div>
                 );
               })}

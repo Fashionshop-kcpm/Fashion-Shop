@@ -59,6 +59,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+        <CartInitializer />
         <Layout>
           <Routes>
             {/* Public */}
