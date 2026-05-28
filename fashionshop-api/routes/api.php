@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Api\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\AdminAuthController;
 
 // ==================== PUBLIC ROUTES ====================
 Route::prefix('v1')->group(function () {
@@ -71,7 +72,13 @@ Route::prefix('v1')->group(function () {
     });
 
 // ==================== ADMIN ROUTES ====================
-    Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+    // Admin login (public)
+    Route::post('/admin/login', [AdminAuthController::class, 'login']);
+
+    Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
+
+        // Admin logout
+        Route::post('/logout', [AdminAuthController::class, 'logout']);
 
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -79,7 +86,7 @@ Route::prefix('v1')->group(function () {
         // Products
         Route::get('/products', [AdminProductController::class, 'index']);
         Route::post('/products', [AdminProductController::class, 'store']);
-        Route::put('/products/{id}', [AdminProductController::class, 'update']);
+        Route::post('/products/{id}', [AdminProductController::class, 'update']);
         Route::delete('/products/{id}', [AdminProductController::class, 'destroy']);
 
         // Orders
