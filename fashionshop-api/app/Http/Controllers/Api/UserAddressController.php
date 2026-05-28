@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\UserAddress;
+use Illuminate\Http\Request;
+
+class UserAddressController extends Controller
+{
+    public function index(Request $request)
+    {
+        return response()->json(
+            UserAddress::where('user_id', $request->user()->id)
+                ->orderBy('is_default', 'desc')
+                ->get()
+        );
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'fullname'        => 'required|string',
+            'phone'           => 'required|regex:/^[0-9]{9,11}$/',
+            'address_details' => 'required|string',
+        ]);
+
+        if ($request->is_default) {
+            UserAddress::where('user_id', $request->user()->id)
+                ->update(['is_default' => 0]);
+        }
+
+        $address = UserAddress::create([
+            'user_id'         => $request->user()->id,
+            'fullname'        => $request->fullname,
+            'phone'           => $request->phone,
+            'address_details' => $request->address_details,
+            'is_default'      => $request->is_default ? 1 : 0,
+        ]);
+
+        return response()->json(['message' => 'Đã thêm địa chỉ', 'address' => $address], 201);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        UserAddress::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->delete();
+
+        return response()->json(['message' => 'Đã xóa địa chỉ']);
+    }
+
+    public function setDefault(Request $request, $id)
+    {
+        UserAddress::where('user_id', $request->user()->id)
+            ->update(['is_default' => 0]);
+
+        UserAddress::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->update(['is_default' => 1]);
+
+        return response()->json(['message' => 'Đã đặt địa chỉ mặc định']);
+    }
+}

@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class ProfileController extends Controller
+{
+    public function show(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'email'  => 'required|email|unique:users,email,' . $request->user()->id,
+            'phone'  => 'required|regex:/^[0-9]{9,11}$/',
+            'gender' => 'required|in:Nam,Nữ',
+        ]);
+
+        $request->user()->update($request->only('email', 'phone', 'gender'));
+
+        return response()->json(['message' => 'Cập nhật thành công']);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'old_password'     => 'required',
+            'new_password'     => 'required|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($request->old_password, $request->user()->password)) {
+            return response()->json(['message' => 'Mật khẩu hiện tại không chính xác'], 400);
+        }
+
+        $request->user()->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return response()->json(['message' => 'Đổi mật khẩu thành công']);
+    }
+}

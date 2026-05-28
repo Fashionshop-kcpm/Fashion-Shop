@@ -1,0 +1,68 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Cart;
+use Illuminate\Http\Request;
+
+class CartController extends Controller
+{
+    public function index(Request $request)
+    {
+        $cart = Cart::with('product')
+            ->where('user_id', $request->user()->id)
+            ->get();
+
+        return response()->json($cart);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity'   => 'required|integer|min:1',
+            'size'       => 'required|in:S,M,L,XL',
+        ]);
+
+        $cart = Cart::where('user_id', $request->user()->id)
+            ->where('product_id', $request->product_id)
+            ->where('size', $request->size)
+            ->first();
+
+        if ($cart) {
+            $cart->increment('quantity', $request->quantity);
+        } else {
+            $cart = Cart::create([
+                'user_id'    => $request->user()->id,
+                'product_id' => $request->product_id,
+                'quantity'   => $request->quantity,
+                'size'       => $request->size,
+            ]);
+        }
+
+        return response()->json(['message' => 'Đã thêm vào giỏ hàng', 'cart' => $cart]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate(['quantity' => 'required|integer|min:1']);
+
+        $cart = Cart::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        $cart->update(['quantity' => $request->quantity]);
+
+        return response()->json(['message' => 'Đã cập nhật giỏ hàng']);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        Cart::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->delete();
+
+        return response()->json(['message' => 'Đã xóa sản phẩm khỏi giỏ hàng']);
+    }
+}
