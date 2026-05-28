@@ -1,0 +1,184 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { getCart } from "../api/cartApi";
+import { getAddresses } from "../api/addressApi";
+import { placeOrder } from "../api/orderApi";
+import useCartStore from "../stores/cartStore";
+import { formatCurrency } from "../utils/formatCurrency";
+import { SHIPPING_FEE } from "../utils/constants";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+
+const IMG_BASE = "http://127.0.0.1:8000/storage/products/";
+
+const schema = z.object({
+  fullname: z.string().min(2, "Họ tên tối thiểu 2 ký tự"),
+  phone: z.string().regex(/^\d{9,11}$/, "Số điện thoại 9-11 chữ số"),
+  address: z.string().min(5, "Địa chỉ tối thiểu 5 ký tự"),
+  payment: z.literal("COD"),
+});
+
+export default function Checkout() {
+  const navigate = useNavigate();
+  const { setCount } = useCartStore();
+  const [loading, setLoading] = useState(false);
+
+  const { data: cartData, isLoading: cartLoading } = useQuery({
+    queryKey: ["cart"],
+    queryFn: getCart,
+  });
+
+  const { data: addrData } = useQuery({
+    queryKey: ["addresses"],
+    queryFn: getAddresses,
+  });
+
+  // Cart: direct array
+  const items = cartData?.data || [];
+  // Addresses: direct array
+  const addresses = addrData?.data || [];
+
+  const subtotal = items.reduce((s, i) => s + i.product.gia * i.quantity, 0);
+  const total = subtotal + SHIPPING_FEE;
+
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { payment: "COD" },
+  });
+
+  const pickAddress = (addr) => {
+    setValue("fullname", addr.fullname);
+    setValue("phone", addr.phone);
+    setValue("address", addr.address_details);
+  };
+
+  const onSubmit = async (data) => {
+    if (items.length === 0) {
+      toast.error("Giỏ hàng trống");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await placeOrder(data);
+      const orderId = res.data?.order?.id || res.data?.id;
+      setCount(0);
+      navigate(`/order-success/${orderId}`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Đặt hàng thất bại");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (cartLoading) return <LoadingSpinner />;
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Thanh Toán</h1>
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Form */}
+        <div className="flex-1">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Saved addresses */}
+            {addresses.length > 0 && (
+              <div className="bg-white border rounded-xl p-5">
+                <p className="font-semibold text-gray-700 mb-3">Địa Chỉ Đã Lưu</p>
+                <div className="space-y-2">
+                  {addresses.map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => pickAddress(a)}
+                      className="w-full text-left border rounded-lg p-3 hover:border-blue-400 hover:bg-blue-50 transition-colors text-sm"
+                    >
+                      <span className="font-medium">{a.fullname}</span> — {a.phone}
+                      {a.is_default ? <span className="ml-2 text-xs text-blue-600 font-semibold">[Mặc định]</span> : null}
+                      <br />
+                      <span className="text-gray-500">{a.address_details}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Delivery info */}
+            <div className="bg-white border rounded-xl p-5 space-y-4">
+              <p className="font-semibold text-gray-700">Thông Tin Giao Hàng</p>
+              {[
+                { name: "fullname", label: "Họ và Tên", placeholder: "Nguyễn Văn A" },
+                { name: "phone", label: "Số Điện Thoại", placeholder: "0901234567" },
+                { name: "address", label: "Địa Chỉ", placeholder: "Số nhà, đường, phường, quận, thành phố" },
+              ].map(({ name, label, placeholder }) => (
+                <div key={name}>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+                  <input
+                    {...register(name)}
+                    placeholder={placeholder}
+                    className="w-full border rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                  {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>}
+                </div>
+              ))}
+            </div>
+
+            {/* Payment */}
+            <div className="bg-white border rounded-xl p-5">
+              <p className="font-semibold text-gray-700 mb-3">Phương Thức Thanh Toán</p>
+              <label className="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:bg-gray-50">
+                <input {...register("payment")} type="radio" value="COD" defaultChecked className="accent-blue-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-800">Thanh toán khi nhận hàng (COD)</p>
+                  <p className="text-xs text-gray-500">Trả tiền mặt khi nhận hàng</p>
+                </div>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || items.length === 0}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3.5 rounded-xl transition-colors"
+            >
+              {loading ? "Đang đặt hàng..." : `Đặt Hàng — ${formatCurrency(total)}`}
+            </button>
+          </form>
+        </div>
+
+        {/* Order summary */}
+        <div className="lg:w-80 shrink-0">
+          <div className="bg-white border rounded-xl p-5 sticky top-20">
+            <h2 className="font-bold text-gray-800 mb-4">Đơn Hàng ({items.length} sản phẩm)</h2>
+            <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+              {items.map((item) => {
+                const img = item.product.hinh_anh
+                  ? `${IMG_BASE}${item.product.hinh_anh}`
+                  : "https://placehold.co/60x60?text=SP";
+                return (
+                  <div key={item.id} className="flex gap-3 items-center">
+                    <img src={img} alt={item.product.ten_sp} className="w-12 h-12 object-cover rounded-lg border" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-gray-800 line-clamp-2">{item.product.ten_sp}</p>
+                      <p className="text-xs text-gray-400">Size: {item.size} × {item.quantity}</p>
+                    </div>
+                    <p className="text-xs font-bold text-gray-700">{formatCurrency(item.product.gia * item.quantity)}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <hr className="mb-3" />
+            <div className="space-y-1.5 text-sm">
+              <div className="flex justify-between text-gray-600"><span>Tạm tính</span><span>{formatCurrency(subtotal)}</span></div>
+              <div className="flex justify-between text-gray-600"><span>Phí ship</span><span>{formatCurrency(SHIPPING_FEE)}</span></div>
+              <hr />
+              <div className="flex justify-between font-bold text-blue-600 text-base"><span>Tổng cộng</span><span>{formatCurrency(total)}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

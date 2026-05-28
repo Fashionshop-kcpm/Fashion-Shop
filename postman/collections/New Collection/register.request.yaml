@@ -1,0 +1,25 @@
+$kind: http-request
+name: register
+url: http://127.0.0.1:8000/api/v1/register
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \    \"fullname\": \"Nguyen Van A\",\r
+
+    \    \"email\": \"test1@gmail.com\",\r
+
+    \    \"phone\": \"0901234567\",\r
+
+    \    \"gender\": \"Nam\",\r
+
+    \    \"password\": \"123456\",\r
+
+    \    \"password_confirmation\": \"123456\"\r
+
+    }"
+order: 1779949535852
