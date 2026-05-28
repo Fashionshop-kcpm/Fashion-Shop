@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
 import useAuthStore from "./stores/authStore";
+import useCartStore from "./stores/cartStore";
+import { getCart } from "./api/cartApi";
 
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -28,6 +31,17 @@ const queryClient = new QueryClient({
 function PrivateRoute({ children }) {
   const token = useAuthStore((s) => s.token);
   return token ? children : <Navigate to="/login" />;
+}
+
+function CartInitializer() {
+  const token = useAuthStore((s) => s.token);
+  const { setCount } = useCartStore();
+  useEffect(() => {
+    if (token) {
+      getCart().then((res) => setCount(res.data?.length || 0)).catch(() => {});
+    }
+  }, [token]);
+  return null;
 }
 
 function Layout({ children }) {

@@ -8,8 +8,8 @@ import toast from "react-hot-toast";
 
 const NAV_LINKS = [
   { label: "Trang Chủ", to: "/" },
-  { label: "Nam", to: "/category?gender=1" },
-  { label: "Nữ", to: "/category?gender=0" },
+  { label: "Nam", to: "/category?gioi_tinh=1" },
+  { label: "Nữ", to: "/category?gioi_tinh=0" },
   { label: "Liên Hệ", to: "/contact" },
 ];
 

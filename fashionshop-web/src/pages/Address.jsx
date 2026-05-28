@@ -10,7 +10,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const schema = z.object({
   fullname: z.string().min(2, "Tên tối thiểu 2 ký tự"),
-  phone: z.string().regex(/^\d{10}$/, "Số điện thoại phải 10 chữ số"),
+  phone: z.string().regex(/^\d{9,11}$/, "Số điện thoại 9-11 chữ số"),
   address_details: z.string().min(5, "Địa chỉ tối thiểu 5 ký tự"),
 });
 
@@ -24,7 +24,7 @@ export default function Address() {
     queryFn: getAddresses,
   });
 
-  const addresses = data?.data?.data || [];
+  const addresses = data?.data || [];
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
