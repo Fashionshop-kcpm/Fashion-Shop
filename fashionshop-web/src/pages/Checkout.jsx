@@ -13,7 +13,7 @@ import { formatCurrency } from "../utils/formatCurrency";
 import { SHIPPING_FEE } from "../utils/constants";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
-const IMG_BASE = "http://127.0.0.1:8000/storage/products/";
+const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
 const schema = z.object({
   fullname: z.string().min(2, "Họ tên tối thiểu 2 ký tự"),

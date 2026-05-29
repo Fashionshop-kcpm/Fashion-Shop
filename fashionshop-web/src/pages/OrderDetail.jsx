@@ -7,7 +7,7 @@ import { formatCurrency } from "../utils/formatCurrency";
 import StatusBadge from "../components/ui/StatusBadge";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
-const IMG_BASE = "http://127.0.0.1:8000/storage/products/";
+const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
 export default function OrderDetail() {
   const { id } = useParams();
