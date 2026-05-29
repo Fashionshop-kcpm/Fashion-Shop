@@ -1,7 +1,0 @@
-$kind: http-request
-name: get_product
-url: http://127.0.0.1:8000/api/v1/products
-method: GET
-headers:
-  Accept: application/json
-order: 3936006259843763

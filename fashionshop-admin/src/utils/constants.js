@@ -11,4 +11,4 @@ export const CONTACT_STATUS = {
   resolved: { label: "Đã xử lý",  color: "bg-green-100 text-green-700" },
 };
 
-export const IMG_BASE = "http://127.0.0.1:8000/storage/products/";
+export const IMG_BASE = "http://127.0.0.1:8000/storage/";
