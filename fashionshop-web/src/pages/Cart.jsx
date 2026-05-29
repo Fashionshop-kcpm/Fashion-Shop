@@ -9,7 +9,7 @@ import { formatCurrency } from "../utils/formatCurrency";
 import { SHIPPING_FEE } from "../utils/constants";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
-const IMG_BASE = "http://127.0.0.1:8000/storage/products/";
+const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
 export default function Cart() {
   const navigate = useNavigate();

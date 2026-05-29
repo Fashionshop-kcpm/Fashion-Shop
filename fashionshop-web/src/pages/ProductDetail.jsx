@@ -17,7 +17,7 @@ import StarRating from "../components/ui/StarRating";
 import SaleBadge from "../components/ui/SaleBadge";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
-const IMG_BASE = "http://127.0.0.1:8000/storage/products/";
+const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
 const reviewSchema = z.object({
   rating: z.coerce.number().min(1).max(5),
