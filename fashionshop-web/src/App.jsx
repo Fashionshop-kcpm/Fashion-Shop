@@ -40,7 +40,7 @@ function CartInitializer() {
     if (token) {
       getCart().then((res) => setCount(res.data?.length || 0)).catch(() => {});
     }
-  }, [token]);
+  }, [token, setCount]);
   return null;
 }
 

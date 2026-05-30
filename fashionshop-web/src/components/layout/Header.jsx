@@ -33,7 +33,7 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await logoutApi();
-    } catch {}
+    } catch { /* ignore */ }
     logout();
     setUserMenuOpen(false);
     navigate("/");

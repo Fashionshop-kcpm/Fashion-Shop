@@ -5,4 +5,7 @@ workspace:
 localResources:
   docs:
     - ..\fashionshop-api\vendor\laravel\framework\src\Illuminate\Validation\LICENSE.md
+    - ..\fashionshop-api\vendor\laravel\framework\src\Illuminate\View\LICENSE.md
+d
+md
 

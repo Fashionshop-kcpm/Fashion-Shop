@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { SlidersHorizontal } from "lucide-react";
@@ -15,12 +14,9 @@ export default function Category() {
   const navigate = useNavigate();
   const { token } = useAuthStore();
   const { count, setCount } = useCartStore();
-  const [page, setPage] = useState(1);
-
   const categoryId = searchParams.get("category_id") || "";
   const gioi_tinh = searchParams.get("gioi_tinh") || "";
-
-  useEffect(() => { setPage(1); }, [categoryId, gioi_tinh]);
+  const page = parseInt(searchParams.get("page") || "1", 10);
 
   const { data: productsRes, isLoading } = useQuery({
     queryKey: ["products", "category", categoryId, gioi_tinh, page],
@@ -49,6 +45,13 @@ export default function Category() {
     const next = new URLSearchParams(searchParams);
     if (val === "") next.delete(key);
     else next.set(key, val);
+    next.delete("page");
+    setSearchParams(next);
+  };
+
+  const setPage = (p) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", p);
     setSearchParams(next);
   };
 

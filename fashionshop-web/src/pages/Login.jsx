@@ -37,7 +37,7 @@ export default function Login() {
       try {
         const cartRes = await getCart();
         setCount(cartRes.data?.length || 0);
-      } catch {}
+      } catch { /* ignore */ }
       toast.success("Đăng nhập thành công!");
       navigate(from, { replace: true });
     } catch (err) {
