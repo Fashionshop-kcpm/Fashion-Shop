@@ -19,3 +19,11 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+
+.postman
+
+postman/
+
+
+.claude
