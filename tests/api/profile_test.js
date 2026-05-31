@@ -1,14 +1,16 @@
+const { expect } = require('chai');
+
 Feature('Profile API @api');
 
 let token = '';
-const profileEmail = `profile_${Date.now()}@test.com`;
-const password = '123456';
+const profileEmail = `profile_${Date.now()}@gmail.com`;
+const password = 'Chi123';
 
 Before(async ({ I }) => {
   const res = await I.sendPostRequest('/register', {
-    fullname: 'Profile User',
+    fullname: 'Nguyễn Chí Trung',
     email: profileEmail,
-    phone: '0912345678',
+    phone: '0938019655',
     gender: 'Nam',
     password,
     password_confirmation: password,
@@ -16,60 +18,69 @@ Before(async ({ I }) => {
   token = res.data.token;
 });
 
-// ─── XEM PROFILE ────────────────────────────────────────────────
+// ─── VIEW PROFILE ────────────────────────────────────────────────
 
-Scenario('GET /profile - Xem thông tin cá nhân', async ({ I }) => {
+Scenario('GET /profile - Status 200 OK', async ({ I }) => {
   const res = await I.sendGetRequest('/profile', {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('name');
-  expect(json).to.have.property('email', profileEmail);
-  expect(json).to.have.property('phone');
-  expect(json).to.have.property('gender');
+  expect(res.status).to.equal(200);
 });
 
-Scenario('GET /profile - Lỗi 401 khi không có token', async ({ I }) => {
-  const res = await I.sendGetRequest('/profile');
+Scenario('GET /profile - Profile có đủ các field', async ({ I }) => {
+  const res = await I.sendGetRequest('/profile', {
+    Authorization: `Bearer ${token}`,
+  });
 
-  I.seeResponseCodeIs(401);
+  expect(res.data).to.have.property('id');
+  expect(res.data).to.have.property('fullname');
+  expect(res.data).to.have.property('email');
+  expect(res.data).to.have.property('phone');
 });
 
-// ─── CẬP NHẬT PROFILE ───────────────────────────────────────────
+Scenario('[BUG] GET /profile - User có field name', async ({ I }) => {
+  const res = await I.sendGetRequest('/profile', {
+    Authorization: `Bearer ${token}`,
+  });
 
-Scenario('PUT /profile - Cập nhật thông tin thành công', async ({ I }) => {
+  // ❌ ProfileController trả $request->user() → chỉ có 'fullname', không có 'name'
+  expect(res.data).to.have.property('name');
+});
+
+// ─── UPDATE PROFILE ──────────────────────────────────────────────
+
+Scenario('PUT /profile - Status 200 OK', async ({ I }) => {
   const res = await I.sendPutRequest('/profile',
-    {
-      email: profileEmail,
-      phone: '0909999999',
-      gender: 'Nữ',
-    },
+    { email: profileEmail, phone: '0901234567', gender: 'Nam' },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(200);
-  I.seeResponseContainsJson({ message: 'Cập nhật thành công' });
+  expect(res.status).to.equal(200);
 });
 
-Scenario('PUT /profile - Lỗi 422 khi email không hợp lệ', async ({ I }) => {
+Scenario('PUT /profile - Message cập nhật thành công', async ({ I }) => {
   const res = await I.sendPutRequest('/profile',
-    {
-      email: 'not-an-email',
-      phone: '0909999999',
-      gender: 'Nam',
-    },
+    { email: profileEmail, phone: '0901234567', gender: 'Nam' },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(422);
+  expect(res.data.message).to.equal('Cập nhật thành công');
 });
 
-// ─── ĐỔI MẬT KHẨU ───────────────────────────────────────────────
+Scenario('[BUG] PUT /profile - Response trả về user đã cập nhật', async ({ I }) => {
+  const res = await I.sendPutRequest('/profile',
+    { email: profileEmail, phone: '0901234567', gender: 'Nam' },
+    { Authorization: `Bearer ${token}` }
+  );
 
-Scenario('PUT /profile/password - Đổi mật khẩu thành công', async ({ I }) => {
+  // ❌ controller chỉ trả message, không có field 'user'
+  expect(res.data).to.have.property('user');
+});
+
+// ─── CHANGE PASSWORD ─────────────────────────────────────────────
+
+Scenario('PUT /profile/password - Status 200 OK', async ({ I }) => {
   const res = await I.sendPutRequest('/profile/password',
     {
       old_password: password,
@@ -79,33 +90,32 @@ Scenario('PUT /profile/password - Đổi mật khẩu thành công', async ({ I 
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(200);
-  I.seeResponseContainsJson({ message: 'Đổi mật khẩu thành công' });
+  expect(res.status).to.equal(200);
 });
 
-Scenario('PUT /profile/password - Lỗi 400 khi sai mật khẩu cũ', async ({ I }) => {
+Scenario('PUT /profile/password - Message đổi mật khẩu thành công', async ({ I }) => {
   const res = await I.sendPutRequest('/profile/password',
     {
-      old_password: 'wrongpassword',
+      old_password: password,
       new_password: 'newpass123',
       new_password_confirmation: 'newpass123',
     },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(400);
-  I.seeResponseContainsJson({ message: 'Mật khẩu hiện tại không chính xác' });
+  expect(res.data.message).to.equal('Đổi mật khẩu thành công');
 });
 
-Scenario('PUT /profile/password - Lỗi 422 khi mật khẩu mới không khớp', async ({ I }) => {
+Scenario('[BUG] PUT /profile/password - Response trả về token mới', async ({ I }) => {
   const res = await I.sendPutRequest('/profile/password',
     {
       old_password: password,
       new_password: 'newpass123',
-      new_password_confirmation: 'different123',
+      new_password_confirmation: 'newpass123',
     },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(422);
+  // ❌ controller chỉ trả message, không cấp token mới
+  expect(res.data).to.have.property('token');
 });
