@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "a8114207-4218-48a3-b3eb-caeb9b32f4a3",
+    "_postman_id": "8a3e0971-527e-4a77-a277-5c518c728fd1",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55108854",
-    "_collection_link": "https://go.postman.co/collection/55108854-a8114207-4218-48a3-b3eb-caeb9b32f4a3?source=collection_link"
+    "_exporter_id": "55104620",
+    "_collection_link": "https://go.postman.co/collection/55104620-8a3e0971-527e-4a77-a277-5c518c728fd1?source=collection_link"
   },
   "item": [
     {
@@ -102,7 +102,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
+          "raw": "{\r\n    \"email\": \"test1243@gmail.com\",\r\n    \"password\": \"Chi123\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -123,9 +123,66 @@
     },
     {
       "name": "add_cart_BUG",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra mã phản hồi\r",
+              "pm.test(\"Trạng thái phản hồi là 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Message đúng\r",
+              "pm.test(\"Message Thêm giỏ hàng đúng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đã thêm vào giỏ hàng\");\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra lỗi về size không hợp lệ\r",
+              "pm.test(\"Size không hợp lệ\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.eql(\"Size không hợp lệ\");\r",
+              "    pm.expect(json.errors.size).to.exist;\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
+              "type": "string"
+            }
+          ]
+        },
         "method": "POST",
-        "header": []
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 2,\r\n    \"size\": \"XXL\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/cart",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cart"
+          ]
+        }
       },
       "response": []
     },
@@ -177,7 +234,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "98|xJTUJPHLC3kdeORuuvqEEiPld6klJRfSfNWPyCnP5467fd50",
+              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
               "type": "string"
             }
           ]
@@ -328,6 +385,265 @@
           "path": [
             "cart",
             "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "view_profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// TEST 2 - Có đủ thông tin user\r",
+              "pm.test(\"Profile có đủ các field\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"id\");\r",
+              "    pm.expect(json).to.have.property(\"fullname\");\r",
+              "    pm.expect(json).to.have.property(\"email\");\r",
+              "    pm.expect(json).to.have.property(\"phone\");\r",
+              "});\r",
+              "\r",
+              "// TEST 3 - kỳ vọng field 'name' thay vì 'fullname'\r",
+              "pm.test(\" User có field 'name'\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"name\"); // ❌ field đúng là 'fullname'\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url}}/profile",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update_profile",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "//  TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "//  TEST 2 - Message đúng\r",
+              "pm.test(\"Message cập nhật thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Cập nhật thành công\");\r",
+              "});\r",
+              "\r",
+              "//  TEST 3  kỳ vọng response trả về user đã update nhưng controller chỉ trả message\r",
+              "pm.test(\"Response trả về user đã cập nhật\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"user\"); // ❌ controller chỉ trả message\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"phone\": \"0901234567\",\r\n    \"gender\": \"Nam\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/profile",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "change_password",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// TEST 2 - Message đúng\r",
+              "pm.test(\"Message đổi mật khẩu thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đổi mật khẩu thành công\");\r",
+              "});\r",
+              "\r",
+              "//  TEST 3 - kỳ vọng field confirm là 'confirm_password' nhưng validation dùng 'confirmed' (tức là new_password_confirmation)\r",
+              "pm.test(\" Response trả về token mới sau khi đổi mật khẩu\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"token\"); // ❌ controller chỉ trả message, không cấp token mới\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "127|OnJlLDnbf5kfIrDtLmTrhtJpslj73AvlNNGcf8h3f88b218a",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    //Nhớ cập nhật token mới của login ở authorization\r\n    \"old_password\": \"Chi123\",\r\n    \"new_password\": \"newpass123\",\r\n    \"new_password_confirmation\": \"newpass123\"\r\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/profile/password",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "profile",
+            "password"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// TEST 2 - Message đúng\r",
+              "pm.test(\"Message đăng xuất thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
+              "});\r",
+              "\r",
+              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
+              "pm.test(\"Response có field 'user'\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "127|OnJlLDnbf5kfIrDtLmTrhtJpslj73AvlNNGcf8h3f88b218a",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url}}/logout",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "logout"
           ]
         }
       },
