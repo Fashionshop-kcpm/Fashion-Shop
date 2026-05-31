@@ -1,3 +1,5 @@
+const { expect } = require('chai');
+
 Feature('Reviews & Contacts API @api');
 
 let token = '';
@@ -6,11 +8,11 @@ let productId = null;
 Before(async ({ I }) => {
   const res = await I.sendPostRequest('/register', {
     fullname: 'Review User',
-    email: `review_${Date.now()}@test.com`,
-    phone: '0912345678',
+    email: `review_${Date.now()}@gmail.com`,
+    phone: '0938019655',
     gender: 'Nam',
-    password: '123456',
-    password_confirmation: '123456',
+    password: 'Chi123',
+    password_confirmation: 'Chi123',
   });
   token = res.data.token;
 
@@ -18,91 +20,79 @@ Before(async ({ I }) => {
   productId = listRes.data.data[0].id;
 });
 
-// ─── VIẾT ĐÁNH GIÁ ──────────────────────────────────────────────
-
-Scenario('POST /products/:id/reviews - Viết đánh giá thành công', async ({ I }) => {
+Scenario('POST /products/:id/reviews - Viet danh gia thanh cong', async ({ I }) => {
   const res = await I.sendPostRequest(`/products/${productId}/reviews`,
-    {
-      rating: 5,
-      comment: 'Sản phẩm rất tốt, đúng size!',
-    },
+    { rating: 5, comment: 'San pham rat tot, dung size!' },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(201);
-
-  const json = res.data;
-  expect(json).to.have.property('id');
-  expect(json).to.have.property('rating', 5);
-  expect(json).to.have.property('comment');
+  expect(res.status).to.equal(201);
+  expect(res.data).to.have.property('id');
+  expect(res.data).to.have.property('rating', 5);
+  expect(res.data).to.have.property('comment');
 });
 
-Scenario('POST /products/:id/reviews - Lỗi 422 khi rating ngoài khoảng 1-5', async ({ I }) => {
+Scenario('POST /products/:id/reviews - Loi 422 khi rating > 5', async ({ I }) => {
   const res = await I.sendPostRequest(`/products/${productId}/reviews`,
-    {
-      rating: 6,
-      comment: 'Sản phẩm tốt',
-    },
+    { rating: 6, comment: 'San pham tot' },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(422);
+  expect(res.status).to.equal(422);
 });
 
-Scenario('POST /products/:id/reviews - Lỗi 422 khi thiếu comment', async ({ I }) => {
+Scenario('POST /products/:id/reviews - Loi 422 khi thieu comment', async ({ I }) => {
   const res = await I.sendPostRequest(`/products/${productId}/reviews`,
     { rating: 4 },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(422);
+  expect(res.status).to.equal(422);
 });
 
-Scenario('POST /products/:id/reviews - Lỗi 401 khi không có token', async ({ I }) => {
+Scenario('POST /products/:id/reviews - Loi 401 khi khong co token', async ({ I }) => {
   const res = await I.sendPostRequest(`/products/${productId}/reviews`, {
     rating: 5,
-    comment: 'Tốt lắm',
+    comment: 'Tot lam',
   });
 
-  I.seeResponseCodeIs(401);
+  expect(res.status).to.equal(401);
 });
 
-Scenario('POST /products/:id/reviews - Lỗi 404 khi sản phẩm không tồn tại', async ({ I }) => {
+Scenario('POST /products/:id/reviews - Loi 404 khi san pham khong ton tai', async ({ I }) => {
   const res = await I.sendPostRequest('/products/999999/reviews',
     { rating: 5, comment: 'Test' },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(404);
+  expect(res.status).to.equal(404);
 });
 
-// ─── LIÊN HỆ ────────────────────────────────────────────────────
-
-Scenario('POST /contacts - Gửi liên hệ thành công', async ({ I }) => {
+Scenario('POST /contacts - Gui lien he thanh cong', async ({ I }) => {
   const res = await I.sendPostRequest('/contacts', {
-    fullname: 'Nguyễn Văn A',
+    fullname: 'Nguyen Van A',
     email: 'contact@test.com',
-    message: 'Tôi muốn hỏi về sản phẩm...',
+    message: 'Toi muon hoi ve san pham...',
   });
 
-  I.seeResponseCodeIs(201);
+  expect(res.status).to.equal(201);
 });
 
-Scenario('POST /contacts - Lỗi 422 khi thiếu message', async ({ I }) => {
+Scenario('POST /contacts - Loi 422 khi thieu message', async ({ I }) => {
   const res = await I.sendPostRequest('/contacts', {
     fullname: 'Test',
     email: 'test@test.com',
   });
 
-  I.seeResponseCodeIs(422);
+  expect(res.status).to.equal(422);
 });
 
-Scenario('POST /contacts - Lỗi 422 khi email không hợp lệ', async ({ I }) => {
+Scenario('POST /contacts - Loi 422 khi email khong hop le', async ({ I }) => {
   const res = await I.sendPostRequest('/contacts', {
     fullname: 'Test',
     email: 'not-an-email',
-    message: 'Xin chào',
+    message: 'Xin chao',
   });
 
-  I.seeResponseCodeIs(422);
+  expect(res.status).to.equal(422);
 });

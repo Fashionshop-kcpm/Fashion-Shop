@@ -2,13 +2,14 @@
   "name": "fashionshop-tests",
   "version": "1.0.0",
   "scripts": {
-    "test": "codeceptjs run --steps",
-    "test:api": "codeceptjs run --grep @api --steps",
-    "test:e2e": "codeceptjs run --grep @e2e --steps"
+    "test:api": "codeceptjs run -c codecept.api.conf.js --steps",
+    "test:api:admin": "codeceptjs run api/admin_test.js -c codecept.api.conf.js --steps",
+    "test:e2e": "codeceptjs run -c codecept.e2e.conf.js --steps"
   },
   "devDependencies": {
     "codeceptjs": "^3.6.4",
     "@codeceptjs/configure": "^0.10.0",
-    "playwright": "^1.48.0"
+    "playwright": "^1.48.0",
+    "chai": "^4.4.1"
   }
 }

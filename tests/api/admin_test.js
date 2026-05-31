@@ -1,9 +1,10 @@
+const { expect } = require('chai');
+
 Feature('Admin API @api @admin');
 
 // ⚠️ Cần có admin account trong DB trước khi chạy test này
-// Chạy: php artisan db:seed --class=AdminSeeder
-const ADMIN_EMAIL = 'admin@gmail.com';
-const ADMIN_PASSWORD = 'adminpass';
+const ADMIN_EMAIL = 'admin@fashionshop.vn';
+const ADMIN_PASSWORD = 'Admin@123456';
 
 let adminToken = '';
 
@@ -23,11 +24,9 @@ Scenario('POST /admin/login - Admin đăng nhập thành công', async ({ I }) =
     password: ADMIN_PASSWORD,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('token');
-  expect(json).to.have.property('admin');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('token');
+  expect(res.data).to.have.property('admin');
 });
 
 Scenario('POST /admin/login - Lỗi 401 khi sai mật khẩu', async ({ I }) => {
@@ -36,10 +35,10 @@ Scenario('POST /admin/login - Lỗi 401 khi sai mật khẩu', async ({ I }) => 
     password: 'wrongpass',
   });
 
-  I.seeResponseCodeIs(401);
+  expect(res.status).to.equal(401);
 });
 
-Scenario('POST /admin/login - Lỗi 403 khi dùng tài khoản user thường', async ({ I }) => {
+Scenario('POST /admin/login - Lỗi khi dùng tài khoản user thường', async ({ I }) => {
   const userEmail = `notadmin_${Date.now()}@test.com`;
   await I.sendPostRequest('/register', {
     fullname: 'Normal User',
@@ -55,7 +54,7 @@ Scenario('POST /admin/login - Lỗi 403 khi dùng tài khoản user thường', 
     password: '123456',
   });
 
-  I.seeResponseCodeIsNot(200);
+  expect(res.status).to.not.equal(200);
 });
 
 // ─── DASHBOARD ──────────────────────────────────────────────────
@@ -65,18 +64,16 @@ Scenario('GET /admin/dashboard - Xem dashboard', async ({ I }) => {
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('total_revenue');
-  expect(json).to.have.property('total_orders');
-  expect(json).to.have.property('total_users');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('total_revenue');
+  expect(res.data).to.have.property('total_orders');
+  expect(res.data).to.have.property('total_users');
 });
 
 Scenario('GET /admin/dashboard - Lỗi 401 khi không có token', async ({ I }) => {
   const res = await I.sendGetRequest('/admin/dashboard');
 
-  I.seeResponseCodeIs(401);
+  expect(res.status).to.equal(401);
 });
 
 // ─── ADMIN PRODUCTS ──────────────────────────────────────────────
@@ -86,15 +83,12 @@ Scenario('GET /admin/products - Xem danh sách sản phẩm', async ({ I }) => {
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('data').that.is.an('array');
-  expect(json).to.have.property('meta');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('data').that.is.an('array');
+  expect(res.data).to.have.property('meta');
 });
 
 Scenario('GET /admin/products - Lỗi 403 khi dùng token user thường', async ({ I }) => {
-  // Tạo user thường
   const userRes = await I.sendPostRequest('/register', {
     fullname: 'Regular User',
     email: `regular_${Date.now()}@test.com`,
@@ -109,7 +103,7 @@ Scenario('GET /admin/products - Lỗi 403 khi dùng token user thường', async
     Authorization: `Bearer ${userToken}`,
   });
 
-  I.seeResponseCodeIs(403);
+  expect(res.status).to.equal(403);
 });
 
 // ─── ADMIN ORDERS ────────────────────────────────────────────────
@@ -119,32 +113,28 @@ Scenario('GET /admin/orders - Xem tất cả đơn hàng', async ({ I }) => {
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('data').that.is.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('data').that.is.an('array');
 });
 
 Scenario('PATCH /admin/orders/:id/status - Cập nhật trạng thái đơn hàng', async ({ I }) => {
-  // Lấy đơn hàng đầu tiên
   const listRes = await I.sendGetRequest('/admin/orders', {
     Authorization: `Bearer ${adminToken}`,
   });
   const orders = listRes.data.data;
 
-  if (orders.length === 0) {
+  if (!orders || orders.length === 0) {
     console.log('Không có đơn hàng để test, bỏ qua');
     return;
   }
 
   const orderId = orders[0].id;
-
   const res = await I.sendPatchRequest(`/admin/orders/${orderId}/status`,
     { status: 'Đang giao' },
     { Authorization: `Bearer ${adminToken}` }
   );
 
-  I.seeResponseCodeIs(200);
+  expect(res.status).to.equal(200);
 });
 
 // ─── ADMIN USERS ─────────────────────────────────────────────────
@@ -154,10 +144,8 @@ Scenario('GET /admin/users - Xem danh sách người dùng', async ({ I }) => {
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.be.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.be.an('array');
 });
 
 Scenario('GET /admin/users/:id - Xem chi tiết người dùng', async ({ I }) => {
@@ -166,23 +154,20 @@ Scenario('GET /admin/users/:id - Xem chi tiết người dùng', async ({ I }) =
   });
   const users = listRes.data;
 
-  if (users.length === 0) {
+  if (!users || users.length === 0) {
     console.log('Không có user để test, bỏ qua');
     return;
   }
 
   const userId = users[0].id;
-
   const res = await I.sendGetRequest(`/admin/users/${userId}`, {
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('id', userId);
-  expect(json).to.have.property('fullname');
-  expect(json).to.have.property('email');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('id', userId);
+  expect(res.data).to.have.property('fullname');
+  expect(res.data).to.have.property('email');
 });
 
 // ─── ADMIN REVIEWS ───────────────────────────────────────────────
@@ -192,10 +177,8 @@ Scenario('GET /admin/reviews - Xem tất cả đánh giá', async ({ I }) => {
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.be.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.be.an('array');
 });
 
 Scenario('PATCH /admin/reviews/:id/reply - Phản hồi đánh giá', async ({ I }) => {
@@ -204,19 +187,18 @@ Scenario('PATCH /admin/reviews/:id/reply - Phản hồi đánh giá', async ({ I
   });
   const reviews = listRes.data;
 
-  if (reviews.length === 0) {
+  if (!reviews || reviews.length === 0) {
     console.log('Không có review để test, bỏ qua');
     return;
   }
 
   const reviewId = reviews[0].id;
-
   const res = await I.sendPatchRequest(`/admin/reviews/${reviewId}/reply`,
     { reply: 'Cảm ơn bạn đã đánh giá sản phẩm!' },
     { Authorization: `Bearer ${adminToken}` }
   );
 
-  I.seeResponseCodeIs(200);
+  expect(res.status).to.equal(200);
 });
 
 // ─── ADMIN CONTACTS ──────────────────────────────────────────────
@@ -226,10 +208,8 @@ Scenario('GET /admin/contacts - Xem danh sách liên hệ', async ({ I }) => {
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.be.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.be.an('array');
 });
 
 Scenario('PATCH /admin/contacts/:id/status - Cập nhật trạng thái liên hệ', async ({ I }) => {
@@ -238,19 +218,18 @@ Scenario('PATCH /admin/contacts/:id/status - Cập nhật trạng thái liên h�
   });
   const contacts = listRes.data;
 
-  if (contacts.length === 0) {
+  if (!contacts || contacts.length === 0) {
     console.log('Không có liên hệ để test, bỏ qua');
     return;
   }
 
   const contactId = contacts[0].id;
-
   const res = await I.sendPatchRequest(`/admin/contacts/${contactId}/status`,
     { status: 'read' },
     { Authorization: `Bearer ${adminToken}` }
   );
 
-  I.seeResponseCodeIs(200);
+  expect(res.status).to.equal(200);
 });
 
 // ─── ADMIN LOGOUT ────────────────────────────────────────────────
@@ -260,5 +239,5 @@ Scenario('POST /admin/logout - Admin đăng xuất thành công', async ({ I }) 
     Authorization: `Bearer ${adminToken}`,
   });
 
-  I.seeResponseCodeIs(200);
+  expect(res.status).to.equal(200);
 });

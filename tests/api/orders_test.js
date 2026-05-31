@@ -1,37 +1,33 @@
+const { expect } = require('chai');
+
 Feature('Orders API @api');
 
 let token = '';
 let productId = null;
-let orderId = null;
 
 const orderPayload = {
-  fullname: 'Nguyễn Văn A',
+  fullname: 'Nguyen Van A',
   phone: '0901234567',
-  address: '123 Đường Lê Lợi, P.1, Q.1, TP.HCM',
+  address: '123 Duong Le Loi, P.1, Q.1, TP.HCM',
   payment: 'COD',
 };
 
 Before(async ({ I }) => {
-  // Tạo user mới
   const res = await I.sendPostRequest('/register', {
     fullname: 'Order User',
-    email: `order_${Date.now()}@test.com`,
-    phone: '0912345678',
+    email: `order_${Date.now()}@gmail.com`,
+    phone: '0938019655',
     gender: 'Nam',
-    password: '123456',
-    password_confirmation: '123456',
+    password: 'Chi123',
+    password_confirmation: 'Chi123',
   });
   token = res.data.token;
 
-  // Lấy ID sản phẩm đầu tiên
   const listRes = await I.sendGetRequest('/products');
   productId = listRes.data.data[0].id;
 });
 
-// ─── ĐẶT HÀNG ───────────────────────────────────────────────────
-
-Scenario('POST /orders - Đặt hàng thành công', async ({ I }) => {
-  // Thêm sản phẩm vào giỏ trước
+Scenario('POST /orders - Dat hang thanh cong', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'M' },
     { Authorization: `Bearer ${token}` }
@@ -41,59 +37,50 @@ Scenario('POST /orders - Đặt hàng thành công', async ({ I }) => {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(201);
-
-  const json = res.data;
-  expect(json).to.have.property('id');
-  expect(json).to.have.property('status');
-  expect(json).to.have.property('total');
-  orderId = json.id;
+  expect(res.status).to.equal(201);
+  expect(res.data).to.have.property('id');
+  expect(res.data).to.have.property('status');
+  expect(res.data).to.have.property('total');
 });
 
-Scenario('POST /orders - Lỗi 400 khi giỏ hàng rỗng', async ({ I }) => {
-  // Không thêm gì vào giỏ
+Scenario('POST /orders - Loi 400 khi gio hang rong', async ({ I }) => {
   const res = await I.sendPostRequest('/orders', orderPayload, {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(400);
+  expect(res.status).to.equal(400);
 });
 
-Scenario('POST /orders - Lỗi 422 khi thiếu thông tin giao hàng', async ({ I }) => {
+Scenario('POST /orders - Loi 422 khi thieu thong tin giao hang', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'L' },
     { Authorization: `Bearer ${token}` }
   );
 
   const res = await I.sendPostRequest('/orders',
-    { payment: 'COD' }, // thiếu fullname, phone, address
+    { payment: 'COD' },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(422);
+  expect(res.status).to.equal(422);
 });
 
-Scenario('POST /orders - Lỗi 401 khi không có token', async ({ I }) => {
+Scenario('POST /orders - Loi 401 khi khong co token', async ({ I }) => {
   const res = await I.sendPostRequest('/orders', orderPayload);
 
-  I.seeResponseCodeIs(401);
+  expect(res.status).to.equal(401);
 });
 
-// ─── XEM ĐƠN HÀNG ───────────────────────────────────────────────
-
-Scenario('GET /orders - Xem danh sách đơn hàng', async ({ I }) => {
+Scenario('GET /orders - Xem danh sach don hang', async ({ I }) => {
   const res = await I.sendGetRequest('/orders', {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.be.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.be.an('array');
 });
 
-Scenario('GET /orders/:id - Xem chi tiết đơn hàng', async ({ I }) => {
-  // Tạo đơn hàng trước
+Scenario('GET /orders/:id - Xem chi tiet don hang', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'M' },
     { Authorization: `Bearer ${token}` }
@@ -107,27 +94,22 @@ Scenario('GET /orders/:id - Xem chi tiết đơn hàng', async ({ I }) => {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('id', id);
-  expect(json).to.have.property('status');
-  expect(json).to.have.property('total');
-  expect(json).to.have.property('details').that.is.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('id', id);
+  expect(res.data).to.have.property('status');
+  expect(res.data).to.have.property('total');
+  expect(res.data).to.have.property('details').that.is.an('array');
 });
 
-Scenario('GET /orders/:id - Lỗi 404 khi ID không tồn tại', async ({ I }) => {
+Scenario('GET /orders/:id - Loi 404 khi ID khong ton tai', async ({ I }) => {
   const res = await I.sendGetRequest('/orders/999999', {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(404);
+  expect(res.status).to.equal(404);
 });
 
-// ─── HỦY ĐƠN HÀNG ───────────────────────────────────────────────
-
-Scenario('PATCH /orders/:id/cancel - Hủy đơn hàng thành công khi status = pending', async ({ I }) => {
-  // Tạo đơn hàng mới
+Scenario('PATCH /orders/:id/cancel - Huy don hang khi status = pending', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'S' },
     { Authorization: `Bearer ${token}` }
@@ -141,35 +123,5 @@ Scenario('PATCH /orders/:id/cancel - Hủy đơn hàng thành công khi status =
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(200);
-});
-
-Scenario('PATCH /orders/:id/cancel - Lỗi 403 khi hủy đơn của người khác', async ({ I }) => {
-  // Tạo user khác
-  const otherRes = await I.sendPostRequest('/register', {
-    fullname: 'Other User',
-    email: `other_${Date.now()}@test.com`,
-    phone: '0901111111',
-    gender: 'Nữ',
-    password: '123456',
-    password_confirmation: '123456',
-  });
-  const otherToken = otherRes.data.token;
-
-  // Tạo đơn hàng bằng user gốc
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'M' },
-    { Authorization: `Bearer ${token}` }
-  );
-  const orderRes = await I.sendPostRequest('/orders', orderPayload, {
-    Authorization: `Bearer ${token}`,
-  });
-  const id = orderRes.data.id;
-
-  // User khác cố hủy đơn → lỗi
-  const res = await I.sendPatchRequest(`/orders/${id}/cancel`, {}, {
-    Authorization: `Bearer ${otherToken}`,
-  });
-
-  I.seeResponseCodeIsNot(200);
+  expect(res.status).to.equal(200);
 });

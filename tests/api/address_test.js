@@ -1,72 +1,65 @@
+const { expect } = require('chai');
+
 Feature('Address API @api');
 
 let token = '';
-let addressId = null;
 
 Before(async ({ I }) => {
   const res = await I.sendPostRequest('/register', {
     fullname: 'Address User',
-    email: `addr_${Date.now()}@test.com`,
-    phone: '0912345678',
+    email: `addr_${Date.now()}@gmail.com`,
+    phone: '0938019655',
     gender: 'Nam',
-    password: '123456',
-    password_confirmation: '123456',
+    password: 'Chi123',
+    password_confirmation: 'Chi123',
   });
   token = res.data.token;
 });
 
-// ─── THÊM ĐỊA CHỈ ───────────────────────────────────────────────
-
-Scenario('POST /addresses - Thêm địa chỉ thành công', async ({ I }) => {
+Scenario('POST /addresses - Them dia chi thanh cong', async ({ I }) => {
   const res = await I.sendPostRequest('/addresses',
     {
-      fullname: 'Nguyễn Văn A',
+      fullname: 'Nguyen Van A',
       phone: '0901234567',
-      address_details: '123 Đường Lê Lợi, P.1, Q.1, TP.HCM',
+      address_details: '123 Duong Le Loi, P.1, Q.1, TP.HCM',
       is_default: true,
     },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(201);
-
-  const json = res.data;
-  expect(json).to.have.property('id');
-  expect(json).to.have.property('address_details');
-  addressId = json.id;
+  expect(res.status).to.equal(201);
+  expect(res.data).to.have.property('id');
+  expect(res.data).to.have.property('address_details');
 });
 
-Scenario('POST /addresses - Lỗi 422 khi thiếu fullname', async ({ I }) => {
+Scenario('POST /addresses - Loi 422 khi thieu fullname', async ({ I }) => {
   const res = await I.sendPostRequest('/addresses',
     {
       phone: '0901234567',
-      address_details: '123 Đường ABC',
+      address_details: '123 Duong ABC',
     },
     { Authorization: `Bearer ${token}` }
   );
 
-  I.seeResponseCodeIs(422);
+  expect(res.status).to.equal(422);
 });
 
-Scenario('POST /addresses - Lỗi 401 khi không có token', async ({ I }) => {
+Scenario('POST /addresses - Loi 401 khi khong co token', async ({ I }) => {
   const res = await I.sendPostRequest('/addresses', {
     fullname: 'Test',
     phone: '0901234567',
     address_details: '123 ABC',
   });
 
-  I.seeResponseCodeIs(401);
+  expect(res.status).to.equal(401);
 });
 
-// ─── XEM DANH SÁCH ───────────────────────────────────────────────
-
-Scenario('GET /addresses - Xem danh sách địa chỉ', async ({ I }) => {
-  // Thêm 1 địa chỉ trước
+Scenario('GET /addresses - Xem danh sach dia chi', async ({ I }) => {
   await I.sendPostRequest('/addresses',
     {
-      fullname: 'Nguyễn Văn A',
+      fullname: 'Nguyen Van A',
       phone: '0901234567',
-      address_details: '456 Đường Nguyễn Huệ, Q.1, TP.HCM',
+      address_details: '456 Duong Nguyen Hue, Q.1, TP.HCM',
       is_default: false,
     },
     { Authorization: `Bearer ${token}` }
@@ -76,23 +69,18 @@ Scenario('GET /addresses - Xem danh sách địa chỉ', async ({ I }) => {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.be.an('array').that.is.not.empty;
-  expect(json[0]).to.have.property('id');
-  expect(json[0]).to.have.property('address_details');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.be.an('array').that.is.not.empty;
+  expect(res.data[0]).to.have.property('id');
+  expect(res.data[0]).to.have.property('address_details');
 });
 
-// ─── ĐẶT MẶC ĐỊNH ────────────────────────────────────────────────
-
-Scenario('PATCH /addresses/:id/default - Đặt địa chỉ mặc định', async ({ I }) => {
-  // Tạo địa chỉ mới
+Scenario('PATCH /addresses/:id/default - Dat dia chi mac dinh', async ({ I }) => {
   const createRes = await I.sendPostRequest('/addresses',
     {
       fullname: 'Test Default',
       phone: '0901234567',
-      address_details: '789 Đường Lý Tự Trọng, Q.1',
+      address_details: '789 Duong Ly Tu Trong, Q.1',
       is_default: false,
     },
     { Authorization: `Bearer ${token}` }
@@ -103,18 +91,15 @@ Scenario('PATCH /addresses/:id/default - Đặt địa chỉ mặc định', asy
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(200);
+  expect(res.status).to.equal(200);
 });
 
-// ─── XÓA ĐỊA CHỈ ────────────────────────────────────────────────
-
-Scenario('DELETE /addresses/:id - Xóa địa chỉ thành công', async ({ I }) => {
-  // Tạo địa chỉ để xóa
+Scenario('DELETE /addresses/:id - Xoa dia chi thanh cong', async ({ I }) => {
   const createRes = await I.sendPostRequest('/addresses',
     {
       fullname: 'To Delete',
       phone: '0901234567',
-      address_details: '999 Đường Cần Xóa',
+      address_details: '999 Can Xoa',
       is_default: false,
     },
     { Authorization: `Bearer ${token}` }
@@ -125,13 +110,13 @@ Scenario('DELETE /addresses/:id - Xóa địa chỉ thành công', async ({ I })
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(200);
+  expect(res.status).to.equal(200);
 });
 
-Scenario('DELETE /addresses/:id - Lỗi 404 khi ID không tồn tại', async ({ I }) => {
+Scenario('DELETE /addresses/:id - Loi 404 khi ID khong ton tai', async ({ I }) => {
   const res = await I.sendDeleteRequest('/addresses/999999', {
     Authorization: `Bearer ${token}`,
   });
 
-  I.seeResponseCodeIs(404);
+  expect(res.status).to.equal(404);
 });

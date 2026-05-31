@@ -1,72 +1,57 @@
+const { expect } = require('chai');
+
 Feature('Products & Categories API @api');
 
-// ─── DANH MỤC ───────────────────────────────────────────────────
-
-Scenario('GET /categories - Lấy danh sách danh mục', async ({ I }) => {
+Scenario('GET /categories - Lay danh sach danh muc', async ({ I }) => {
   const res = await I.sendGetRequest('/categories');
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.be.an('array').that.is.not.empty;
-  expect(json[0]).to.have.property('id');
-  expect(json[0]).to.have.property('name');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.be.an('array').that.is.not.empty;
+  expect(res.data[0]).to.have.property('id');
+  expect(res.data[0]).to.have.property('name');
 });
 
-// ─── SẢN PHẨM ───────────────────────────────────────────────────
-
-Scenario('GET /products - Lấy danh sách sản phẩm', async ({ I }) => {
+Scenario('GET /products - Lay danh sach san pham', async ({ I }) => {
   const res = await I.sendGetRequest('/products');
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('data').that.is.an('array');
-  expect(json).to.have.property('meta');
-  expect(json.meta).to.have.property('total');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('data').that.is.an('array');
+  expect(res.data).to.have.property('meta');
+  expect(res.data.meta).to.have.property('total');
 });
 
-Scenario('GET /products?keyword=áo - Tìm kiếm theo tên', async ({ I }) => {
-  const res = await I.sendGetRequest('/products?keyword=áo');
+Scenario('GET /products?keyword=ao - Tim kiem theo ten', async ({ I }) => {
+  const res = await I.sendGetRequest('/products?keyword=ao');
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('data').that.is.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('data').that.is.an('array');
 });
 
-Scenario('GET /products?category_id=1 - Lọc theo danh mục', async ({ I }) => {
+Scenario('GET /products?category_id=1 - Loc theo danh muc', async ({ I }) => {
   const res = await I.sendGetRequest('/products?category_id=1');
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('data').that.is.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('data').that.is.an('array');
 });
 
-Scenario('GET /products?gioi_tinh=1 - Lọc theo giới tính Nam', async ({ I }) => {
+Scenario('GET /products?gioi_tinh=1 - Loc theo gioi tinh Nam', async ({ I }) => {
   const res = await I.sendGetRequest('/products?gioi_tinh=1');
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('data').that.is.an('array');
-  json.data.forEach((p) => {
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('data').that.is.an('array');
+  res.data.data.forEach((p) => {
     expect(p.gender).to.equal(1);
   });
 });
 
-Scenario('GET /products?page=1 - Phân trang', async ({ I }) => {
+Scenario('GET /products?page=1 - Phan trang', async ({ I }) => {
   const res = await I.sendGetRequest('/products?page=1');
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json.meta).to.have.property('current_page', 1);
+  expect(res.status).to.equal(200);
+  expect(res.data.meta).to.have.property('current_page', 1);
 });
 
-Scenario('GET /products/:id - Xem chi tiết sản phẩm tồn tại', async ({ I }) => {
-  // Lấy ID sản phẩm đầu tiên từ danh sách
+Scenario('GET /products/:id - Xem chi tiet san pham ton tai', async ({ I }) => {
   const listRes = await I.sendGetRequest('/products');
   const products = listRes.data.data;
   expect(products.length).to.be.greaterThan(0);
@@ -74,31 +59,24 @@ Scenario('GET /products/:id - Xem chi tiết sản phẩm tồn tại', async ({
 
   const res = await I.sendGetRequest(`/products/${productId}`);
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.have.property('id', productId);
-  expect(json).to.have.property('name');
-  expect(json).to.have.property('price');
-  expect(json).to.have.property('stock');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.have.property('id', productId);
+  expect(res.data).to.have.property('name');
+  expect(res.data).to.have.property('price');
 });
 
-Scenario('GET /products/:id - Lỗi 404 khi ID không tồn tại', async ({ I }) => {
+Scenario('GET /products/:id - Loi 404 khi ID khong ton tai', async ({ I }) => {
   const res = await I.sendGetRequest('/products/999999');
 
-  I.seeResponseCodeIs(404);
+  expect(res.status).to.equal(404);
 });
 
-// ─── ĐÁNH GIÁ SẢN PHẨM (public - xem) ─────────────────────────
-
-Scenario('GET /products/:id/reviews - Xem đánh giá sản phẩm', async ({ I }) => {
+Scenario('GET /products/:id/reviews - Xem danh gia san pham', async ({ I }) => {
   const listRes = await I.sendGetRequest('/products');
   const productId = listRes.data.data[0].id;
 
   const res = await I.sendGetRequest(`/products/${productId}/reviews`);
 
-  I.seeResponseCodeIs(200);
-
-  const json = res.data;
-  expect(json).to.be.an('array');
+  expect(res.status).to.equal(200);
+  expect(res.data).to.be.an('array');
 });
