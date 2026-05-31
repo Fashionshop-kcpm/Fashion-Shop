@@ -70,7 +70,7 @@ class OrderController extends Controller
 
         Cart::where('user_id', $request->user()->id)->delete();
 
-        return response()->json(['message' => 'Đặt hàng thành công', 'order' => $order], 200);
+            return response()->json(['message' => 'Đặt hàng thành công', 'order' => $order->load('details')], 200);
     }
 
     public function cancel(Request $request, $id)
