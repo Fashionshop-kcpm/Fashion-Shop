@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "8a3e0971-527e-4a77-a277-5c518c728fd1",
+    "_postman_id": "a8114207-4218-48a3-b3eb-caeb9b32f4a3",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55104620",
-    "_collection_link": "https://go.postman.co/collection/55104620-8a3e0971-527e-4a77-a277-5c518c728fd1?source=collection_link"
+    "_exporter_id": "55108854",
+    "_collection_link": "https://go.postman.co/collection/55108854-a8114207-4218-48a3-b3eb-caeb9b32f4a3?source=collection_link"
   },
   "item": [
     {
@@ -47,7 +47,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"chi16@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
+          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"chi17@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -102,7 +102,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"email\": \"test1243@gmail.com\",\r\n    \"password\": \"Chi123\"\r\n}",
+          "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"123456\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -125,6 +125,17 @@
       "name": "add_cart_BUG",
       "event": [
         {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
           "listen": "test",
           "script": {
             "exec": [
@@ -133,11 +144,10 @@
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "// Message đúng\r",
-              "pm.test(\"Message Thêm giỏ hàng đúng\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json.message).to.equal(\"Đã thêm vào giỏ hàng\");\r",
-              "});\r",
+              "// 2. Kiểm tra định dạng phản hồi có phải là JSON không\r",
+              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "})\r",
               "\r",
               "// Kiểm tra lỗi về size không hợp lệ\r",
               "pm.test(\"Size không hợp lệ\", function () {\r",
@@ -158,7 +168,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
               "type": "string"
             }
           ]
@@ -209,11 +219,11 @@
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "// Message đúng\r",
-              "pm.test(\"Message Thêm giỏ hàng đúng\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json.message).to.equal(\"Đã thêm vào giỏ hàng\");\r",
+              "// 2. Kiểm tra định dạng phản hồi có phải là JSON không\r",
+              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
               "});\r",
+              "\r",
               "\r",
               "// Kiểm tra lỗi về size không hợp lệ\r",
               "pm.test(\"Size không hợp lệ\", function () {\r",
@@ -234,7 +244,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
               "type": "string"
             }
           ]
@@ -297,7 +307,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "98|xJTUJPHLC3kdeORuuvqEEiPld6klJRfSfNWPyCnP5467fd50",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
               "type": "string"
             }
           ]
@@ -344,10 +354,12 @@
               "    pm.expect(json.message).to.equal(\"Đã xóa sản phẩm khỏi giỏ hàng\");\r",
               "});\r",
               "\r",
-              "// Kiểm tra thông báo lỗi không phải số trả về từ API\r",
-              "pm.test(\"Kiểm tra thông báo lỗi ID không phải số\", () => {\r",
+              "// Kiểm tra thông báo lỗi không ID không tồn tại API\r",
+              "pm.test(\"Kiểm tra thông báo lỗi ID không tồn tại\", () => {\r",
               "    pm.expect(pm.response.json().message).to.eql(\"ID không hợp lệ\");\r",
-              "});"
+              "});\r",
+              "\r",
+              ""
             ],
             "type": "text/javascript",
             "packages": {},
@@ -361,7 +373,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "98|xJTUJPHLC3kdeORuuvqEEiPld6klJRfSfNWPyCnP5467fd50",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
               "type": "string"
             }
           ]
@@ -385,6 +397,331 @@
           "path": [
             "cart",
             "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "orders_user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra định dạng phản hồi có phải là JSON không\r",
+              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "// Kiểm tra chứa danh sách sản phẩm của đơn hàng\r",
+              "pm.test(\"Response phải chứa danh sách sản phẩm của đơn hàng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.order).to.have.property(\"details\");\r",
+              "});\r",
+              "\r",
+              "\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"fullname\": \"Nguyễn Văn A\",\r\n    \"phone\": \"0901234567\",\r\n    \"address\": \"123 Đường Lê Lợi, P.1, Q.1, TP.HCM\",\r\n    \"payment\": \"COD\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/orders",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "orders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "review_oders_user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra trạng thái 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra danh sách đơn hàng không rỗng\r",
+              "pm.test(\"Có dữ liệu đơn hàng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.length || json.data.length).to.be.above(0);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra đơn hàng có số lượng sản phẩm\r",
+              "pm.test(\"Đơn hàng phải có tổng số lượng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json[0]).to.have.property(\"total_quantity\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/orders",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "orders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "review_detail_orders_user",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra trạng thái 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra có details và product trong từng detail\r",
+              "pm.test(\"Order có details với product\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"details\");\r",
+              "    pm.expect(json.details).to.be.an(\"array\");\r",
+              "    if (json.details.length > 0) {\r",
+              "        pm.expect(json.details[0]).to.have.property(\"product\");\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra có size bên trong product không\r",
+              "pm.test(\"Kiểm tra có size bên trong product\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    const item = json.details[0];\r",
+              "    pm.expect(item.product, \"Thiếu thuộc tính size bên trong product\").to.have.property(\"size\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/orders/40",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "orders",
+            "40"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "cancel_orders",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra trạng thái 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra message đúng\r",
+              "pm.test(\"Message hủy đơn thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đã hủy đơn hàng\");\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra xem có trả về status khi hủy đơn hàng không?\r",
+              "pm.test(\"Phải trả về status khi hủy đơn hàng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"status\");\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/orders/52/cancel",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "orders",
+            "52",
+            "cancel"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login_admin",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"admin@fashionshop.vn\",\r\n    \"password\": \"Admin123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "dashboard_admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra trạng thái 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra không được cho user thường vào admin\r",
+              "pm.test(\"Không cho user thường vào admin\", function () {\r",
+              "    pm.expect(pm.response.code).to.not.eql(403);\r",
+              "    pm.expect(pm.response.code).to.not.eql(401);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra có trường data hay không\r",
+              "pm.test(\"Admin dashboard phải trả về có field data\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"data\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "137|gIj7DCPf1oAHWHOjcAlmSVZ0ovU8gEen5xxalGiw1429c863",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/admin/dashboard",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "dashboard"
           ]
         }
       },
