@@ -18,9 +18,7 @@ class ContactController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate(['status' => 'required|in:new,read,resolved']);
-
         Contact::findOrFail($id)->update(['status' => $request->status]);
-
-        return response()->json(['message' => 'Đã cập nhật trạng thái']);
+        return response()->json(['message' => 'Status updated successfully']);
     }
 }
