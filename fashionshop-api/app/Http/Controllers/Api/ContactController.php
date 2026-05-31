@@ -18,6 +18,6 @@ class ContactController extends Controller
 
         Contact::create($request->only('fullname', 'email', 'message'));
 
-        return response()->json(['message' => 'Đã gửi liên hệ thành công'], 201);
+        return response()->json(['message' => 'Đã gửi liên hệ thành công','token' => null], 201);
     }
 }
