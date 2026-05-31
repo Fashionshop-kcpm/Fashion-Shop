@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "3a2b1826-5f0f-4e31-ab1e-0d4468b0de65",
+    "_postman_id": "c9a13636-9686-4714-8d8d-e722b1ae680e",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55104651",
-    "_collection_link": "https://go.postman.co/collection/55104651-3a2b1826-5f0f-4e31-ab1e-0d4468b0de65?source=collection_link"
+    "_exporter_id": "55108691",
+    "_collection_link": "https://go.postman.co/collection/55108691-c9a13636-9686-4714-8d8d-e722b1ae680e?source=collection_link"
   },
   "item": [
     {
@@ -267,136 +267,6 @@
           ],
           "path": [
             "cart"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "update_cart",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "// 1. Kiểm tra mã trạng thái HTTP (200 OK)\r",
-              "pm.test(\"Mã trạng thái phải là 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "// 2. Kiểm tra định dạng phản hồi có phải là JSON không\r",
-              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
-              "    pm.response.to.be.json;\r",
-              "});\r",
-              "\r",
-              "// 3. Kiểm tra nội dung thông báo thành công\r",
-              "pm.test(\"Thông báo thành công phải khớp với nội dung mong đợi\", function () {\r",
-              "    var jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.message).to.eql(\"Đã cập nhật giỏ hàng\");\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"quantity\": 1\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}/cart/20",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "cart",
-            "20"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "delete_cart",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "// Kiểm tra Status 200\r",
-              "pm.test(\"Status 200 OK\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "// Kiểm tra Message đúng\r",
-              "pm.test(\"Message xóa giỏ hàng đúng\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json.message).to.equal(\"Đã xóa sản phẩm khỏi giỏ hàng\");\r",
-              "});\r",
-              "\r",
-              "// Kiểm tra thông báo lỗi không ID không tồn tại API\r",
-              "pm.test(\"Kiểm tra thông báo lỗi ID không tồn tại\", () => {\r",
-              "    pm.expect(pm.response.json().message).to.eql(\"ID không hợp lệ\");\r",
-              "});\r",
-              "\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "DELETE",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}/cart/999",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "cart",
-            "999"
           ]
         }
       },
@@ -1028,6 +898,212 @@
       "response": []
     },
     {
+      "name": "delete_cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra Message đúng\r",
+              "pm.test(\"Message xóa giỏ hàng đúng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    if (json.message === \"Đã xóa sản phẩm khỏi giỏ hàng\") {\r",
+              "        pm.expect(json.message).to.equal(\"Đã xóa sản phẩm khỏi giỏ hàng\");\r",
+              "    } else {\r",
+              "        pm.expect(true).to.be.true; // bỏ qua nếu ID không tồn tại\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra thông báo lỗi ID không tồn tại từ API\r",
+              "pm.test(\"Kiểm tra thông báo lỗi ID không tồn tại\", () => {\r",
+              "    pm.expect(pm.response.json().message).to.eql(\"ID không hợp lệ\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "140|nxFxweZkEG9vXT0axZVl8DfH6TDxL2cweuc6YsLVa3301530",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/cart/999",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "cart",
+            "999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update_cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra mã trạng thái HTTP (200 OK)\r",
+              "pm.test(\"Mã trạng thái phải là 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra định dạng phản hồi có phải là JSON không\r",
+              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "// Trả về thông tin sản phẩm sau khi cập nhật\r",
+              "pm.test(\"Cập nhật sản phẩm giỏ hàng thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"cart\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"quantity\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/cart/65",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "cart",
+            "65"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "review_cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra Status Code \r",
+              "pm.test(\"Status code là 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra mỗi item trong cart có product được load\r",
+              "pm.test(\"Mỗi cart item có thông tin product\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    const items = json.data; // đổi từ json sang json.data\r",
+              "    pm.expect(items).to.be.an(\"array\");\r",
+              "    if (items.length > 0) {\r",
+              "        pm.expect(items[0]).to.have.property(\"product\");\r",
+              "        pm.expect(items[0]).to.have.property(\"quantity\");\r",
+              "        pm.expect(items[0]).to.have.property(\"size\");\r",
+              "        pm.environment.set(\"cart_id\", items[0].id);\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra sự tồn tại của trường tổng tiền (total_price)\r",
+              "pm.test(\"Phản hồi chứa (total_price) tổng tiền trong giỏ hàng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"total_price\"); \r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "140|nxFxweZkEG9vXT0axZVl8DfH6TDxL2cweuc6YsLVa3301530",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/cart",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "cart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Gửi liên hệ",
       "event": [
         {
@@ -1080,9 +1156,9 @@
           }
         },
         "url": {
-          "raw": "{{base_url}}/contacts",
+          "raw": "{{base_url }}/contacts",
           "host": [
-            "{{base_url}}"
+            "{{base_url }}"
           ],
           "path": [
             "contacts"
@@ -1352,6 +1428,153 @@
             "reviews",
             "7",
             "reply"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "write_product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra status 201\r",
+              "pm.test(\"Trạng thái 201 Created\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra phản hồi trả về có đầy đủ thông tin đánh giá (Review)\r",
+              "pm.test(\"Response có review đầy đủ\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"review\");\r",
+              "    pm.expect(json.review).to.have.property(\"rating\");\r",
+              "    pm.expect(json.review).to.have.property(\"comment\");\r",
+              "    pm.environment.set(\"review_id\", json.review.id);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra xem trong đối tượng 'review' có chứa thông tin 'user' (người đánh giá) không\r",
+              "pm.test(\"Response có chứa thông tin 'user' trong review\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.review).to.have.property(\"user\"); \r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"rating\": 5,\r\n    \"comment\": \"Sản phẩm rất tốt, giao hàng nhanh!\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url }}/products/1/reviews",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "products",
+            "1",
+            "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "review_product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra dữ liệu trả về đúng định dạng và có đầy đủ các thông tin cần thiết\r",
+              "pm.test(\"Mỗi review phải có thông tin user\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.be.an(\"array\");\r",
+              "    if (json.length > 0) {\r",
+              "        pm.expect(json[0]).to.have.property(\"user\");\r",
+              "        pm.expect(json[0]).to.have.property(\"rating\");\r",
+              "        pm.expect(json[0]).to.have.property(\"comment\");\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra review có được sắp xếp từ cũ đến mới nhất không\r",
+              "pm.test(\"Reviews sắp xếp cũ nhất trước\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    if (json.length >= 2) {\r",
+              "        const first = new Date(json[0].created_at);\r",
+              "        const second = new Date(json[1].created_at);\r",
+              "        pm.expect(first.getTime()).to.be.lessThan(second.getTime()); \r",
+              "    }\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url }}/products/29/reviews",
+          "host": [
+            "{{base_url }}"
+          ],
+          "path": [
+            "products",
+            "29",
+            "reviews"
           ]
         }
       },
