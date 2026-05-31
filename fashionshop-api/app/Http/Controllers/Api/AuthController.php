@@ -31,7 +31,14 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Đăng ký thành công',
-            'user'    => $user,
+            'user'    => [
+                'id'       => $user->id,
+                'name'     => $user->fullname,
+                'fullname' => $user->fullname,
+                'email'    => $user->email,
+                'phone'    => $user->phone,
+                'gender'   => $user->gender,
+            ],
             'token'   => $token,
         ], 201);
     }
