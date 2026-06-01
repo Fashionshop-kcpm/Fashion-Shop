@@ -30,7 +30,8 @@ class ReviewController extends Controller
     'user_id'    => $request->user()->id,
     'rating'     => $request->rating,
     'comment'    => $request->comment,
-]);
+]);     
+    
 
 $review->load('user');
 
