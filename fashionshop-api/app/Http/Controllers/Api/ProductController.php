@@ -38,6 +38,8 @@ class ProductController extends Controller
             return response()->json(['message' => 'Sản phẩm không tồn tại'], 404);
         }
 
+        $product->name = $product->ten_sp;
+
         return response()->json($product);
     }
 
