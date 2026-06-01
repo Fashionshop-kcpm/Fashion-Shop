@@ -1,5 +1,11 @@
 {
   "info": {
+    "_postman_id": "4a1df611-9f97-41ba-906c-4465164f0dac",
+    "name": "FashionShop",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55047512",
+    "_collection_link": "https://go.postman.co/collection/55047512-4a1df611-9f97-41ba-906c-4465164f0dac?source=collection_link"
     "_postman_id": "40b6fddf-c775-4a4d-8cee-a101fca742e7",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
@@ -928,6 +934,67 @@
       "response": []
     },
     {
+      "name": "Logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// TEST 2 - Message đúng\r",
+              "pm.test(\"Message đăng xuất thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
+              "});\r",
+              "\r",
+              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
+              "pm.test(\"Response có field 'user'\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "DELETE",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url}}/cart/999",
+          "raw": "{{base_url}}/logout",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "review_cart",
       "name": "delete_cart",
       "event": [
         {
@@ -1683,6 +1750,373 @@
           "path": [
             "products",
             "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Danh sách sản phẩm (admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "//  API hoạt động và trả về HTTP Status 200\r",
+              "pm.test(\"Status code là 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// API không bị lỗi code, nhả ra đúng định dạng JSON\r",
+              "pm.test(\"Định dạng dữ liệu trả về là JSON hợp lệ\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "//  Lỗi thiếu chuẩn hóa cấu trúc API\r",
+              "pm.test(\"API phải có cờ 'success' = true để báo hiệu thành công cho Frontend\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "    pm.expect(responseData).to.have.property('success', true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/admin/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Thêm sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 201 Created\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response có product vừa tạo\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"product\");\r",
+              "    pm.environment.set(\"admin_product_id\", json.product?.id);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"API cần trả về cờ 'success': true để đồng bộ cấu trúc\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"success\", true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "ten_sp",
+              "value": "Áo sơ mi đen",
+              "type": "text",
+              "uuid": "9139d8ec-cb38-482c-9d78-a15f581d4269"
+            },
+            {
+              "key": "gia",
+              "value": "100000",
+              "type": "text",
+              "uuid": "35e25c6a-f965-4500-8f6e-24bbe92b23e9"
+            },
+            {
+              "key": "so_luong",
+              "value": "50",
+              "type": "text",
+              "uuid": "5f1b03c9-7fdd-475c-9ffd-8c1c5b370317"
+            },
+            {
+              "key": "gioi_tinh",
+              "value": "1",
+              "type": "text",
+              "uuid": "7f45f7f3-98cc-47ec-a1e6-0a82acad6f5c"
+            },
+            {
+              "key": "hinh_anh",
+              "type": "file",
+              "uuid": "24a9f514-e3b8-484c-ba3a-4f3cb33c553c",
+              "src": "/C:/Users/truon/Downloads/aosomiden.png"
+            },
+            {
+              "key": "mo_ta",
+              "value": "Áo sơ mi đen trơn đẹp, phong cánh kiểu Hàn",
+              "type": "text",
+              "uuid": "5f13cdf4-73bb-4cdf-b250-37c91231ab86"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sửa sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Route chấp nhận POST method cho update (Không bị 405)\", function () {\r",
+              "    pm.expect(pm.response.code).to.not.equal(405);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"API cần trả về cờ 'success': true để đồng bộ toàn hệ thống\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"success\", true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "ten_sp",
+              "value": "Áo Sơ Mi Trắng Trơn",
+              "type": "text",
+              "uuid": "1ccb49a7-ab1c-40dd-8417-204eaaf774b9"
+            },
+            {
+              "key": "gia",
+              "value": "220000",
+              "type": "text",
+              "uuid": "705d1bca-9a40-4526-8145-7c4d9d0fe300"
+            },
+            {
+              "key": "so_luong",
+              "value": "11",
+              "type": "text",
+              "uuid": "a64a434b-ca41-4da9-983d-8793bde2fac6"
+            },
+            {
+              "key": "gioi_tinh",
+              "value": "1",
+              "type": "text",
+              "uuid": "c3dbd859-f191-44dc-a15a-df3cd7594574"
+            },
+            {
+              "key": "hinh_anh",
+              "type": "file",
+              "uuid": "1875f93a-c680-4a60-bfd7-4157ac940cad",
+              "src": "/C:/Users/truon/Downloads/aosomitrang.png"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/products/:id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Xoá sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Message xóa sản phẩm thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"message\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"API phải trả về 'id' của sản phẩm vừa xóa cho Frontend\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"id\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/admin/products/:id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "{{product_id}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Danh sách sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response có cấu trúc paginate đúng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"data\");\r",
+              "    pm.expect(json).to.have.property(\"total\");\r",
+              "    pm.expect(json).to.have.property(\"per_page\");\r",
+              "    pm.expect(json.per_page).to.equal(8);\r",
+              "    if (json.data.length > 0) {\r",
+              "        pm.environment.set(\"product_id\", json.data[0].id);\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Mỗi trang có 10 sản phẩm\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.per_page).to.equal(10);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products?keyword=áo&page=1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "keyword",
+              "value": "áo"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Danh mục",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response là mảng danh mục\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.data).to.be.an(\"array\");\r",
+              "    if (json.length > 0) {\r",
+              "        pm.environment.set(\"category_id\", json[0].id);\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response có phân trang\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"pagination\"); \r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/categories",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "categories"
           ]
         }
       },
