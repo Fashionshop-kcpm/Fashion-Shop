@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "1917734a-5aca-43a3-8089-8373674786c0",
+    "_postman_id": "40b6fddf-c775-4a4d-8cee-a101fca742e7",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55104651",
-    "_collection_link": "https://go.postman.co/collection/55104651-1917734a-5aca-43a3-8089-8373674786c0?source=collection_link"
+    "_exporter_id": "55108854",
+    "_collection_link": "https://go.postman.co/collection/55108854-40b6fddf-c775-4a4d-8cee-a101fca742e7?source=collection_link"
   },
   "item": [
     {
@@ -341,67 +341,6 @@
       "response": []
     },
     {
-
-      "name": "Logout",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "// TEST 1 - Status 200\r",
-              "pm.test(\"Status 200 OK\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "// TEST 2 - Message đúng\r",
-              "pm.test(\"Message đăng xuất thành công\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
-              "});\r",
-              "\r",
-              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
-              "pm.test(\"Response có field 'user'\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "noauth"
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{token}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "{{base_url}}/logout",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "logout"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-
-
       "name": "update_cart",
       "event": [
         {
@@ -964,11 +903,7 @@
         "auth": {
           "type": "noauth"
         },
-
-        "method": "DELETE",
-
         "method": "POST",
-
         "header": [
           {
             "key": "Authorization",
@@ -981,11 +916,7 @@
           "raw": ""
         },
         "url": {
-
-          "raw": "{{base_url}}/cart/999",
-
           "raw": "{{base_url}}/logout",
-
           "host": [
             "{{base_url}}"
           ],
@@ -997,8 +928,6 @@
       "response": []
     },
     {
-
-
       "name": "delete_cart",
       "event": [
         {
@@ -1066,7 +995,6 @@
       "response": []
     },
     {
-
       "name": "review_cart",
       "event": [
         {
@@ -1707,28 +1635,26 @@
       "response": []
     },
     {
-      "name": "logout_admin",
+      "name": "Chi tiết sản phẩm",
       "event": [
         {
           "listen": "test",
           "script": {
             "exec": [
-              "// Test 1: Đăng xuất thành công\r",
-              "pm.test(\"Đăng xuất thành công - Status 200\", function () {\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "// Test 2: Response có message xác nhận đăng xuất\r",
-              "pm.test(\"Message đăng xuất thành công\", function () {\r",
+              "pm.test(\"Response có category và reviews\", function () {\r",
               "    const json = pm.response.json();\r",
-              "    pm.expect(json.message).to.equal(\"Đã đăng xuất\");\r",
+              "    pm.expect(json).to.have.property(\"category\");\r",
+              "    pm.expect(json).to.have.property(\"reviews\");\r",
+              "    pm.expect(json.reviews).to.be.an(\"array\");\r",
               "});\r",
               "\r",
-              "// Test 3: FAIL - Sau khi đăng xuất token phải bị vô hiệu hóa\r",
-              "pm.test(\"Token phải bị vô hiệu hóa sau khi đăng xuất\", function () {\r",
+              "pm.test(\"Sản phẩm có field 'name'\", function () {\r",
               "    const json = pm.response.json();\r",
-              "    pm.expect(json).to.have.property(\"token_revoked\");\r",
-              "    pm.expect(json.token_revoked).to.equal(true);\r",
+              "    pm.expect(json).to.have.property(\"name\");\r",
               "});"
             ],
             "type": "text/javascript",
@@ -1741,26 +1667,22 @@
         "auth": {
           "type": "noauth"
         },
-        "method": "POST",
+        "method": "GET",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{admin_token}}",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"123456\"\r\n}"
-        },
         "url": {
-          "raw": "{{base_url}}/admin/logout",
+          "raw": "{{base_url}}/products/2",
           "host": [
             "{{base_url}}"
           ],
           "path": [
-            "admin",
-            "logout"
+            "products",
+            "2"
           ]
         }
       },
