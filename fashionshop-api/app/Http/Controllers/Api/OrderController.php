@@ -18,7 +18,6 @@ class OrderController extends Controller
 
         return response()->json($orders);
     }
-
     public function show(Request $request, $id)
     {
         $order = Order::with('details.product')
