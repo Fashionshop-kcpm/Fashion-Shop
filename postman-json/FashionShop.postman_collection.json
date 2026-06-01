@@ -341,6 +341,7 @@
       "response": []
     },
     {
+
       "name": "Logout",
       "event": [
         {
@@ -399,6 +400,8 @@
       "response": []
     },
     {
+
+
       "name": "update_cart",
       "event": [
         {
@@ -928,6 +931,74 @@
       "response": []
     },
     {
+      "name": "Logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// TEST 2 - Message đúng\r",
+              "pm.test(\"Message đăng xuất thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
+              "});\r",
+              "\r",
+              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
+              "pm.test(\"Response có field 'user'\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+
+        "method": "DELETE",
+
+        "method": "POST",
+
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+
+          "raw": "{{base_url}}/cart/999",
+
+          "raw": "{{base_url}}/logout",
+
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+
+
       "name": "delete_cart",
       "event": [
         {
@@ -995,6 +1066,7 @@
       "response": []
     },
     {
+
       "name": "review_cart",
       "event": [
         {
