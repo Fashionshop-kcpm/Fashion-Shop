@@ -72,7 +72,7 @@ class ProductController extends Controller
 
         $product->update($request->except('hinh_anh'));
 
-        return response()->json(['message' => 'Đã cập nhật sản phẩm', 'product' => $product]);
+        return response()->json(['success' => true, 'message' => 'Đã cập nhật sản phẩm', 'product' => $product]);
     }
 
     public function destroy($id)
