@@ -78,6 +78,10 @@ class ProductController extends Controller
     public function destroy($id)
     {
         Product::findOrFail($id)->delete();
-        return response()->json(['message' => 'Đã xóa sản phẩm']);
+        
+        return response()->json([
+            'message' => 'Đã xóa sản phẩm',
+            'id'      => (int) $id  
+        ]);
     }
 }
