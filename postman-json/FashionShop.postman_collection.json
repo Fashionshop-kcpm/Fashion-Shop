@@ -6,6 +6,12 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "55047512",
     "_collection_link": "https://go.postman.co/collection/55047512-4a1df611-9f97-41ba-906c-4465164f0dac?source=collection_link"
+    "_postman_id": "40b6fddf-c775-4a4d-8cee-a101fca742e7",
+    "name": "FashionShop",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55108854",
+    "_collection_link": "https://go.postman.co/collection/55108854-40b6fddf-c775-4a4d-8cee-a101fca742e7?source=collection_link"
   },
   "item": [
     {
@@ -928,6 +934,67 @@
       "response": []
     },
     {
+      "name": "Logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// TEST 2 - Message đúng\r",
+              "pm.test(\"Message đăng xuất thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
+              "});\r",
+              "\r",
+              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
+              "pm.test(\"Response có field 'user'\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "DELETE",
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url}}/cart/999",
+          "raw": "{{base_url}}/logout",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "review_cart",
       "name": "delete_cart",
       "event": [
         {
