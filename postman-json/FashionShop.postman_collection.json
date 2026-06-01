@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "d8765f14-92db-4464-9735-995e4beea32b",
+    "_postman_id": "1917734a-5aca-43a3-8089-8373674786c0",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55108854",
-    "_collection_link": "https://go.postman.co/collection/55108854-d8765f14-92db-4464-9735-995e4beea32b?source=collection_link"
+    "_exporter_id": "55104651",
+    "_collection_link": "https://go.postman.co/collection/55104651-1917734a-5aca-43a3-8089-8373674786c0?source=collection_link"
   },
   "item": [
     {
@@ -43,11 +43,14 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"chi17@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
+          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"bao2005@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -98,6 +101,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "POST",
         "header": [],
         "body": {
@@ -164,17 +170,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 2,\r\n    \"size\": \"XXL\"\r\n}",
@@ -240,20 +245,19 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
+          "raw": "{\r\n    \"product_id\": 2,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -305,17 +309,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\r\n    \"fullname\": \"Nguyễn Văn A\",\r\n    \"phone\": \"0901234567\",\r\n    \"address\": \"123 Đường Lê Lợi, P.1, Q.1, TP.HCM\",\r\n    \"payment\": \"COD\"\r\n}\r\n",
@@ -332,6 +335,127 @@
           ],
           "path": [
             "orders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Logout",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// TEST 1 - Status 200\r",
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// TEST 2 - Message đúng\r",
+              "pm.test(\"Message đăng xuất thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
+              "});\r",
+              "\r",
+              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
+              "pm.test(\"Response có field 'user'\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "{{base_url}}/logout",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update_cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra mã trạng thái HTTP (200 OK)\r",
+              "pm.test(\"Mã trạng thái phải là 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra định dạng phản hồi có phải là JSON không\r",
+              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "// Trả về thông tin sản phẩm sau khi cập nhật\r",
+              "pm.test(\"Cập nhật sản phẩm giỏ hàng thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"cart\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"quantity\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/cart/96",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cart",
+            "96"
           ]
         }
       },
@@ -369,17 +493,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/orders",
           "host": [
@@ -429,17 +552,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/orders/40",
           "host": [
@@ -486,17 +608,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "PATCH",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/orders/52/cancel",
           "host": [
@@ -543,17 +664,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "137|gIj7DCPf1oAHWHOjcAlmSVZ0ovU8gEen5xxalGiw1429c863",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/admin/dashboard",
           "host": [
@@ -605,17 +725,16 @@
       },
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": ""
@@ -664,17 +783,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "PUT",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"phone\": \"0901234567\",\r\n    \"gender\": \"Nam\"\r\n}",
@@ -728,14 +846,7 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "127|OnJlLDnbf5kfIrDtLmTrhtJpslj73AvlNNGcf8h3f88b218a",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "PUT",
         "header": [
@@ -747,6 +858,11 @@
           {
             "key": "Content-Type",
             "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],
@@ -762,65 +878,6 @@
           "path": [
             "profile",
             "password"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Logout",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "// TEST 1 - Status 200\r",
-              "pm.test(\"Status 200 OK\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "// TEST 2 - Message đúng\r",
-              "pm.test(\"Message đăng xuất thành công\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
-              "});\r",
-              "\r",
-              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
-              "pm.test(\"Response có field 'user'\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "127|OnJlLDnbf5kfIrDtLmTrhtJpslj73AvlNNGcf8h3f88b218a",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "{{base_url}}/logout",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "logout"
           ]
         }
       },
@@ -843,6 +900,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "POST",
         "header": [],
         "body": {
@@ -902,17 +962,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "140|nxFxweZkEG9vXT0axZVl8DfH6TDxL2cweuc6YsLVa3301530",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "DELETE",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "",
@@ -923,77 +982,13 @@
           }
         },
         "url": {
-          "raw": "{{base_url }}/cart/999",
+          "raw": "{{base_url}}/cart/999",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "cart",
             "999"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "update_cart",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "// Kiểm tra mã trạng thái HTTP (200 OK)\r",
-              "pm.test(\"Mã trạng thái phải là 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "// Kiểm tra định dạng phản hồi có phải là JSON không\r",
-              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
-              "    pm.response.to.be.json;\r",
-              "});\r",
-              "\r",
-              "// Trả về thông tin sản phẩm sau khi cập nhật\r",
-              "pm.test(\"Cập nhật sản phẩm giỏ hàng thành công\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json).to.have.property(\"cart\");\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"quantity\": 1\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url }}/cart/65",
-          "host": [
-            "{{base_url }}"
-          ],
-          "path": [
-            "cart",
-            "65"
           ]
         }
       },
@@ -1041,17 +1036,16 @@
       },
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "140|nxFxweZkEG9vXT0axZVl8DfH6TDxL2cweuc6YsLVa3301530",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "",
@@ -1062,9 +1056,9 @@
           }
         },
         "url": {
-          "raw": "{{base_url }}/cart",
+          "raw": "{{base_url}}/cart",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "cart"
@@ -1103,6 +1097,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "POST",
         "header": [
           {
@@ -1113,6 +1110,11 @@
           {
             "key": "Content-Type",
             "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],
@@ -1168,6 +1170,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "PATCH",
         "header": [
           {
@@ -1248,6 +1253,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "GET",
         "header": [
           {
@@ -1307,6 +1315,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "DELETE",
         "header": [
           {
@@ -1366,6 +1377,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "PATCH",
         "header": [
           {
@@ -1438,14 +1452,7 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
         "header": [
@@ -1457,6 +1464,11 @@
           {
             "key": "Content-Type",
             "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],
@@ -1470,9 +1482,9 @@
           }
         },
         "url": {
-          "raw": "{{base_url }}/products/1/reviews",
+          "raw": "{{base_url}}/products/1/reviews",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "products",
@@ -1525,21 +1537,20 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
-          "raw": "{{base_url }}/products/29/reviews",
+          "raw": "{{base_url}}/products/29/reviews",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "products",
@@ -1618,6 +1629,66 @@
           "path": [
             "admin",
             "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "logout_admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Test 1: Đăng xuất thành công\r",
+              "pm.test(\"Đăng xuất thành công - Status 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Test 2: Response có message xác nhận đăng xuất\r",
+              "pm.test(\"Message đăng xuất thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.message).to.equal(\"Đã đăng xuất\");\r",
+              "});\r",
+              "\r",
+              "// Test 3: FAIL - Sau khi đăng xuất token phải bị vô hiệu hóa\r",
+              "pm.test(\"Token phải bị vô hiệu hóa sau khi đăng xuất\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"token_revoked\");\r",
+              "    pm.expect(json.token_revoked).to.equal(true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"123456\"\r\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/logout",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "logout"
           ]
         }
       },
