@@ -25,12 +25,14 @@ class ReviewController extends Controller
             'comment' => 'required|string',
         ]);
 
-        $review = Review::create([
-            'product_id' => $id,
-            'user_id'    => $request->user()->id,
-            'rating'     => $request->rating,
-            'comment'    => $request->comment,
-        ]);
+    $review = Review::create([
+    'product_id' => $id,
+    'user_id'    => $request->user()->id,
+    'rating'     => $request->rating,
+    'comment'    => $request->comment,
+]);
+
+$review->load('user');
 
         return response()->json(['message' => 'Đã gửi đánh giá', 'review' => $review], 201);
     }
