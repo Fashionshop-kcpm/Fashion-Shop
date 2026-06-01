@@ -12,10 +12,14 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $orders = Order::where('user_id', $request->user()->id)
+       $orders = Order::with('details')
+            ->where('user_id', $request->user()->id)
             ->orderBy('created_at', 'desc')
-            ->get();
-
+            ->get()
+            ->map(function ($order) {
+        $order->total_quantity = $order->details->sum('quantity');
+        return $order;
+    });
         return response()->json($orders);
     }
     public function show(Request $request, $id)
