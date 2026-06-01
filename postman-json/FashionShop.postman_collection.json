@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "d8765f14-92db-4464-9735-995e4beea32b",
+    "_postman_id": "4a1df611-9f97-41ba-906c-4465164f0dac",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55108854",
-    "_collection_link": "https://go.postman.co/collection/55108854-d8765f14-92db-4464-9735-995e4beea32b?source=collection_link"
+    "_exporter_id": "55047512",
+    "_collection_link": "https://go.postman.co/collection/55047512-4a1df611-9f97-41ba-906c-4465164f0dac?source=collection_link"
   },
   "item": [
     {
@@ -43,11 +43,14 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"chi17@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
+          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"bao2005@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -98,6 +101,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "POST",
         "header": [],
         "body": {
@@ -164,17 +170,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 2,\r\n    \"size\": \"XXL\"\r\n}",
@@ -240,20 +245,19 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
+          "raw": "{\r\n    \"product_id\": 2,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -305,17 +309,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\r\n    \"fullname\": \"Nguyễn Văn A\",\r\n    \"phone\": \"0901234567\",\r\n    \"address\": \"123 Đường Lê Lợi, P.1, Q.1, TP.HCM\",\r\n    \"payment\": \"COD\"\r\n}\r\n",
@@ -332,6 +335,69 @@
           ],
           "path": [
             "orders"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update_cart",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Kiểm tra mã trạng thái HTTP (200 OK)\r",
+              "pm.test(\"Mã trạng thái phải là 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// Kiểm tra định dạng phản hồi có phải là JSON không\r",
+              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "// Trả về thông tin sản phẩm sau khi cập nhật\r",
+              "pm.test(\"Cập nhật sản phẩm giỏ hàng thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"cart\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"quantity\": 1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/cart/96",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "cart",
+            "96"
           ]
         }
       },
@@ -369,17 +435,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/orders",
           "host": [
@@ -429,17 +494,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/orders/40",
           "host": [
@@ -486,17 +550,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "108|sbhD0WrTtMHXbgPeQxuRNtgBvxUCIbbTOAFrVvm36fc4bf91",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "PATCH",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/orders/52/cancel",
           "host": [
@@ -543,17 +606,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "137|gIj7DCPf1oAHWHOjcAlmSVZ0ovU8gEen5xxalGiw1429c863",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/admin/dashboard",
           "host": [
@@ -605,17 +667,16 @@
       },
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": ""
@@ -664,17 +725,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "114|5pG02jeTxhlHFCJ90FHz95dYvpGn05ZMYU9EdjEjcd3f4dc7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "PUT",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"phone\": \"0901234567\",\r\n    \"gender\": \"Nam\"\r\n}",
@@ -728,14 +788,7 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "127|OnJlLDnbf5kfIrDtLmTrhtJpslj73AvlNNGcf8h3f88b218a",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "PUT",
         "header": [
@@ -747,6 +800,11 @@
           {
             "key": "Content-Type",
             "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],
@@ -762,6 +820,50 @@
           "path": [
             "profile",
             "password"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login Ad",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const json = pm.response.json();\r",
+              "pm.environment.set(\"admin_token\", json.token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"admin@fashionshop.vn\",\r\n    \"password\": \"Admin123456\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "login"
           ]
         }
       },
@@ -799,17 +901,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "127|OnJlLDnbf5kfIrDtLmTrhtJpslj73AvlNNGcf8h3f88b218a",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": ""
@@ -821,47 +922,6 @@
           ],
           "path": [
             "logout"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Login Ad",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "const json = pm.response.json();\r",
-              "pm.environment.set(\"admin_token\", json.token);"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"email\": \"admin@fashionshop.vn\",\r\n    \"password\": \"Admin123456\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}/admin/login",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "admin",
-            "login"
           ]
         }
       },
@@ -902,17 +962,16 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "140|nxFxweZkEG9vXT0axZVl8DfH6TDxL2cweuc6YsLVa3301530",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "DELETE",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "",
@@ -923,77 +982,13 @@
           }
         },
         "url": {
-          "raw": "{{base_url }}/cart/999",
+          "raw": "{{base_url}}/cart/999",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "cart",
             "999"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "update_cart",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "// Kiểm tra mã trạng thái HTTP (200 OK)\r",
-              "pm.test(\"Mã trạng thái phải là 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "// Kiểm tra định dạng phản hồi có phải là JSON không\r",
-              "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
-              "    pm.response.to.be.json;\r",
-              "});\r",
-              "\r",
-              "// Trả về thông tin sản phẩm sau khi cập nhật\r",
-              "pm.test(\"Cập nhật sản phẩm giỏ hàng thành công\", function () {\r",
-              "    const json = pm.response.json();\r",
-              "    pm.expect(json).to.have.property(\"cart\");\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"quantity\": 1\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url }}/cart/65",
-          "host": [
-            "{{base_url }}"
-          ],
-          "path": [
-            "cart",
-            "65"
           ]
         }
       },
@@ -1041,17 +1036,16 @@
       },
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "140|nxFxweZkEG9vXT0axZVl8DfH6TDxL2cweuc6YsLVa3301530",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "",
@@ -1062,9 +1056,9 @@
           }
         },
         "url": {
-          "raw": "{{base_url }}/cart",
+          "raw": "{{base_url}}/cart",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "cart"
@@ -1103,6 +1097,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "POST",
         "header": [
           {
@@ -1113,6 +1110,11 @@
           {
             "key": "Content-Type",
             "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],
@@ -1168,6 +1170,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "PATCH",
         "header": [
           {
@@ -1248,6 +1253,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "GET",
         "header": [
           {
@@ -1307,6 +1315,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "DELETE",
         "header": [
           {
@@ -1366,6 +1377,9 @@
         }
       ],
       "request": {
+        "auth": {
+          "type": "noauth"
+        },
         "method": "PATCH",
         "header": [
           {
@@ -1438,14 +1452,7 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "POST",
         "header": [
@@ -1457,6 +1464,11 @@
           {
             "key": "Content-Type",
             "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],
@@ -1470,9 +1482,9 @@
           }
         },
         "url": {
-          "raw": "{{base_url }}/products/1/reviews",
+          "raw": "{{base_url}}/products/1/reviews",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "products",
@@ -1525,21 +1537,20 @@
       ],
       "request": {
         "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "230|CPqUvqoPYpwywrbD3XCF15MQ03we0ctueEvyj9dv63afabb7",
-              "type": "string"
-            }
-          ]
+          "type": "noauth"
         },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
-          "raw": "{{base_url }}/products/29/reviews",
+          "raw": "{{base_url}}/products/29/reviews",
           "host": [
-            "{{base_url }}"
+            "{{base_url}}"
           ],
           "path": [
             "products",
@@ -1618,6 +1629,427 @@
           "path": [
             "admin",
             "reviews"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Chi tiết sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response có category và reviews\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"category\");\r",
+              "    pm.expect(json).to.have.property(\"reviews\");\r",
+              "    pm.expect(json.reviews).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Sản phẩm có field 'name'\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"name\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/products/2",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Danh sách sản phẩm (admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "//  API hoạt động và trả về HTTP Status 200\r",
+              "pm.test(\"Status code là 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "// API không bị lỗi code, nhả ra đúng định dạng JSON\r",
+              "pm.test(\"Định dạng dữ liệu trả về là JSON hợp lệ\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "//  Lỗi thiếu chuẩn hóa cấu trúc API\r",
+              "pm.test(\"API phải có cờ 'success' = true để báo hiệu thành công cho Frontend\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "    pm.expect(responseData).to.have.property('success', true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/admin/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Thêm sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 201 Created\", function () {\r",
+              "    pm.response.to.have.status(201);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response có product vừa tạo\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"product\");\r",
+              "    pm.environment.set(\"admin_product_id\", json.product?.id);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"API cần trả về cờ 'success': true để đồng bộ cấu trúc\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"success\", true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "ten_sp",
+              "value": "Áo sơ mi đen",
+              "type": "text",
+              "uuid": "9139d8ec-cb38-482c-9d78-a15f581d4269"
+            },
+            {
+              "key": "gia",
+              "value": "100000",
+              "type": "text",
+              "uuid": "35e25c6a-f965-4500-8f6e-24bbe92b23e9"
+            },
+            {
+              "key": "so_luong",
+              "value": "50",
+              "type": "text",
+              "uuid": "5f1b03c9-7fdd-475c-9ffd-8c1c5b370317"
+            },
+            {
+              "key": "gioi_tinh",
+              "value": "1",
+              "type": "text",
+              "uuid": "7f45f7f3-98cc-47ec-a1e6-0a82acad6f5c"
+            },
+            {
+              "key": "hinh_anh",
+              "type": "file",
+              "uuid": "24a9f514-e3b8-484c-ba3a-4f3cb33c553c",
+              "src": "/C:/Users/truon/Downloads/aosomiden.png"
+            },
+            {
+              "key": "mo_ta",
+              "value": "Áo sơ mi đen trơn đẹp, phong cánh kiểu Hàn",
+              "type": "text",
+              "uuid": "5f13cdf4-73bb-4cdf-b250-37c91231ab86"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/products",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Sửa sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Route chấp nhận POST method cho update (Không bị 405)\", function () {\r",
+              "    pm.expect(pm.response.code).to.not.equal(405);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"API cần trả về cờ 'success': true để đồng bộ toàn hệ thống\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"success\", true);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "ten_sp",
+              "value": "Áo Sơ Mi Trắng Trơn",
+              "type": "text",
+              "uuid": "1ccb49a7-ab1c-40dd-8417-204eaaf774b9"
+            },
+            {
+              "key": "gia",
+              "value": "220000",
+              "type": "text",
+              "uuid": "705d1bca-9a40-4526-8145-7c4d9d0fe300"
+            },
+            {
+              "key": "so_luong",
+              "value": "11",
+              "type": "text",
+              "uuid": "a64a434b-ca41-4da9-983d-8793bde2fac6"
+            },
+            {
+              "key": "gioi_tinh",
+              "value": "1",
+              "type": "text",
+              "uuid": "c3dbd859-f191-44dc-a15a-df3cd7594574"
+            },
+            {
+              "key": "hinh_anh",
+              "type": "file",
+              "uuid": "1875f93a-c680-4a60-bfd7-4157ac940cad",
+              "src": "/C:/Users/truon/Downloads/aosomitrang.png"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/admin/products/:id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Xoá sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Message xóa sản phẩm thành công\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"message\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"API phải trả về 'id' của sản phẩm vừa xóa cho Frontend\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"id\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/admin/products/:id",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "admin",
+            "products",
+            ":id"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "{{product_id}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Danh sách sản phẩm",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response có cấu trúc paginate đúng\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"data\");\r",
+              "    pm.expect(json).to.have.property(\"total\");\r",
+              "    pm.expect(json).to.have.property(\"per_page\");\r",
+              "    pm.expect(json.per_page).to.equal(8);\r",
+              "    if (json.data.length > 0) {\r",
+              "        pm.environment.set(\"product_id\", json.data[0].id);\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Mỗi trang có 10 sản phẩm\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.per_page).to.equal(10);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/products?keyword=áo&page=1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "products"
+          ],
+          "query": [
+            {
+              "key": "keyword",
+              "value": "áo"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Danh mục",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response là mảng danh mục\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.data).to.be.an(\"array\");\r",
+              "    if (json.length > 0) {\r",
+              "        pm.environment.set(\"category_id\", json[0].id);\r",
+              "    }\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response có phân trang\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json).to.have.property(\"pagination\"); \r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/categories",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "categories"
           ]
         }
       },

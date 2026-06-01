@@ -75,7 +75,7 @@ if ($validator->fails()) {
 
         $cart->update(['quantity' => $request->quantity]);
 
-        return response()->json(['message' => 'Đã cập nhật giỏ hàng']);
+        return response()->json(['message' => 'Đã cập nhật giỏ hàng', 'cart' => $cart]);
     }
 
     public function destroy(Request $request, $id)

@@ -21,11 +21,13 @@ class DashboardController extends Controller
             ->get();
 
         return response()->json([
-            'total_revenue'  => $totalRevenue,
-            'total_orders'   => $totalOrders,
-            'total_users'    => $totalUsers,
-            'total_products' => $totalProducts,
-            'recent_orders'  => $recentOrders,
-        ]);
+        'data' => [
+        'total_revenue'  => $totalRevenue,
+        'total_orders'   => $totalOrders,
+        'total_users'    => $totalUsers,
+        'total_products' => $totalProducts,
+        'recent_orders'  => $recentOrders,
+    ]
+]);
     }
 }
