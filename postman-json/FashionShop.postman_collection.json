@@ -11,7 +11,7 @@
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "55108854",
-    "_collection_link": "https://go.postman.co/collection/55108854-40b6fddf-c775-4a4d-8cee-a101fca742e7?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/55108854-40b6fddf-c775-4a4d-8cee-a101fca742e7?source=collection_link",
     "_exporter_id": "55104651",
     "_collection_link": "https://go.postman.co/collection/55104651-44b1d269-2c37-49c3-ad32-580ce47f3c6b?source=collection_link"
   },
