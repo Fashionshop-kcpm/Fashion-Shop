@@ -15,12 +15,8 @@ class ProductController extends Controller
             $query->where('ten_sp', 'LIKE', "%{$request->keyword}%");
         }
 
-        // Code mới: Thêm cấu trúc chuẩn hóa cho API
-        return response()->json([
-            'success' => true,
-            'message' => 'Lấy danh sách sản phẩm thành công',
-            'data'    => $query->paginate(10)
-        ]);
+        $products = $query->paginate(10);
+        return response()->json(array_merge($products->toArray(), ['success' => true]));
     }
 
 
