@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "4a1df611-9f97-41ba-906c-4465164f0dac",
+    "_postman_id": "44b1d269-2c37-49c3-ad32-580ce47f3c6b",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -12,6 +12,8 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "55108854",
     "_collection_link": "https://go.postman.co/collection/55108854-40b6fddf-c775-4a4d-8cee-a101fca742e7?source=collection_link"
+    "_exporter_id": "55104651",
+    "_collection_link": "https://go.postman.co/collection/55104651-44b1d269-2c37-49c3-ad32-580ce47f3c6b?source=collection_link"
   },
   "item": [
     {
@@ -56,7 +58,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"bao2005@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
+          "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"bao200529@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -934,27 +936,28 @@
       "response": []
     },
     {
-      "name": "Logout",
+      "name": "logout_admin",
       "event": [
         {
           "listen": "test",
           "script": {
             "exec": [
-              "// TEST 1 - Status 200\r",
-              "pm.test(\"Status 200 OK\", function () {\r",
+              "// Test 1: Đăng xuất thành công\r",
+              "pm.test(\"Đăng xuất thành công - Status 200\", function () {\r",
               "    pm.response.to.have.status(200);\r",
               "});\r",
               "\r",
-              "// TEST 2 - Message đúng\r",
+              "// Test 2: Response có message xác nhận đăng xuất\r",
               "pm.test(\"Message đăng xuất thành công\", function () {\r",
               "    const json = pm.response.json();\r",
-              "    pm.expect(json.message).to.equal(\"Đăng xuất thành công\");\r",
+              "    pm.expect(json.message).to.equal(\"Đã đăng xuất\");\r",
               "});\r",
               "\r",
-              "// TEST 3 - kiểm tra response có field 'user' nhưng logout không trả về user\r",
-              "pm.test(\"Response có field 'user'\", function () {\r",
+              "// Test 3: FAIL - Sau khi đăng xuất token phải bị vô hiệu hóa\r",
+              "pm.test(\"Token phải bị vô hiệu hóa sau khi đăng xuất\", function () {\r",
               "    const json = pm.response.json();\r",
-              "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
+              "    pm.expect(json).to.have.property(\"token_revoked\");\r",
+              "    pm.expect(json.token_revoked).to.equal(true);\r",
               "});"
             ],
             "type": "text/javascript",
@@ -967,26 +970,25 @@
         "auth": {
           "type": "noauth"
         },
-        "method": "DELETE",
         "method": "POST",
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer {{token}}",
+            "value": "Bearer {{admin_token}}",
             "type": "text"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": ""
+          "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"123456\"\r\n}"
         },
         "url": {
-          "raw": "{{base_url}}/cart/999",
-          "raw": "{{base_url}}/logout",
+          "raw": "{{base_url}}/admin/logout",
           "host": [
             "{{base_url}}"
           ],
           "path": [
+            "admin",
             "logout"
           ]
         }
@@ -994,7 +996,6 @@
       "response": []
     },
     {
-      "name": "review_cart",
       "name": "delete_cart",
       "event": [
         {
@@ -1786,7 +1787,13 @@
       ],
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/admin/products",
           "host": [
@@ -1830,7 +1837,13 @@
       ],
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "formdata",
           "formdata": [
@@ -1913,7 +1926,13 @@
       ],
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
         "body": {
           "mode": "formdata",
           "formdata": [
@@ -1998,7 +2017,13 @@
       ],
       "request": {
         "method": "DELETE",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{admin_token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/admin/products/:id",
           "host": [
@@ -2054,7 +2079,13 @@
       ],
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/products?keyword=áo&page=1",
           "host": [
@@ -2109,7 +2140,13 @@
       ],
       "request": {
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
         "url": {
           "raw": "{{base_url}}/categories",
           "host": [

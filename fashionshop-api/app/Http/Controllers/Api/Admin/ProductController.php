@@ -11,13 +11,18 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::with('category');
-
         if ($request->keyword) {
             $query->where('ten_sp', 'LIKE', "%{$request->keyword}%");
         }
 
-        return response()->json($query->paginate(10));
+        // Code mới: Thêm cấu trúc chuẩn hóa cho API
+        return response()->json([
+            'success' => true,
+            'message' => 'Lấy danh sách sản phẩm thành công',
+            'data'    => $query->paginate(10)
+        ]);
     }
+
 
     public function store(Request $request)
     {
@@ -72,7 +77,7 @@ class ProductController extends Controller
 
         $product->update($request->except('hinh_anh'));
 
-        return response()->json(['message' => 'Đã cập nhật sản phẩm', 'product' => $product]);
+        return response()->json(['success' => true, 'message' => 'Đã cập nhật sản phẩm', 'product' => $product]);
     }
 
     public function destroy($id)
