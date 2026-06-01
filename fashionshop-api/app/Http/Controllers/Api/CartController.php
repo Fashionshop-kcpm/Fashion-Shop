@@ -9,13 +9,18 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     public function index(Request $request)
-    {
-        $cart = Cart::with('product')
-            ->where('user_id', $request->user()->id)
-            ->get();
+{
+    $cart = Cart::with('product')
+        ->where('user_id', $request->user()->id)
+        ->get();
 
-        return response()->json($cart);
-    }
+    $total_price = $cart->sum(fn($item) => $item->product->price * $item->quantity);
+
+    return response()->json([
+        'data'        => $cart,
+        'total_price' => $total_price,
+    ]);
+}
 
     public function store(Request $request)
     {
