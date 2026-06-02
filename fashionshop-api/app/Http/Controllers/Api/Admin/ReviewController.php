@@ -34,7 +34,20 @@ public function index()
 
     public function destroy($id)
     {
-        Review::findOrFail($id)->delete();
-        return response()->json(['message' => 'Đã xóa đánh giá']);
+        $review = Review::find($id);
+        
+        if (!$review) {
+            return response()->json([
+                'message' => 'Không tìm thấy đánh giá',
+                'data' => null
+            ], 404);
+        }
+        
+        $review->delete();
+        
+        return response()->json([
+            'message' => 'Đã xóa đánh giá',
+            'data' => ['id' => $id, 'deleted' => true]
+        ]);
     }
 }
