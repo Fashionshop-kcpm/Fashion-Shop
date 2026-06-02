@@ -37,7 +37,11 @@ export default function Products() {
 
   const products  = data?.data?.data || [];
   const meta      = data?.data;
-  const categories = catData?.data || [];
+  const categories = Array.isArray(catData?.data)
+  ? catData.data
+  : Array.isArray(catData?.data?.data)
+    ? catData.data.data
+    : [];
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin-products"] });
 
