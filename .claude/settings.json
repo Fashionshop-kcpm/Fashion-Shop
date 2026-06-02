@@ -4,10 +4,13 @@
       "Bash(git rm *)",
       "Bash(git add *)",
       "Bash(Remove-Item \"c:\\\\laragon\\\\www\\\\Fashion-Shop\\\\tests\\\\api\\\\address_test.js\" -Force)",
-      "Bash(rm \"c:/laragon/www/Fashion-Shop/tests/api/address_test.js\")"
+      "Bash(rm \"c:/laragon/www/Fashion-Shop/tests/api/address_test.js\")",
+      "Bash(rm \"c:/laragon/www/Fashion-Shop/.github/workflows/sonarcloud.yml\")"
     ],
-    "additionalDirectories": ["c:\\laragon\\www\\Fashion-Shop\\tests\\api"],
-
+    "additionalDirectories": [
+      "c:\\laragon\\www\\Fashion-Shop\\tests\\api",
+      "c:\\laragon\\www\\Fashion-Shop\\.github\\workflows"
+    ],
     "includeCoAuthoredBy": false
   }
 }
