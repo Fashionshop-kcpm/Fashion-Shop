@@ -10,9 +10,14 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return response()->json(
-            Contact::orderBy('created_at', 'desc')->paginate(10)
-        );
+        $contacts = Contact::orderBy('created_at', 'desc')->paginate(10);
+        
+        $contacts->getCollection()->transform(function ($contact) {
+            $contact->status = 'closed';
+            return $contact;
+        });
+        
+        return response()->json($contacts);
     }
 
     public function updateStatus(Request $request, $id)
