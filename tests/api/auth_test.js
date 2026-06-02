@@ -36,7 +36,7 @@ Scenario('POST /register - Response có token và user', async ({ I }) => {
   expect(res.data.user).to.have.property('email');
 });
 
-Scenario('POST /register - User có field name', async ({ I }) => {
+Scenario('[BUG] POST /register - User có field name', async ({ I }) => {
   const uniqueEmail = `reg3_${Date.now()}@gmail.com`;
   const res = await I.sendPostRequest('/register', {
     fullname: 'Nguyễn Chí Trung',
@@ -47,14 +47,13 @@ Scenario('POST /register - User có field name', async ({ I }) => {
     password_confirmation: password,
   });
 
-  // field 'name' đã được fix ở register controller
+  // ❌ controller dùng 'fullname', không phải 'name'
   expect(res.data.user).to.have.property('name');
 });
 
 // ─── LOGIN ──────────────────────────────────────────────────────
 
 Scenario('POST /login - Status 200 OK', async ({ I }) => {
-  // Tạo user trước
   await I.sendPostRequest('/register', {
     fullname: 'Nguyễn Chí Trung',
     email,
@@ -116,6 +115,12 @@ Scenario('[BUG] POST /logout - Response có field user', async ({ I }) => {
     Authorization: `Bearer ${token}`,
   });
 
-  // ❌ controller chỉ trả message, không có 'user' → test này sẽ fail
+  // ❌ controller chỉ trả message, không có 'user'
   expect(res.data).to.have.property('user');
+});
+
+Scenario('POST /logout - Lỗi 401 khi không có token', async ({ I }) => {
+  const res = await I.sendPostRequest('/logout', {});
+
+  expect(res.status).to.equal(401);
 });
