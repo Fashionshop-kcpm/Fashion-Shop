@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "afc41ffe-c472-4855-b437-58afadd645fd",
+    "_postman_id": "a5b42bbf-b697-4d14-ac41-0d03b652bf6e",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55108854",
-    "_collection_link": "https://go.postman.co/collection/55108854-afc41ffe-c472-4855-b437-58afadd645fd?source=collection_link"
+    "_exporter_id": "55104651",
+    "_collection_link": "https://go.postman.co/collection/55104651-a5b42bbf-b697-4d14-ac41-0d03b652bf6e?source=collection_link"
   },
   "item": [
     {
@@ -2154,6 +2154,194 @@
               "path": [
                 "admin",
                 "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "order_detail",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Order có user, details, total và status\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"id\");\r",
+                  "    pm.expect(json).to.have.property(\"user\");\r",
+                  "    pm.expect(json).to.have.property(\"details\");\r",
+                  "    pm.expect(json).to.have.property(\"total\");\r",
+                  "    pm.expect(json).to.have.property(\"status\");\r",
+                  "    pm.expect(json.details).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Product dùng 'name' không dùng 'ten_sp' hoặc details không được rỗng\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.details).to.be.an(\"array\").that.is.not.empty;\r",
+                  "\r",
+                  "    json.details.forEach(function(item, i) {\r",
+                  "        pm.expect(item.product, `item ${i}`).to.have.property(\"name\");\r",
+                  "        pm.expect(item.product).to.not.have.property(\"ten_sp\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/orders/66",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "orders",
+                "66"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "order_status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response có message cập nhật\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"message\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response trả về order sau khi cập nhật status\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"order\");\r",
+                  "    if (json.order) {\r",
+                  "        pm.expect(json.order.status).to.equal(\"shipping\");\r",
+                  "    }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\":\"shipping\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/orders/64/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "orders",
+                "64",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "order_list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response trả về danh sách đơn hàng\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    const isArray = Array.isArray(json);\r",
+                  "    const hasPagination = json.hasOwnProperty(\"data\");\r",
+                  "    pm.expect(isArray || hasPagination).to.be.true;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Lọc đơn hàng theo status='pending'\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    const orders = Array.isArray(json) ? json : json.data;\r",
+                  "    if (orders && orders.length > 0) {\r",
+                  "        orders.forEach(o => {\r",
+                  "            pm.expect(o.status).to.equal(\"pending\");\r",
+                  "        });\r",
+                  "    }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "orders"
               ]
             }
           },
