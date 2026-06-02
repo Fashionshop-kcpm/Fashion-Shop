@@ -39,6 +39,7 @@ class ProductController extends Controller
         }
 
         $product->name = $product->ten_sp;
+        $reviews = $product->reviews->sortBy('created_at')->values();
 
         return response()->json($product);
     }
