@@ -8,20 +8,18 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function index(Request $request)
+   public function index(Request $request)
     {
         $query = Order::with('user')->orderBy('created_at', 'desc');
 
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
+        $status = $request->status ?? 'pending';
+        $query->where('status', $status);
 
         if ($request->keyword) {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('fullname', 'LIKE', "%{$request->keyword}%");
             })->orWhere('id', $request->keyword);
         }
-
         return response()->json($query->paginate(10));
     }
 
