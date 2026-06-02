@@ -38,37 +38,15 @@ class OrderController extends Controller
     }
 
 
-   public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => 'required|in:pending,shipping,completed,cancelled'
-    ]);
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,shipping,completed,cancelled'
+        ]);
 
-    // 1. Tìm đơn hàng và cập nhật trạng thái mới
-    $order = Order::findOrFail($id);
-    $order->update(['status' => $request->status]);
+        $order = Order::findOrFail($id);
+        $order->update(['status' => $request->status]);
 
-    // 2. Load các quan hệ (user, details, product) vào đối tượng $order vừa cập nhật
-    $order->load(['user', 'details.product']);
-
-    // 3. Chuẩn hóa cấu trúc sản phẩm bên trong details để không bị bắt lỗi 'ten_sp'
-    if ($order->details) {
-        $order->details->each(function ($detail) {
-            if ($detail->product) {
-                // Thêm thuộc tính 'name' cho đúng chuẩn yêu cầu
-                $detail->product->name = $detail->product->ten_sp;
-                // Ẩn thuộc tính 'ten_sp' đi
-                $detail->product->makeHidden('ten_sp');
-            }
-        });
+        return response()->json(['message' => 'Đã cập nhật trạng thái']);
     }
-
-    // 4. Trả về JSON bao gồm cả 'message' và 'order' để pass test case
-    return response()->json([
-        'message' => 'Đã cập nhật trạng thái',
-        'order'   => $order
-    ]);
-}
-
-
 }
