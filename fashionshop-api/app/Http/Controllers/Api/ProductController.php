@@ -32,15 +32,16 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::with(['reviews.user'])->find($id);
+        $product = Product::with(['category', 'reviews.user'])->find($id);
 
         if (!$product) {
             return response()->json(['message' => 'Sản phẩm không tồn tại'], 404);
         }
 
+        $product->name = $product->ten_sp;
         $reviews = $product->reviews->sortBy('created_at')->values();
 
-        return response()->json($reviews);
+        return response()->json($product);
     }
 
     
