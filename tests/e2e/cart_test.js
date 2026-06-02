@@ -1,9 +1,8 @@
 Feature('Trang Giỏ Hàng @e2e');
 
 Before(async ({ I }) => {
+  // loginNewUser đã navigate đến localhost:5173 và set auth
   await I.loginNewUser();
-  I.amOnPage('/');
-  I.waitForElement('body', 3);
 });
 
 After(async ({ I }) => {
@@ -11,43 +10,38 @@ After(async ({ I }) => {
 });
 
 Scenario('Chuyển đến /login khi truy cập /cart chưa đăng nhập', async ({ I }) => {
+  // Clear auth khi đang ở localhost:5173 (đúng origin)
   await I.clearAuth();
   I.amOnPage('/cart');
-  I.waitForURL('http://localhost:5173/login', 5);
+  await I.waitForURL('http://localhost:5173/login', 5);
   I.seeCurrentUrlEquals('http://localhost:5173/login');
 });
 
 Scenario('Trang giỏ hàng hiển thị đúng khi đã đăng nhập', async ({ I }) => {
   I.amOnPage('/cart');
-  I.waitForElement('h1', 8);
+  await I.waitForElement('h1', 8);
   I.see('Giỏ Hàng');
 });
 
 Scenario('Giỏ hàng trống hiển thị thông báo', async ({ I }) => {
   I.amOnPage('/cart');
-  I.waitForElement('h1', 8);
-  I.see('Giỏ Hàng');
-  // User mới tạo → giỏ hàng trống
-  I.waitForText('Giỏ hàng trống', 8);
+  await I.waitForElement('h1', 8);
+  await I.waitForText('Giỏ hàng trống', 8);
 });
 
 Scenario('Thêm sản phẩm vào giỏ từ trang chi tiết', async ({ I }) => {
-  // Vào trang category, chọn sản phẩm đầu tiên
   I.amOnPage('/category');
-  I.waitForElement('h3', 10);
-  I.click(locate('h3').first());
-  I.waitForNavigation();
-  I.seeInCurrentUrl('/products/');
+  await I.waitForElement('h3', 10);
+  I.click(locate('a').inside('h3').first());
+  await I.waitForURL('**/products/**', 8);
 
-  // Bấm Thêm Vào Giỏ
-  I.waitForText('Thêm Vào Giỏ', 8);
+  await I.waitForText('Thêm Vào Giỏ', 8);
   I.click(locate('button').withText('Thêm Vào Giỏ').first());
 
-  I.waitForText('Đã thêm vào giỏ hàng', 5);
+  await I.waitForText('Đã thêm vào giỏ hàng', 5);
 });
 
 Scenario('Xem giỏ hàng sau khi thêm sản phẩm qua API', async ({ I }) => {
-  // Thêm sản phẩm qua API để test nhanh hơn
   const listRes = await I.sendGetRequest('/products');
   const productId = listRes.data.data[0].id;
   const token = await I.executeScript(() => localStorage.getItem('token'));
@@ -58,10 +52,9 @@ Scenario('Xem giỏ hàng sau khi thêm sản phẩm qua API', async ({ I }) => 
   );
 
   I.amOnPage('/cart');
-  I.waitForElement('h1', 8);
+  await I.waitForElement('h1', 8);
   I.see('Giỏ Hàng');
-  // Có ít nhất 1 sản phẩm trong giỏ
-  I.waitForElement('img.object-cover', 8);
+  await I.waitForElement('img.object-cover', 8);
 });
 
 Scenario('Tăng số lượng sản phẩm trong giỏ hàng', async ({ I }) => {
@@ -75,14 +68,13 @@ Scenario('Tăng số lượng sản phẩm trong giỏ hàng', async ({ I }) => 
   );
 
   I.amOnPage('/cart');
-  I.waitForElement('button', 8);
+  await I.waitForElement('button', 8);
 
-  // Bấm nút tăng số lượng (+)
-  I.waitForElement(locate('button').withText('+').first(), 5);
-  I.click(locate('button').withText('+').first());
+  const plusBtn = locate('button').withText('+').first();
+  await I.waitForElement(plusBtn, 5);
+  I.click(plusBtn);
 
-  // Số lượng tăng lên 2
-  I.waitForText('2', 3);
+  await I.waitForText('2', 3);
 });
 
 Scenario('Nút Tiến hành thanh toán dẫn đến /checkout', async ({ I }) => {
@@ -96,8 +88,7 @@ Scenario('Nút Tiến hành thanh toán dẫn đến /checkout', async ({ I }) =
   );
 
   I.amOnPage('/cart');
-  I.waitForElement('a[href="/checkout"], button', 8);
-
-  I.click(locate('a[href="/checkout"]').first());
-  I.waitForURL('http://localhost:5173/checkout', 8);
+  await I.waitForElement('a[href="/checkout"]', 8);
+  I.click('a[href="/checkout"]');
+  await I.waitForURL('http://localhost:5173/checkout', 8);
 });
