@@ -1,53 +1,63 @@
-Feature('Trang San Pham @e2e');
+Feature('Trang Sản Phẩm @e2e');
 
-Scenario('Trang chu hien thi danh sach san pham', async ({ I }) => {
+Scenario('Trang chủ hiển thị danh sách sản phẩm và tabs', async ({ I }) => {
   I.amOnPage('/');
-  I.waitForElement('h1', 5);
+  I.waitForElement('h3', 10);
+
+  I.see('Nổi Bật');
+  I.see('Bán Chạy');
+  I.see('Khuyến Mãi');
   I.seeElement('h3');
 });
 
-Scenario('Trang chu co tab Noi Bat, Ban Chay, Khuyen Mai', async ({ I }) => {
+Scenario('Trang chủ - tab Bán Chạy hiển thị sản phẩm', async ({ I }) => {
   I.amOnPage('/');
-  I.waitForText('Noi Bat', 5);
+  I.waitForText('Bán Chạy', 8);
+
+  I.click('Bán Chạy');
+  I.waitForElement('h3', 8);
+  I.seeElement('h3');
+});
+
+Scenario('Trang category hiển thị danh sách sản phẩm', async ({ I }) => {
+  I.amOnPage('/category');
+  I.waitForElement('h3', 10);
+
+  I.seeElement('h3');
   I.seeElement('button');
 });
 
-Scenario('Bam vao san pham mo trang chi tiet', async ({ I }) => {
-  I.amOnPage('/');
-  I.waitForElement('h3 a, a h3', 10);
+Scenario('Bấm vào sản phẩm mở trang chi tiết', async ({ I }) => {
+  I.amOnPage('/category');
+  I.waitForElement('h3 a, a h3, h3', 10);
+
   I.click(locate('h3').first());
   I.waitForNavigation();
   I.seeInCurrentUrl('/products/');
 });
 
-Scenario('Trang chi tiet san pham hien thi ten va gia', async ({ I }) => {
-  // Di den trang category de lay san pham
+Scenario('Trang chi tiết sản phẩm hiển thị thông tin', async ({ I }) => {
   I.amOnPage('/category');
   I.waitForElement('h3', 10);
   I.click(locate('h3').first());
   I.waitForNavigation();
+
+  I.waitForElement('h1', 8);
   I.seeInCurrentUrl('/products/');
-  I.waitForElement('h1', 5);
-  I.seeElement('button[type="submit"], button');
+  I.seeElement('button');
 });
 
-Scenario('Trang category hien thi danh sach san pham', async ({ I }) => {
-  I.amOnPage('/category');
-  I.waitForElement('h3', 10);
-  I.seeElement('h3');
-});
-
-Scenario('Trang search tim kiem san pham theo tu khoa', async ({ I }) => {
+Scenario('Trang search hiển thị kết quả theo keyword', async ({ I }) => {
   I.amOnPage('/search?keyword=ao');
   I.waitForElement('body', 5);
+
   I.seeInCurrentUrl('/search');
 });
 
-Scenario('Click Them Gio khi chua dang nhap chuyen den trang login', async ({ I }) => {
+Scenario('Bấm Thêm Giỏ khi chưa đăng nhập → chuyển đến /login', async ({ I }) => {
   I.amOnPage('/');
   I.waitForElement('button', 10);
-  // Bam nut "Them Gio" dau tien
-  I.click(locate('button').withText('Them Gio').first());
-  I.waitForNavigation();
-  I.seeCurrentUrlEquals('http://localhost:5173/login');
+
+  I.click(locate('button').withText('Thêm Giỏ').first());
+  I.waitForURL('http://localhost:5173/login', 5);
 });

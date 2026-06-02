@@ -1,94 +1,164 @@
-// Admin panel chay tren http://localhost:5174
-const ADMIN_URL = "http://localhost:5174";
-const ADMIN_EMAIL = "admin@fashionshop.vn";
-const ADMIN_PASSWORD = "Admin123456";
+// Admin panel chạy trên http://localhost:5174
+const ADMIN_URL = 'http://localhost:5174';
+const ADMIN_EMAIL = 'admin@fashionshop.vn';
+const ADMIN_PASSWORD = 'Admin123456';
 
-Feature("Admin Panel @e2e @admin");
+Feature('Admin Panel @e2e @admin');
 
-Scenario("Trang admin login hien thi form dang nhap", async ({ I }) => {
+// Helper login nội bộ trong file này
+async function adminLogin(I) {
   I.amOnPage(`${ADMIN_URL}/login`);
-  I.waitForElement('h1, [name="email"]', 8);
+  I.waitForElement('[name="email"]', 8);
+  I.fillField('[name="email"]', ADMIN_EMAIL);
+  I.fillField('[name="password"]', ADMIN_PASSWORD);
+  I.click('button[type="submit"]');
+  I.waitForURL(`${ADMIN_URL}/`, 10);
+}
+
+// ─── ADMIN LOGIN ─────────────────────────────────────────────────
+
+Scenario('Trang admin login hiển thị form đăng nhập', async ({ I }) => {
+  I.amOnPage(`${ADMIN_URL}/login`);
+  I.waitForElement('[name="email"]', 8);
+
+  I.see('FashionShop Admin');
   I.seeElement('[name="email"]');
   I.seeElement('[name="password"]');
   I.seeElement('button[type="submit"]');
 });
 
-Scenario(
-  "Admin dang nhap thanh cong va chuyen den dashboard",
-  async ({ I }) => {
-    I.amOnPage(`${ADMIN_URL}/login`);
-    I.waitForElement('[name="email"]', 8);
+Scenario('Admin đăng nhập thành công và chuyển đến dashboard', async ({ I }) => {
+  await adminLogin(I);
 
-    I.fillField('[name="email"]', ADMIN_EMAIL);
-    I.fillField('[name="password"]', ADMIN_PASSWORD);
-    I.click('button[type="submit"]');
+  I.seeInCurrentUrl(ADMIN_URL);
+  I.waitForElement('h1', 8);
+  I.see('Dashboard');
+});
 
-    I.waitForNavigation();
-    I.seeInCurrentUrl(ADMIN_URL);
-    // Dashboard hien thi
-    I.waitForElement("h1, main", 8);
-  },
-);
-
-Scenario("Admin dang nhap that bai voi sai mat khau", async ({ I }) => {
+Scenario('Admin đăng nhập thất bại - sai mật khẩu', async ({ I }) => {
   I.amOnPage(`${ADMIN_URL}/login`);
   I.waitForElement('[name="email"]', 8);
 
   I.fillField('[name="email"]', ADMIN_EMAIL);
-  I.fillField('[name="password"]', "wrongpassword");
+  I.fillField('[name="password"]', 'wrongpassword');
   I.click('button[type="submit"]');
 
-  // Toast loi hien ra, van o trang login
-  I.waitForText("Dang nhap that bai", 5);
-  I.seeInCurrentUrl("/login");
+  I.waitForText('thất bại', 5);
+  I.seeInCurrentUrl('/login');
 });
 
-Scenario("Admin dang nhap that bai voi email khong hop le", async ({ I }) => {
+Scenario('Admin đăng nhập thất bại - email không hợp lệ', async ({ I }) => {
   I.amOnPage(`${ADMIN_URL}/login`);
   I.waitForElement('[name="email"]', 8);
 
-  I.fillField('[name="email"]', "notvalidemail");
+  I.fillField('[name="email"]', 'notvalidemail');
   I.fillField('[name="password"]', ADMIN_PASSWORD);
   I.click('button[type="submit"]');
 
-  // Validation error
-  I.waitForElement("p.text-red-500, span.text-red-500", 5);
-  I.seeInCurrentUrl("/login");
+  I.waitForElement('p.text-red-500', 5);
+  I.seeInCurrentUrl('/login');
 });
 
-Scenario("Admin xem trang san pham", async ({ I }) => {
-  I.amOnPage(`${ADMIN_URL}/login`);
-  I.waitForElement('[name="email"]', 8);
-  I.fillField('[name="email"]', ADMIN_EMAIL);
-  I.fillField('[name="password"]', ADMIN_PASSWORD);
-  I.click('button[type="submit"]');
-  I.waitForNavigation();
+// ─── DASHBOARD ───────────────────────────────────────────────────
 
-  // Chuyen sang trang products
+Scenario('Dashboard hiển thị thống kê Doanh Thu, Đơn Hàng, Người Dùng, Sản Phẩm', async ({ I }) => {
+  await adminLogin(I);
+
+  I.amOnPage(`${ADMIN_URL}/`);
+  I.waitForElement('h1', 8);
+  I.see('Dashboard');
+  I.see('Doanh Thu');
+  I.see('Đơn Hàng');
+  I.see('Người Dùng');
+  I.see('Sản Phẩm');
+});
+
+// ─── PRODUCTS ────────────────────────────────────────────────────
+
+Scenario('Admin xem danh sách sản phẩm', async ({ I }) => {
+  await adminLogin(I);
+
   I.amOnPage(`${ADMIN_URL}/products`);
-  I.waitForElement("h1, table, .grid", 8);
+  I.waitForElement('h1', 8);
+  I.seeElement('table, .grid');
 });
 
-Scenario("Admin xem trang don hang", async ({ I }) => {
-  I.amOnPage(`${ADMIN_URL}/login`);
-  I.waitForElement('[name="email"]', 8);
-  I.fillField('[name="email"]', ADMIN_EMAIL);
-  I.fillField('[name="password"]', ADMIN_PASSWORD);
-  I.click('button[type="submit"]');
-  I.waitForNavigation();
+// ─── ORDERS ──────────────────────────────────────────────────────
+
+Scenario('Admin xem danh sách đơn hàng', async ({ I }) => {
+  await adminLogin(I);
 
   I.amOnPage(`${ADMIN_URL}/orders`);
-  I.waitForElement("h1, table, .space-y", 8);
+  I.waitForElement('h1', 8);
+  I.see('Đơn Hàng');
+  I.seeElement('table');
 });
 
-Scenario("Admin xem trang danh gia", async ({ I }) => {
-  I.amOnPage(`${ADMIN_URL}/login`);
-  I.waitForElement('[name="email"]', 8);
-  I.fillField('[name="email"]', ADMIN_EMAIL);
-  I.fillField('[name="password"]', ADMIN_PASSWORD);
-  I.click('button[type="submit"]');
+Scenario('Admin lọc đơn hàng theo trạng thái', async ({ I }) => {
+  await adminLogin(I);
+
+  I.amOnPage(`${ADMIN_URL}/orders`);
+  I.waitForElement('select', 8);
+
+  // Chọn lọc theo trạng thái
+  I.selectOption('select', 'pending');
+  I.waitForElement('table', 5);
+  I.seeInCurrentUrl(`${ADMIN_URL}/orders`);
+});
+
+Scenario('Admin tìm kiếm đơn hàng theo từ khóa', async ({ I }) => {
+  await adminLogin(I);
+
+  I.amOnPage(`${ADMIN_URL}/orders`);
+  I.waitForElement('input[placeholder*="Tìm"]', 8);
+
+  I.fillField('input[placeholder*="Tìm"]', '1');
+  I.pressKey('Enter');
+  I.waitForElement('table', 5);
+});
+
+Scenario('Admin xem chi tiết đơn hàng', async ({ I }) => {
+  await adminLogin(I);
+
+  I.amOnPage(`${ADMIN_URL}/orders`);
+  I.waitForElement('table', 10);
+
+  // Bấm vào link chi tiết đơn hàng đầu tiên
+  const eyeLink = locate('a[href*="/orders/"]').first();
+  I.waitForElement(eyeLink, 8);
+  I.click(eyeLink);
+
   I.waitForNavigation();
+  I.seeInCurrentUrl('/orders/');
+  I.waitForElement('h1, .text-2xl', 8);
+});
+
+// ─── REVIEWS ─────────────────────────────────────────────────────
+
+Scenario('Admin xem danh sách đánh giá', async ({ I }) => {
+  await adminLogin(I);
 
   I.amOnPage(`${ADMIN_URL}/reviews`);
-  I.waitForElement("h1, table, .space-y", 8);
+  I.waitForElement('h1, table, .space-y', 8);
+  I.seeInCurrentUrl('/reviews');
+});
+
+// ─── CONTACTS ────────────────────────────────────────────────────
+
+Scenario('Admin xem danh sách liên hệ', async ({ I }) => {
+  await adminLogin(I);
+
+  I.amOnPage(`${ADMIN_URL}/contacts`);
+  I.waitForElement('h1, table, .space-y', 8);
+  I.seeInCurrentUrl('/contacts');
+});
+
+// ─── USERS ───────────────────────────────────────────────────────
+
+Scenario('Admin xem danh sách người dùng', async ({ I }) => {
+  await adminLogin(I);
+
+  I.amOnPage(`${ADMIN_URL}/users`);
+  I.waitForElement('h1, table', 8);
+  I.seeInCurrentUrl('/users');
 });

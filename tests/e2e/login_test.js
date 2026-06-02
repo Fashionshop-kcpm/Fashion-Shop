@@ -1,45 +1,58 @@
-Feature('Trang Dang Nhap @e2e');
+Feature('Trang Đăng Nhập @e2e');
 
-// User da duoc seed trong DB (khop voi Postman collection)
 const VALID_EMAIL = 'test12@gmail.com';
 const VALID_PASSWORD = '123456';
 
-Scenario('Dang nhap thanh cong va chuyen ve trang chu', async ({ I }) => {
+Scenario('Trang login hiển thị đúng form', async ({ I }) => {
   I.amOnPage('/login');
-  I.see('Dang Nhap');
+  I.waitForElement('[name="email"]', 8);
+
+  I.seeElement('[name="email"]');
+  I.seeElement('[name="password"]');
+  I.seeElement('button[type="submit"]');
+  I.see('Đăng Nhập');
+});
+
+Scenario('Đăng nhập thành công và chuyển về trang chủ', async ({ I }) => {
+  I.amOnPage('/login');
+  I.waitForElement('[name="email"]', 8);
 
   I.fillField('[name="email"]', VALID_EMAIL);
   I.fillField('[name="password"]', VALID_PASSWORD);
   I.click('button[type="submit"]');
 
-  I.waitForNavigation();
+  I.waitForURL('http://localhost:5173/', 10);
   I.seeCurrentUrlEquals('http://localhost:5173/');
 });
 
-Scenario('Dang nhap that bai - sai mat khau', async ({ I }) => {
+Scenario('Đăng nhập thất bại - sai mật khẩu', async ({ I }) => {
   I.amOnPage('/login');
+  I.waitForElement('[name="email"]', 8);
 
   I.fillField('[name="email"]', VALID_EMAIL);
   I.fillField('[name="password"]', 'wrongpassword');
   I.click('button[type="submit"]');
 
-  I.waitForText('Dang nhap that bai', 5);
-  I.seeCurrentUrlEquals('http://localhost:5173/login');
+  I.waitForText('thất bại', 5);
+  I.seeInCurrentUrl('/login');
 });
 
-Scenario('Dang nhap that bai - email khong hop le', async ({ I }) => {
+Scenario('Đăng nhập thất bại - email không hợp lệ (validation client)', async ({ I }) => {
   I.amOnPage('/login');
+  I.waitForElement('[name="email"]', 8);
 
-  I.fillField('[name="email"]', 'not-valid');
+  I.fillField('[name="email"]', 'notvalidemail');
   I.fillField('[name="password"]', '123456');
   I.click('button[type="submit"]');
 
-  I.see('Email khong hop le');
+  I.waitForElement('p.text-red-500', 5);
+  I.see('Email không hợp lệ');
   I.seeCurrentUrlEquals('http://localhost:5173/login');
 });
 
-Scenario('Chuyen trang dang ky khi bam link', async ({ I }) => {
+Scenario('Chuyển sang trang đăng ký khi bấm link', async ({ I }) => {
   I.amOnPage('/login');
-  I.click('Dang ky ngay');
-  I.seeCurrentUrlEquals('http://localhost:5173/register');
+  I.waitForElement('a[href="/register"]', 5);
+  I.click('a[href="/register"]');
+  I.waitForURL('http://localhost:5173/register', 5);
 });

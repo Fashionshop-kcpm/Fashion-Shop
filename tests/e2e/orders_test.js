@@ -1,50 +1,35 @@
-Feature('Trang Don Hang @e2e');
-
-let testToken = '';
+Feature('Trang Đơn Hàng @e2e');
 
 Before(async ({ I }) => {
-  const creds = await I.loginNewUser();
-  testToken = creds.token;
+  await I.loginNewUser();
+  I.amOnPage('/');
+  I.waitForElement('body', 3);
 });
 
 After(async ({ I }) => {
   await I.clearAuth();
 });
 
-Scenario('Chuyen den /login khi truy cap /orders chua dang nhap', async ({ I }) => {
+Scenario('Chuyển đến /login khi truy cập /orders chưa đăng nhập', async ({ I }) => {
   await I.clearAuth();
   I.amOnPage('/orders');
-  I.waitForNavigation();
-  I.seeCurrentUrlEquals('http://localhost:5173/login');
+  I.waitForURL('http://localhost:5173/login', 5);
 });
 
-Scenario('Trang don hang hien thi khi chua co don', async ({ I }) => {
+Scenario('Trang lịch sử đơn hàng hiển thị đúng', async ({ I }) => {
   I.amOnPage('/orders');
   I.waitForElement('h1', 8);
-  I.see('Lich Su Don Hang');
+  I.see('Lịch Sử Đơn Hàng');
 });
 
-Scenario('Trang checkout hien thi form dat hang', async ({ I }) => {
-  // Can them san pham vao gio truoc
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
-  const token = await I.executeScript(() => localStorage.getItem('token'));
-
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'M' },
-    { Authorization: `Bearer ${token}` }
-  );
-
-  I.amOnPage('/checkout');
-  I.waitForElement('h1, form', 8);
-  I.seeElement('[name="fullname"]');
-  I.seeElement('[name="phone"]');
-  I.seeElement('[name="address"]');
-  I.seeElement('button[type="submit"]');
+Scenario('Thông báo chưa có đơn hàng khi user mới', async ({ I }) => {
+  I.amOnPage('/orders');
+  I.waitForElement('h1', 8);
+  I.waitForText('Chưa có đơn hàng nào', 8);
 });
 
-Scenario('Dat hang thanh cong va chuyen trang order-success', async ({ I }) => {
-  // Them san pham vao gio qua API
+Scenario('Trang checkout hiển thị form đặt hàng', async ({ I }) => {
+  // Thêm sản phẩm vào giỏ trước
   const listRes = await I.sendGetRequest('/products');
   const productId = listRes.data.data[0].id;
   const token = await I.executeScript(() => localStorage.getItem('token'));
@@ -57,9 +42,28 @@ Scenario('Dat hang thanh cong va chuyen trang order-success', async ({ I }) => {
   I.amOnPage('/checkout');
   I.waitForElement('[name="fullname"]', 8);
 
-  I.fillField('[name="fullname"]', 'Nguyen Van Test');
+  I.seeElement('[name="fullname"]');
+  I.seeElement('[name="phone"]');
+  I.seeElement('[name="address"]');
+  I.seeElement('button[type="submit"]');
+});
+
+Scenario('Đặt hàng thành công và chuyển trang order-success', async ({ I }) => {
+  const listRes = await I.sendGetRequest('/products');
+  const productId = listRes.data.data[0].id;
+  const token = await I.executeScript(() => localStorage.getItem('token'));
+
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'M' },
+    { Authorization: `Bearer ${token}` }
+  );
+
+  I.amOnPage('/checkout');
+  I.waitForElement('[name="fullname"]', 8);
+
+  I.fillField('[name="fullname"]', 'Nguyễn Văn Test');
   I.fillField('[name="phone"]', '0901234567');
-  I.fillField('[name="address"]', '123 Duong Le Loi, Quan 1, TP.HCM');
+  I.fillField('[name="address"]', '123 Đường Lê Lợi, Quận 1, TP.HCM');
 
   I.click('button[type="submit"]');
 
@@ -67,7 +71,7 @@ Scenario('Dat hang thanh cong va chuyen trang order-success', async ({ I }) => {
   I.seeInCurrentUrl('/order-success/');
 });
 
-Scenario('Dat hang loi 422 khi de trong dia chi', async ({ I }) => {
+Scenario('Lỗi validation khi để trống địa chỉ', async ({ I }) => {
   const listRes = await I.sendGetRequest('/products');
   const productId = listRes.data.data[0].id;
   const token = await I.executeScript(() => localStorage.getItem('token'));
@@ -82,17 +86,16 @@ Scenario('Dat hang loi 422 khi de trong dia chi', async ({ I }) => {
 
   I.fillField('[name="fullname"]', 'Test User');
   I.fillField('[name="phone"]', '0901234567');
-  // Bo trong address
+  // Bỏ trống address
 
   I.click('button[type="submit"]');
 
-  // Form validation khong cho submit
-  I.waitForElement('p.text-red-500, span.text-red-500', 5);
+  I.waitForElement('p.text-red-500', 5);
   I.seeCurrentUrlEquals('http://localhost:5173/checkout');
 });
 
-Scenario('Xem danh sach don hang sau khi dat', async ({ I }) => {
-  // Tao 1 don hang qua API
+Scenario('Xem danh sách đơn hàng sau khi đặt', async ({ I }) => {
+  // Tạo đơn hàng qua API
   const listRes = await I.sendGetRequest('/products');
   const productId = listRes.data.data[0].id;
   const token = await I.executeScript(() => localStorage.getItem('token'));
@@ -102,13 +105,34 @@ Scenario('Xem danh sach don hang sau khi dat', async ({ I }) => {
     { Authorization: `Bearer ${token}` }
   );
   await I.sendPostRequest('/orders',
-    { fullname: 'Test User', phone: '0901234567', address: '123 ABC', payment: 'COD' },
+    { fullname: 'Test', phone: '0901234567', address: '123 ABC', payment: 'COD' },
     { Authorization: `Bearer ${token}` }
   );
 
   I.amOnPage('/orders');
   I.waitForElement('h1', 8);
-  I.see('Lich Su Don Hang');
-  // Co it nhat 1 don hang
+  I.see('Lịch Sử Đơn Hàng');
+  // Có ít nhất 1 đơn hàng
   I.waitForElement('a[href*="/orders/"]', 8);
+  I.see('Đơn #');
+});
+
+Scenario('Xem chi tiết đơn hàng', async ({ I }) => {
+  const listRes = await I.sendGetRequest('/products');
+  const productId = listRes.data.data[0].id;
+  const token = await I.executeScript(() => localStorage.getItem('token'));
+
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'M' },
+    { Authorization: `Bearer ${token}` }
+  );
+  const orderRes = await I.sendPostRequest('/orders',
+    { fullname: 'Test', phone: '0901234567', address: '123 ABC', payment: 'COD' },
+    { Authorization: `Bearer ${token}` }
+  );
+  const orderId = orderRes.data.order?.id || orderRes.data.id;
+
+  I.amOnPage(`/orders/${orderId}`);
+  I.waitForElement('h1, .text-2xl', 8);
+  I.seeInCurrentUrl(`/orders/${orderId}`);
 });
