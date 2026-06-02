@@ -9,6 +9,16 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        return response()->json(Category::all());
+        $categories = Category::paginate(10);
+
+        return response()->json([
+            'data' => $categories->items(),
+            'pagination' => [
+                'current_page' => $categories->currentPage(),
+                'per_page' => $categories->perPage(),
+                'total' => $categories->total(),
+                'last_page' => $categories->lastPage(),
+            ]
+        ]);
     }
 }
