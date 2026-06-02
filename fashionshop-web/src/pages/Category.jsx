@@ -39,7 +39,7 @@ export default function Category() {
   const total = productsRes?.data?.total || 0;
 
   // Categories: direct array
-  const categories = catsRes?.data || [];
+  const categories = catsRes?.data?.data || [];
 
   const setFilter = (key, val) => {
     const next = new URLSearchParams(searchParams);
