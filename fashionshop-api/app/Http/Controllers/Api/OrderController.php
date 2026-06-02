@@ -29,7 +29,9 @@ class OrderController extends Controller
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
 
-        return response()->json($order);
+        return response()->json([
+            'order' => $order
+        ]);
     }
 
     public function store(Request $request)

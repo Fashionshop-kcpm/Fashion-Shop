@@ -23,13 +23,13 @@ export default function Cart() {
     queryFn: async () => {
       const res = await getCart();
       // Cart trả về array trực tiếp
-      setCount(res.data?.length || 0);
+      setCount(res.data?.data?.length || 0);
       return res;
     },
   });
 
   // Cart: direct array
-  const items = data?.data || [];
+  const items = data?.data?.data || [];
 
   const subtotal = items.reduce((s, i) => s + (i.product?.gia || 0) * i.quantity, 0);
   const total = subtotal + SHIPPING_FEE;

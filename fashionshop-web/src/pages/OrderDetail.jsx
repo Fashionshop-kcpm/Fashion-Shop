@@ -20,7 +20,7 @@ export default function OrderDetail() {
   });
 
   // Order detail: direct object
-  const order = data?.data;
+  const order = data?.data?.order;
 
   const handleCancel = async () => {
     if (!confirm("Bạn có chắc muốn hủy đơn hàng này?")) return;

@@ -38,7 +38,7 @@ export default function Checkout() {
   });
 
   // Cart: direct array
-  const items = cartData?.data || [];
+  const items = cartData?.data?.data || [];
   // Addresses: direct array
   const addresses = addrData?.data || [];
 
