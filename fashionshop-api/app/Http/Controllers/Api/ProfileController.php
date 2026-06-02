@@ -53,6 +53,13 @@ class ProfileController extends Controller
             'password' => Hash::make($request->new_password)
         ]);
 
-        return response()->json(['message' => 'Đổi mật khẩu thành công']);
+        $request->user()->currentAccessToken()->delete();
+
+        $newToken = $request->user()->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Đổi mật khẩu thành công',
+            'token'   => $newToken,
+        ]);
     }
 }
