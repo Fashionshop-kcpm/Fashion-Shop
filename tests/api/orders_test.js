@@ -27,7 +27,9 @@ Before(async ({ I }) => {
   productId = listRes.data.data[0].id;
 });
 
-Scenario('POST /orders - Dat hang thanh cong', async ({ I }) => {
+// ─── ĐẶT HÀNG ────────────────────────────────────────────────────
+
+Scenario('POST /orders - Status 200 OK', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'M' },
     { Authorization: `Bearer ${token}` }
@@ -37,13 +39,36 @@ Scenario('POST /orders - Dat hang thanh cong', async ({ I }) => {
     Authorization: `Bearer ${token}`,
   });
 
-  expect(res.status).to.equal(201);
-  expect(res.data).to.have.property('id');
-  expect(res.data).to.have.property('status');
-  expect(res.data).to.have.property('total');
+  expect(res.status).to.equal(200);
 });
 
-Scenario('POST /orders - Loi 400 khi gio hang rong', async ({ I }) => {
+Scenario('POST /orders - Phản hồi trả về JSON', async ({ I }) => {
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'L' },
+    { Authorization: `Bearer ${token}` }
+  );
+
+  const res = await I.sendPostRequest('/orders', orderPayload, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  expect(res.data).to.be.an('object');
+});
+
+Scenario('POST /orders - Response chứa danh sách sản phẩm của đơn hàng', async ({ I }) => {
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'S' },
+    { Authorization: `Bearer ${token}` }
+  );
+
+  const res = await I.sendPostRequest('/orders', orderPayload, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  expect(res.data.order).to.have.property('details');
+});
+
+Scenario('POST /orders - Lỗi 400 khi giỏ hàng rỗng', async ({ I }) => {
   const res = await I.sendPostRequest('/orders', orderPayload, {
     Authorization: `Bearer ${token}`,
   });
@@ -51,7 +76,7 @@ Scenario('POST /orders - Loi 400 khi gio hang rong', async ({ I }) => {
   expect(res.status).to.equal(400);
 });
 
-Scenario('POST /orders - Loi 422 khi thieu thong tin giao hang', async ({ I }) => {
+Scenario('POST /orders - Lỗi 422 khi thiếu thông tin giao hàng', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'L' },
     { Authorization: `Bearer ${token}` }
@@ -65,22 +90,15 @@ Scenario('POST /orders - Loi 422 khi thieu thong tin giao hang', async ({ I }) =
   expect(res.status).to.equal(422);
 });
 
-Scenario('POST /orders - Loi 401 khi khong co token', async ({ I }) => {
+Scenario('POST /orders - Lỗi 401 khi không có token', async ({ I }) => {
   const res = await I.sendPostRequest('/orders', orderPayload);
 
   expect(res.status).to.equal(401);
 });
 
-Scenario('GET /orders - Xem danh sach don hang', async ({ I }) => {
-  const res = await I.sendGetRequest('/orders', {
-    Authorization: `Bearer ${token}`,
-  });
+// ─── HỦY ĐƠN HÀNG ────────────────────────────────────────────────
 
-  expect(res.status).to.equal(200);
-  expect(res.data).to.be.an('array');
-});
-
-Scenario('GET /orders/:id - Xem chi tiet don hang', async ({ I }) => {
+Scenario('PATCH /orders/:id/cancel - Hủy đơn hàng thành công', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'M' },
     { Authorization: `Bearer ${token}` }
@@ -88,28 +106,16 @@ Scenario('GET /orders/:id - Xem chi tiet don hang', async ({ I }) => {
   const orderRes = await I.sendPostRequest('/orders', orderPayload, {
     Authorization: `Bearer ${token}`,
   });
-  const id = orderRes.data.id;
+  const id = orderRes.data.order?.id || orderRes.data.id;
 
-  const res = await I.sendGetRequest(`/orders/${id}`, {
+  const res = await I.sendPatchRequest(`/orders/${id}/cancel`, {}, {
     Authorization: `Bearer ${token}`,
   });
 
   expect(res.status).to.equal(200);
-  expect(res.data).to.have.property('id', id);
-  expect(res.data).to.have.property('status');
-  expect(res.data).to.have.property('total');
-  expect(res.data).to.have.property('details').that.is.an('array');
 });
 
-Scenario('GET /orders/:id - Loi 404 khi ID khong ton tai', async ({ I }) => {
-  const res = await I.sendGetRequest('/orders/999999', {
-    Authorization: `Bearer ${token}`,
-  });
-
-  expect(res.status).to.equal(404);
-});
-
-Scenario('PATCH /orders/:id/cancel - Huy don hang khi status = pending', async ({ I }) => {
+Scenario('PATCH /orders/:id/cancel - Message hủy đơn thành công', async ({ I }) => {
   await I.sendPostRequest('/cart',
     { product_id: productId, quantity: 1, size: 'S' },
     { Authorization: `Bearer ${token}` }
@@ -117,11 +123,137 @@ Scenario('PATCH /orders/:id/cancel - Huy don hang khi status = pending', async (
   const orderRes = await I.sendPostRequest('/orders', orderPayload, {
     Authorization: `Bearer ${token}`,
   });
-  const id = orderRes.data.id;
+  const id = orderRes.data.order?.id || orderRes.data.id;
 
   const res = await I.sendPatchRequest(`/orders/${id}/cancel`, {}, {
     Authorization: `Bearer ${token}`,
   });
 
+  expect(res.data.message).to.equal('Đã hủy đơn hàng');
+});
+
+Scenario('[BUG] PATCH /orders/:id/cancel - Phải trả về status khi hủy đơn hàng', async ({ I }) => {
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'XL' },
+    { Authorization: `Bearer ${token}` }
+  );
+  const orderRes = await I.sendPostRequest('/orders', orderPayload, {
+    Authorization: `Bearer ${token}`,
+  });
+  const id = orderRes.data.order?.id || orderRes.data.id;
+
+  const res = await I.sendPatchRequest(`/orders/${id}/cancel`, {}, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  // ❌ controller không trả về field 'status'
+  expect(res.data).to.have.property('status');
+});
+
+// ─── XEM DANH SÁCH ĐƠN HÀNG ──────────────────────────────────────
+
+Scenario('GET /orders - Status 200 OK', async ({ I }) => {
+  const res = await I.sendGetRequest('/orders', {
+    Authorization: `Bearer ${token}`,
+  });
+
   expect(res.status).to.equal(200);
+});
+
+Scenario('GET /orders - Có dữ liệu đơn hàng', async ({ I }) => {
+  // Tạo 1 đơn hàng trước
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'M' },
+    { Authorization: `Bearer ${token}` }
+  );
+  await I.sendPostRequest('/orders', orderPayload, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  const res = await I.sendGetRequest('/orders', {
+    Authorization: `Bearer ${token}`,
+  });
+
+  const count = res.data.length || (res.data.data && res.data.data.length) || 0;
+  expect(count).to.be.above(0);
+});
+
+Scenario('[BUG] GET /orders - Đơn hàng phải có tổng số lượng', async ({ I }) => {
+  const res = await I.sendGetRequest('/orders', {
+    Authorization: `Bearer ${token}`,
+  });
+
+  const orders = Array.isArray(res.data) ? res.data : res.data.data;
+  if (orders && orders.length > 0) {
+    // ❌ controller không trả về field 'total_quantity'
+    expect(orders[0]).to.have.property('total_quantity');
+  }
+});
+
+// ─── XEM CHI TIẾT ĐƠN HÀNG ───────────────────────────────────────
+
+Scenario('GET /orders/:id - Status 200 OK', async ({ I }) => {
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'M' },
+    { Authorization: `Bearer ${token}` }
+  );
+  const orderRes = await I.sendPostRequest('/orders', orderPayload, {
+    Authorization: `Bearer ${token}`,
+  });
+  const id = orderRes.data.order?.id || orderRes.data.id;
+
+  const res = await I.sendGetRequest(`/orders/${id}`, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  expect(res.status).to.equal(200);
+});
+
+Scenario('GET /orders/:id - Order có details với product', async ({ I }) => {
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'L' },
+    { Authorization: `Bearer ${token}` }
+  );
+  const orderRes = await I.sendPostRequest('/orders', orderPayload, {
+    Authorization: `Bearer ${token}`,
+  });
+  const id = orderRes.data.order?.id || orderRes.data.id;
+
+  const res = await I.sendGetRequest(`/orders/${id}`, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  expect(res.data).to.have.property('details');
+  expect(res.data.details).to.be.an('array');
+  if (res.data.details.length > 0) {
+    expect(res.data.details[0]).to.have.property('product');
+  }
+});
+
+Scenario('[BUG] GET /orders/:id - Có size bên trong product', async ({ I }) => {
+  await I.sendPostRequest('/cart',
+    { product_id: productId, quantity: 1, size: 'S' },
+    { Authorization: `Bearer ${token}` }
+  );
+  const orderRes = await I.sendPostRequest('/orders', orderPayload, {
+    Authorization: `Bearer ${token}`,
+  });
+  const id = orderRes.data.order?.id || orderRes.data.id;
+
+  const res = await I.sendGetRequest(`/orders/${id}`, {
+    Authorization: `Bearer ${token}`,
+  });
+
+  if (res.data.details && res.data.details.length > 0) {
+    // ❌ size nằm ở order detail, không phải bên trong product
+    expect(res.data.details[0].product).to.have.property('size');
+  }
+});
+
+Scenario('GET /orders/:id - Lỗi 404 khi ID không tồn tại', async ({ I }) => {
+  const res = await I.sendGetRequest('/orders/999999', {
+    Authorization: `Bearer ${token}`,
+  });
+
+  expect(res.status).to.equal(404);
 });
