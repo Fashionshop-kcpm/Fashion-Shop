@@ -22,7 +22,7 @@ class OrderController extends Controller
     });
         return response()->json($orders);
     }
-    public function show(Request $request, $id)
+   public function show(Request $request, $id)
     {
         $order = Order::with('details.product')
             ->where('id', $id)
@@ -30,6 +30,10 @@ class OrderController extends Controller
             ->firstOrFail();
 
         return response()->json([
+            'details' => $order->details->map(function ($detail) {
+                $detail->product->size = $detail->size;
+                return $detail;
+            }),
             'order' => $order
         ]);
     }
