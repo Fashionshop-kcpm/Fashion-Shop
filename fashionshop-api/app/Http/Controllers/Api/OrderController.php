@@ -28,7 +28,7 @@ class OrderController extends Controller
             ->where('id', $id)
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
-
+        $order->details->transform(function ($detail) { $detail->product->size = $detail->size; return $detail; });
         return response()->json($order);
     }
 
