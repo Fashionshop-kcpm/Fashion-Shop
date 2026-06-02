@@ -26,8 +26,17 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with(['user', 'details.product'])->findOrFail($id);
+        $order->details->each(function ($detail) {
+            if ($detail->product) {
+                $detail->product->name = $detail->product->ten_sp;
+                
+                $detail->product->makeHidden('ten_sp');
+            }
+        });
+
         return response()->json($order);
     }
+
 
     public function updateStatus(Request $request, $id)
     {
