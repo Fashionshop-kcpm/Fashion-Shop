@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(Remove-Item \"c:\\\\laragon\\\\www\\\\Fashion-Shop\\\\tests\\\\api\\\\address_test.js\" -Force)",
+      "Bash(rm \"c:/laragon/www/Fashion-Shop/tests/api/address_test.js\")"
+    ],
+    "additionalDirectories": ["c:\\laragon\\www\\Fashion-Shop\\tests\\api"],
+
+    "includeCoAuthoredBy": false
+  }
+}
