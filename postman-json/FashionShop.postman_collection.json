@@ -9,7 +9,7 @@
   },
   "item": [
     {
-      "name": "USER",
+      "name": "Public",
       "item": [
         {
           "name": "register",
@@ -53,7 +53,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"bao29@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
+              "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"bao3012@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -111,7 +111,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"newpass123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"bao3012@gmail.com\",\r\n    \"password\": \"Chi123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -131,12 +131,70 @@
           "response": []
         },
         {
+          "name": "Danh mục",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response là mảng danh mục\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.data).to.be.an(\"array\");\r",
+                  "    if (json.length > 0) {\r",
+                  "        pm.environment.set(\"category_id\", json[0].id);\r",
+                  "    }\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response có phân trang\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"pagination\"); \r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Danh sách sản phẩm",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
+                  "var jsonData = pm.response.json();\r",
+                  "if (jsonData.data && jsonData.data.length > 0) {\r",
+                  "    pm.environment.set(\"product_id\", jsonData.data[0].id);\r",
+                  "}\r",
                   "pm.test(\"Status 200 OK\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
@@ -198,7 +256,7 @@
           "response": []
         },
         {
-          "name": "Danh mục",
+          "name": "Chi tiết sản phẩm",
           "event": [
             {
               "listen": "test",
@@ -208,17 +266,16 @@
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Response là mảng danh mục\", function () {\r",
+                  "pm.test(\"Response có category và reviews\", function () {\r",
                   "    const json = pm.response.json();\r",
-                  "    pm.expect(json.data).to.be.an(\"array\");\r",
-                  "    if (json.length > 0) {\r",
-                  "        pm.environment.set(\"category_id\", json[0].id);\r",
-                  "    }\r",
+                  "    pm.expect(json).to.have.property(\"category\");\r",
+                  "    pm.expect(json).to.have.property(\"reviews\");\r",
+                  "    pm.expect(json.reviews).to.be.an(\"array\");\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Response có phân trang\", function () {\r",
+                  "pm.test(\"Sản phẩm có field 'name'\", function () {\r",
                   "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.have.property(\"pagination\"); \r",
+                  "    pm.expect(json).to.have.property(\"name\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -240,17 +297,161 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/categories",
+              "raw": "{{base_url}}/products/{{product_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "categories"
+                "products",
+                "{{product_id}}"
               ]
             }
           },
           "response": []
         },
+        {
+          "name": "review_product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Kiểm tra Status 200\r",
+                  "pm.test(\"Status 200 OK\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra dữ liệu trả về đúng định dạng và có đầy đủ các thông tin cần thiết\r",
+                  "pm.test(\"Mỗi review phải có thông tin user\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.be.an(\"array\");\r",
+                  "    if (json.length > 0) {\r",
+                  "        pm.expect(json[0]).to.have.property(\"user\");\r",
+                  "        pm.expect(json[0]).to.have.property(\"rating\");\r",
+                  "        pm.expect(json[0]).to.have.property(\"comment\");\r",
+                  "    }\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra review có được sắp xếp từ cũ đến mới nhất không\r",
+                  "pm.test(\"Reviews sắp xếp cũ nhất trước\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    if (json.length >= 2) {\r",
+                  "        const first = new Date(json[0].created_at);\r",
+                  "        const second = new Date(json[1].created_at);\r",
+                  "        pm.expect(first.getTime()).to.be.lessThan(second.getTime()); \r",
+                  "    }\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}/reviews",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}",
+                "reviews"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gửi liên hệ",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test 1: Gửi liên hệ thành công\r",
+                  "pm.test(\"Gửi liên hệ thành công - Status 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "// Test 2: Response trả về JSON\r",
+                  "pm.test(\"Response trả về đúng định dạng JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "// Test 3: FAIL - kiểm tra field không tồn tại\r",
+                  "pm.test(\"Response phải có trường 'token'\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"token\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"fullname\": \"Nguyễn Văn A\",\r\n    \"email\": \"test@gmail.com\",\r\n    \"phone\": \"0901234567\",\r\n    \"message\": \"Tôi muốn hỏi về sản phẩm\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/contacts",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "contacts"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "USER",
+      "item": [
         {
           "name": "add_cart_BUG",
           "event": [
@@ -343,6 +544,11 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "var jsonData = pm.response.json();\r",
+                  "if (jsonData.cart && jsonData.cart.id) {\r",
+                  "    pm.environment.set(\"cart_id\", jsonData.cart.id);\r",
+                  "}\r",
+                  "\r",
                   "// Kiểm tra mã phản hồi\r",
                   "pm.test(\"Trạng thái phản hồi là 200 OK\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
@@ -451,13 +657,13 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/cart/97",
+              "raw": "{{base_url}}/cart/{{cart_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "cart",
-                "97"
+                "{{cart_id}}"
               ]
             }
           },
@@ -826,67 +1032,13 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/cart/999",
+              "raw": "{{base_url}}/cart/{{cart_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "cart",
-                "999"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Chi tiết sản phẩm",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status 200 OK\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Response có category và reviews\", function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.have.property(\"category\");\r",
-                  "    pm.expect(json).to.have.property(\"reviews\");\r",
-                  "    pm.expect(json.reviews).to.be.an(\"array\");\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Sản phẩm có field 'name'\", function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.have.property(\"name\");\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/products/3",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "products",
-                "3"
+                "{{cart_id}}"
               ]
             }
           },
@@ -957,79 +1109,13 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/products/4/reviews",
+              "raw": "{{base_url}}/products/{{product_id}}/reviews",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "products",
-                "4",
-                "reviews"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "review_product",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Kiểm tra Status 200\r",
-                  "pm.test(\"Status 200 OK\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "// Kiểm tra dữ liệu trả về đúng định dạng và có đầy đủ các thông tin cần thiết\r",
-                  "pm.test(\"Mỗi review phải có thông tin user\", function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.be.an(\"array\");\r",
-                  "    if (json.length > 0) {\r",
-                  "        pm.expect(json[0]).to.have.property(\"user\");\r",
-                  "        pm.expect(json[0]).to.have.property(\"rating\");\r",
-                  "        pm.expect(json[0]).to.have.property(\"comment\");\r",
-                  "    }\r",
-                  "});\r",
-                  "\r",
-                  "// Kiểm tra review có được sắp xếp từ cũ đến mới nhất không\r",
-                  "pm.test(\"Reviews sắp xếp cũ nhất trước\", function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    if (json.length >= 2) {\r",
-                  "        const first = new Date(json[0].created_at);\r",
-                  "        const second = new Date(json[1].created_at);\r",
-                  "        pm.expect(first.getTime()).to.be.lessThan(second.getTime()); \r",
-                  "    }\r",
-                  "});\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/products/29/reviews",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "products",
-                "29",
+                "{{product_id}}",
                 "reviews"
               ]
             }
@@ -1233,78 +1319,6 @@
           "response": []
         },
         {
-          "name": "Gửi liên hệ",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Test 1: Gửi liên hệ thành công\r",
-                  "pm.test(\"Gửi liên hệ thành công - Status 201\", function () {\r",
-                  "    pm.response.to.have.status(201);\r",
-                  "});\r",
-                  "\r",
-                  "// Test 2: Response trả về JSON\r",
-                  "pm.test(\"Response trả về đúng định dạng JSON\", function () {\r",
-                  "    pm.response.to.be.json;\r",
-                  "});\r",
-                  "\r",
-                  "// Test 3: FAIL - kiểm tra field không tồn tại\r",
-                  "pm.test(\"Response phải có trường 'token'\", function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.have.property(\"token\");\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json",
-                "type": "text"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"fullname\": \"Nguyễn Văn A\",\r\n    \"email\": \"test@gmail.com\",\r\n    \"phone\": \"0901234567\",\r\n    \"message\": \"Tôi muốn hỏi về sản phẩm\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/contacts",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "contacts"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Logout",
           "event": [
             {
@@ -1361,6 +1375,40 @@
             }
           },
           "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
         }
       ]
     },
@@ -1685,14 +1733,14 @@
               ]
             },
             "url": {
-              "raw": "{{base_url}}/admin/products/44",
+              "raw": "{{base_url}}/admin/products/{{product_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "admin",
                 "products",
-                "44"
+                "{{product_id}}"
               ]
             }
           },
@@ -1735,14 +1783,14 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/admin/products/44",
+              "raw": "{{base_url}}/admin/products/{{product_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "admin",
                 "products",
-                "44"
+                "{{product_id}}"
               ]
             }
           },
@@ -2100,66 +2148,6 @@
           "response": []
         },
         {
-          "name": "logout_admin",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "// Test 1: Đăng xuất thành công\r",
-                  "pm.test(\"Đăng xuất thành công - Status 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "// Test 2: Response có message xác nhận đăng xuất\r",
-                  "pm.test(\"Message đăng xuất thành công\", function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json.message).to.equal(\"Đã đăng xuất\");\r",
-                  "});\r",
-                  "\r",
-                  "// Test 3: FAIL - Sau khi đăng xuất token phải bị vô hiệu hóa\r",
-                  "pm.test(\"Token phải bị vô hiệu hóa sau khi đăng xuất\", function () {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json).to.have.property(\"token_revoked\");\r",
-                  "    pm.expect(json.token_revoked).to.equal(true);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "noauth"
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{admin_token}}",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"123456\"\r\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/admin/logout",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "admin",
-                "logout"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "order_detail",
           "event": [
             {
@@ -2346,6 +2334,100 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "logout_admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test 1: Đăng xuất thành công\r",
+                  "pm.test(\"Đăng xuất thành công - Status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// Test 2: Response có message xác nhận đăng xuất\r",
+                  "pm.test(\"Message đăng xuất thành công\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.message).to.equal(\"Đã đăng xuất\");\r",
+                  "});\r",
+                  "\r",
+                  "// Test 3: FAIL - Sau khi đăng xuất token phải bị vô hiệu hóa\r",
+                  "pm.test(\"Token phải bị vô hiệu hóa sau khi đăng xuất\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"token_revoked\");\r",
+                  "    pm.expect(json.token_revoked).to.equal(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"test12@gmail.com\",\r\n    \"password\": \"123456\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/admin/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{admin_token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
         }
       ]
     }
