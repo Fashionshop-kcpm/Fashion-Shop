@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "a5b42bbf-b697-4d14-ac41-0d03b652bf6e",
-    "name": "FashionShop",
+    "_postman_id": "5a62df72-963d-4089-bbd3-73d3b148c99a",
+    "name": "FashionShop Copy",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55104651",
-    "_collection_link": "https://go.postman.co/collection/55104651-a5b42bbf-b697-4d14-ac41-0d03b652bf6e?source=collection_link"
+    "_exporter_id": "55108854",
+    "_collection_link": "https://go.postman.co/collection/55108854-5a62df72-963d-4089-bbd3-73d3b148c99a?source=collection_link"
   },
   "item": [
     {
@@ -53,7 +53,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"bao3012@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
+              "raw": "{\r\n    \"fullname\":\"Nguyễn Chí Trung\",\r\n    \"email\":\"trung77@gmail.com\",\r\n    \"phone\":\"0938019655\",\r\n    \"gender\":\"Nam\",\r\n    \"password\":\"Chi123\",\r\n    \"password_confirmation\":\"Chi123\"\r\n\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -111,7 +111,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"email\": \"bao3012@gmail.com\",\r\n    \"password\": \"Chi123\"\r\n}",
+              "raw": "{\r\n    \"email\": \"trung77@gmail.com\",\r\n    \"password\": \"Chi123\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -807,6 +807,220 @@
           "response": []
         },
         {
+          "name": "add_address",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Kiểm tra trạng thái 201\r",
+                  "pm.test(\"Status code là 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra message và cấu trúc của address trong response body\r",
+                  "pm.test(\"Có message thêm địa chỉ\", function () {\r",
+                  "    let data = pm.response.json();\r",
+                  "    pm.expect(data.message).to.eql(\"Đã thêm địa chỉ\");\r",
+                  "    pm.expect(data.address).to.be.an(\"object\");\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra response có thông tin thành công\r",
+                  "pm.test(\"Response phải có trường success\", function () {\r",
+                  "    let data = pm.response.json();\r",
+                  "    pm.expect(data.success).to.eql(true);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"fullname\": \"Nguyen Van A\",\r\n    \"phone\": \"0987654321\",\r\n    \"address_details\": \"123 Le Loi, Quan 1, TP HCM\",\r\n    \"is_default\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "addresses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Đặt làm địa chỉ mặc định",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Kiểm tra status code\r",
+                  "\r",
+                  "pm.test(\"Kiểm tra status code phải là 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra có field message\r",
+                  "pm.test(\"Kiểm tra response có message\", function () {\r",
+                  "    const res = pm.response.json();\r",
+                  "    pm.expect(res).to.have.property(\"message\");\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra response có data không\r",
+                  "pm.test(\"Kiểm tra response có data\", function () {\r",
+                  "    const res = pm.response.json();\r",
+                  "    pm.expect(res).to.have.property(\"data\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/addresses/{{address_order_id}}/default",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "addresses",
+                "{{address_order_id}}",
+                "default"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "review_address",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Kiểm tra API trả về thành công\r",
+                  "pm.test(\"Status code phải là 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "// Kiểm tra dữ liệu trả về không được trống\r",
+                  "pm.test(\"Body không rỗng\", function () {\r",
+                  "    pm.expect(pm.response.text().length).to.be.greaterThan(0);\r",
+                  "});\r",
+                  "\r",
+                  "// Response phải có trường message\r",
+                  "pm.test(\"Response phải có trường message\", function () {\r",
+                  "    let data = pm.response.json();\r",
+                  "    pm.expect(data).to.have.property(\"message\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/addresses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "addresses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete_address",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Kiểm tra status code\r",
+                  "pm.test(\"Kiểm tra status code phải là 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra có message\r",
+                  "pm.test(\"Kiểm tra response có message\", function () {\r",
+                  "    const res = pm.response.json();\r",
+                  "    pm.expect(res).to.have.property(\"message\");\r",
+                  "});\r",
+                  "\r",
+                  "// Kiểm tra response sau khi xóa có trả về thông tin địa chỉ đã xóa hay không\r",
+                  "pm.test(\"Response phải trả về địa chỉ đã xóa\", function () {\r",
+                  "    const res = pm.response.json();\r",
+                  "    pm.expect(res).to.have.property(\"address\");\r",
+                  "    pm.expect(res.address).to.have.property(\"id\");\r",
+                  "    pm.expect(res.address).to.have.property(\"fullname\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/addresses/{{address_order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "addresses",
+                "{{address_order_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "cancel_orders",
           "event": [
             {
@@ -850,13 +1064,13 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/orders/11/cancel",
+              "raw": "{{base_url}}/orders/{{order_id}}/cancel",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "orders",
-                "11",
+                "{{order_id}}",
                 "cancel"
               ]
             }
@@ -965,13 +1179,13 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/orders/83",
+              "raw": "{{base_url}}/orders/{{order_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "orders",
-                "83"
+                "{{order_id}}"
               ]
             }
           },
@@ -1925,14 +2139,14 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/admin/contacts/4/status",
+              "raw": "{{base_url}}/admin/contacts/87/status",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "admin",
                 "contacts",
-                "4",
+                "87",
                 "status"
               ]
             }
