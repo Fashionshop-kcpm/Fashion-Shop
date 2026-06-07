@@ -38,7 +38,11 @@ class UserAddressController extends Controller
             'is_default'      => $request->is_default ? 1 : 0,
         ]);
 
-        return response()->json(['message' => 'Đã thêm địa chỉ', 'address' => $address], 201);
+        return response()->json([
+            'success' => true, 
+            'message' => 'Đã thêm địa chỉ', 
+            'address' => $address
+        ], 201);
     }
 
     public function destroy(Request $request, $id)
