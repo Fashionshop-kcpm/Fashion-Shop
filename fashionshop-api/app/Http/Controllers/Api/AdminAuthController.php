@@ -33,7 +33,11 @@ class AdminAuthController extends Controller
 
     public function logout(Request $request)
     {
+        $token = $request->user()->createToken('new_token')->plainTextToken;
         $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Đã đăng xuất']);
+        return response()->json([
+            'message' => 'Đã đăng xuất',
+            'token' => $token
+        ]);
     }
 }
