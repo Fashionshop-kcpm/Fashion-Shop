@@ -61,7 +61,7 @@ class OrderController extends Controller
                 $detail->product->makeHidden('ten_sp');
             }
         });
-    }
+    } 
 
     // 4. Trả về JSON bao gồm cả 'message' và 'order' để pass test case
     return response()->json([
