@@ -85,15 +85,22 @@ class OrderController extends Controller
     public function cancel(Request $request, $id)
     {
         $order = Order::where('id', $id)
-            ->where('user_id', $request->user()->id)
-            ->firstOrFail();
+        ->where('user_id', $request->user()->id)
+        ->firstOrFail();
 
-        if ($order->status !== 'pending') {
-            return response()->json(['message' => 'Không thể hủy đơn hàng này'], 400);
-        }
+    if ($order->status !== 'pending') {
+        return response()->json([
+            'message' => 'Không thể hủy đơn hàng này'
+        ], 400);
+    }
 
-        $order->update(['status' => 'cancelled']);
+    $order->update([
+        'status' => 'cancelled'
+    ]);
 
-        return response()->json(['message' => 'Đã hủy đơn hàng']);
+    return response()->json([
+        'message' => 'Đã hủy đơn hàng',
+        'status'  => 'cancelled'
+    ], 200);
     }
 }
