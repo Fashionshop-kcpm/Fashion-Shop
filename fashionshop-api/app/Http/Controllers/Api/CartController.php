@@ -82,10 +82,20 @@ if ($validator->fails()) {
 
     public function destroy(Request $request, $id)
     {
-        Cart::where('id', $id)
+        $cart = Cart::where('id', $id)
             ->where('user_id', $request->user()->id)
-            ->delete();
+            ->first();
 
-        return response()->json(['message' => 'Đã xóa sản phẩm khỏi giỏ hàng']);
+        if (!$cart) {
+            return response()->json([
+                'message' => 'ID không hợp lệ'
+            ], 200);
+        }
+
+        $cart->delete();
+
+        return response()->json([
+            'message' => 'Đã xóa sản phẩm khỏi giỏ hàng'
+        ], 200);
     }
 }
