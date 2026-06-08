@@ -47,11 +47,27 @@ class UserAddressController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        UserAddress::where('id', $id)
+        $address = UserAddress::where('id', $id)
             ->where('user_id', $request->user()->id)
-            ->delete();
+            ->first();
 
-        return response()->json(['message' => 'Đã xóa địa chỉ']);
+        if (!$address) {
+            return response()->json([
+                'message' => 'Không tìm thấy địa chỉ'
+            ], 404);
+        }
+
+        // Lưu thông tin địa chỉ trước khi xóa
+        $deletedAddress = $address->toArray();
+
+        // Xóa địa chỉ
+        $address->delete();
+
+        // Trả về thông tin địa chỉ đã xóa
+        return response()->json([
+            'message' => 'Đã xóa địa chỉ',
+            'address' => $deletedAddress
+        ], 200);
     }
 
     public function setDefault(Request $request, $id)
