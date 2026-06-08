@@ -33,7 +33,7 @@ public function index()
         $review = Review::findOrFail($id);
         $review->update(['shop_reply' => $request->shop_reply]);
 
-        return response()->json(['message' => 'Đã phản hồi đánh giá']);
+        return response()->json($review->fresh());
     }
 
     public function destroy($id)
