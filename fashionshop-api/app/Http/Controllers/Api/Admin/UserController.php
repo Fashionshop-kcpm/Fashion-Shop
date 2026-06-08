@@ -17,7 +17,7 @@ class UserController extends Controller
                   ->orWhere('email', 'LIKE', "%{$request->keyword}%");
         }
 
-        return response()->json($query->paginate(10));
+        return response()->json($query->paginate(20));
     }
 
     public function show($id)
