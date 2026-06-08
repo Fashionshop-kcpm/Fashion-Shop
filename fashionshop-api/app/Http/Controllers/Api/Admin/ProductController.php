@@ -49,7 +49,8 @@ class ProductController extends Controller
             'hinh_anh'    => $hinh_anh,
         ]);
 
-        return response()->json(['message' => 'Đã thêm sản phẩm', 'product' => $product], 201);
+        return response()->json(['success' => true, 'message' => 'Đã thêm sản phẩm', 'product' => $product], 201);
+
     }
 
     public function update(Request $request, $id)
