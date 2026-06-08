@@ -17,6 +17,7 @@ class ProductController extends Controller
 
         $products = $query->paginate(10);
         return response()->json(array_merge($products->toArray(), ['success' => true]));
+        
     }
 
 
@@ -83,7 +84,7 @@ class ProductController extends Controller
         
         return response()->json([
             'message' => 'Đã xóa sản phẩm',
-            'id'      => (int) $id  
+            'id'      => (int) $id,
         ]);
     }
 }

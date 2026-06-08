@@ -25,7 +25,7 @@ class ProductController extends Controller
             $query->where('gioi_tinh', $request->gioi_tinh);
         }
 
-        $products = $query->paginate(8);
+        $products = $query->paginate(10);
 
         return response()->json($products);
     }
