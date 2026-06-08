@@ -59,10 +59,24 @@ class UserAddressController extends Controller
         UserAddress::where('user_id', $request->user()->id)
             ->update(['is_default' => 0]);
 
-        UserAddress::where('id', $id)
+        $address = UserAddress::where('id', $id)
             ->where('user_id', $request->user()->id)
-            ->update(['is_default' => 1]);
+            ->first();
 
-        return response()->json(['message' => 'Đã đặt địa chỉ mặc định']);
+        if (!$address) {
+            return response()->json([
+                'message' => 'Không tìm thấy địa chỉ',
+                'data' => null
+            ], 404);
+        }
+
+        $address->update([
+            'is_default' => 1
+        ]);
+
+        return response()->json([
+            'message' => 'Đã đặt địa chỉ mặc định',
+            'data' => $address->fresh()
+        ], 200);
     }
 }
