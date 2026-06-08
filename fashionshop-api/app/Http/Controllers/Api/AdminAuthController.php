@@ -37,7 +37,7 @@ class AdminAuthController extends Controller
         
         return response()->json([
             'message'       => 'Đã đăng xuất',
-            'token_revoked' => true
+            'token_revoked' => true,
         ]);
     }
 }
