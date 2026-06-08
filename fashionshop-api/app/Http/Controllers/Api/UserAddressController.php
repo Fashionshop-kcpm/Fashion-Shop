@@ -10,12 +10,15 @@ class UserAddressController extends Controller
 {
     public function index(Request $request)
     {
-        return response()->json(
-            UserAddress::where('user_id', $request->user()->id)
-                ->orderBy('is_default', 'desc')
-                ->get()
-        );
-    }
+        $addresses = UserAddress::where('user_id', $request->user()->id)
+            ->orderBy('is_default', 'desc')
+            ->get();
+
+        return response()->json([
+            'message' => 'Lấy danh sách địa chỉ thành công',
+            'data' => $addresses
+    ]);
+}
 
     public function store(Request $request)
     {
