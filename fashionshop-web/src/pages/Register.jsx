@@ -55,11 +55,13 @@ export default function Register() {
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       <input
-        {...register(name)}
-        type={type}
-        placeholder={placeholder}
-        className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-      />
+      {...register(name)}
+      name={name}
+      type={type}
+      autoComplete="off"
+      placeholder={placeholder}
+      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+    />
       {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>}
     </div>
   );
@@ -70,9 +72,9 @@ export default function Register() {
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Đăng Ký</h1>
         <p className="text-sm text-gray-500 mb-6">Tạo tài khoản FashionShop mới</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {field("fullname", "Họ và Tên", "text", "Nguyễn Văn A")}
-          {field("email", "Email", "email", "email@example.com")}
+          {field("email", "Email", "text", "email@example.com")}
           {field("phone", "Số Điện Thoại", "text", "0901234567")}
 
           <div>

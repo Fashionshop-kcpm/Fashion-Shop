@@ -47,14 +47,24 @@ export default function OrderDetail() {
       </button>
 
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Đơn Hàng #{order.id}</h1>
-          <p className="text-sm text-gray-400 mt-0.5">
-            {new Date(order.created_at).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-          </p>
-        </div>
-        <OrderBadge status={order.status} />
-      </div>
+  <div>
+    <h1 className="text-2xl font-bold text-gray-800">
+      Chi tiết đơn hàng #{order.id}
+    </h1>
+
+    <p className="text-sm text-gray-400 mt-0.5">
+      {new Date(order.created_at).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </p>
+  </div>
+
+  <OrderBadge status={order.status} />
+</div>
 
       {/* Products */}
       <div className="bg-white border rounded-xl overflow-hidden mb-4">

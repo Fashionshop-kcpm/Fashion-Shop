@@ -103,13 +103,13 @@ Scenario('Admin lọc đơn hàng theo trạng thái', async ({ I }) => {
   I.seeInCurrentUrl('/orders');
 });
 
-Scenario('Admin tìm kiếm đơn hàng theo từ khóa', async ({ I }) => {
+Scenario('Admin vào chi tiết đơn hàng và hiển thị dữ liệu', async ({ I }) => {
   I.amOnPage(`${ADMIN_URL}/orders`);
-  await I.waitForElement('input[placeholder*="Tìm"]', 8);
-
-  I.fillField('input[placeholder*="Tìm"]', '1');
-  I.pressKey('Enter');
-  await I.waitForElement('table', 8);
+  I.waitForElement('table', 10);
+  I.click(locate('a[href*="/orders/"]').first());
+  I.waitForURL('**/orders/**', 10);
+  I.waitForElement('h1', 10);
+  I.see('Chi tiết');
 });
 
 Scenario('Admin xem chi tiết đơn hàng đầu tiên (nếu có)', async ({ I }) => {

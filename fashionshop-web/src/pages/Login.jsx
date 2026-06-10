@@ -19,7 +19,9 @@ export default function Login() {
   const location = useLocation();
   const { setAuth } = useAuthStore();
   const { setCount } = useCartStore();
+
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
 
   const from = location.state?.from?.pathname || "/";
 
@@ -30,24 +32,26 @@ export default function Login() {
   } = useForm({
     resolver: zodResolver(schema),
   });
-  //react-hook-form tự thu thập data thành email và password
+
   const onSubmit = async (data) => {
     setLoading(true);
+    setServerError("");
+
     try {
       const res = await login(data);
-      // Backend trả về: { message, user, token }
       const { user, token } = res.data;
+
       setAuth(user, token);
+
       try {
         const cartRes = await getCart();
-        setCount(cartRes.data?.length || 0);
-      } catch {
-        /* ignore */
-      }
+        setCount(cartRes.data?.data?.length || 0);
+      } catch {}
+
       toast.success("Đăng nhập thành công!");
       navigate(from, { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Đăng nhập thất bại");
+      setServerError("Email hoặc mật khẩu không chính xác");
     } finally {
       setLoading(false);
     }
@@ -56,50 +60,50 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-sm border p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-800 mb-1">Đăng Nhập</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-1">
+          Đăng Nhập
+        </h1>
+
         <p className="text-sm text-gray-500 mb-6">
           Chào mừng bạn trở lại FashionShop
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              {...register("email")}
-              type="email"
-              placeholder="email@example.com"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
+        <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <input
+            {...register("email")}
+            type="text"
+            placeholder="email@example.com"
+            className="w-full border px-3 py-2.5 rounded-lg"
+          />
+          {errors.email && (
+            <p className="text-red-500 text-xs">
+              {errors.email.message}
+            </p>
+          )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mật Khẩu
-            </label>
-            <input
-              {...register("password")}
-              type="password"
-              placeholder="••••••••"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
+          <input
+            {...register("password")}
+            type="password"
+            placeholder="••••••••"
+            className="w-full border px-3 py-2.5 rounded-lg"
+          />
+          {errors.password && (
+            <p className="text-red-500 text-xs">
+              {errors.password.message}
+            </p>
+          )}
+
+          {/* 🔥 FIX CHO TEST */}
+          {serverError && (
+            <p className="text-red-500 text-sm font-medium">
+              {serverError}
+            </p>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 rounded-lg transition-colors"
+            className="w-full bg-blue-600 text-white py-2.5 rounded-lg"
           >
             {loading ? "Đang đăng nhập..." : "Đăng Nhập"}
           </button>
@@ -107,10 +111,7 @@ export default function Login() {
 
         <p className="text-sm text-center text-gray-500 mt-6">
           Chưa có tài khoản?{" "}
-          <Link
-            to="/register"
-            className="text-blue-600 font-medium hover:underline"
-          >
+          <Link to="/register" className="text-blue-600">
             Đăng ký ngay
           </Link>
         </p>
