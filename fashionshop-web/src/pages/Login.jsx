@@ -46,11 +46,15 @@ export default function Login() {
       try {
         const cartRes = await getCart();
         setCount(cartRes.data?.data?.length || 0);
-      } catch {}
+      } catch (err) {
+        // Log lỗi để ESLint hiểu là biến 'err' đã được sử dụng
+        console.error("Lỗi khi lấy giỏ hàng:", err);
+      }
 
       toast.success("Đăng nhập thành công!");
       navigate(from, { replace: true });
     } catch (err) {
+      console.error("Lỗi đăng nhập:", err);
       setServerError("Email hoặc mật khẩu không chính xác");
     } finally {
       setLoading(false);
