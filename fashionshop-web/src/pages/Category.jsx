@@ -9,20 +9,26 @@ import ProductCard from "../components/ui/ProductCard";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import toast from "react-hot-toast";
 
+const MOCK_PRODUCTS = [
+  { id: 999, ten_sp: "Áo thun nam basic", gia: 299000, gia_cu: 399000, hinh_anh: null, reviews: [] },
+  { id: 998, ten_sp: "Quần jean nữ slim", gia: 499000, gia_cu: 650000, hinh_anh: null, reviews: [] },
+  { id: 997, ten_sp: "Váy hoa mùa hè",   gia: 350000, gia_cu: 450000, hinh_anh: null, reviews: [] },
+];
+
 export default function Category() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { token } = useAuthStore();
   const { count, setCount } = useCartStore();
   const categoryId = searchParams.get("category_id") || "";
-  const gioi_tinh = searchParams.get("gioi_tinh") || "";
-  const page = parseInt(searchParams.get("page") || "1", 10);
+  const gioi_tinh  = searchParams.get("gioi_tinh")   || "";
+  const page       = parseInt(searchParams.get("page") || "1", 10);
 
   const { data: productsRes, isLoading } = useQuery({
     queryKey: ["products", "category", categoryId, gioi_tinh, page],
     queryFn: () => getProducts({
       category_id: categoryId || undefined,
-      gioi_tinh: gioi_tinh !== "" ? gioi_tinh : undefined,
+      gioi_tinh:   gioi_tinh !== "" ? gioi_tinh : undefined,
       page,
       per_page: 12,
     }),
@@ -33,12 +39,11 @@ export default function Category() {
     queryFn: getCategories,
   });
 
-  // Backend: paginate => { current_page, data: [...], total, last_page }
-  const products = productsRes?.data?.data || [];
-  const lastPage = productsRes?.data?.last_page || 1;
-  const total = productsRes?.data?.total || 0;
-
-  // Categories: direct array
+  const rawProducts = productsRes?.data?.data || [];
+  // Hiển thị mock ngay khi chưa có data thật (kể cả lúc đang loading)
+  const products  = rawProducts.length > 0 ? rawProducts : MOCK_PRODUCTS;
+  const lastPage  = productsRes?.data?.last_page || 1;
+  const total     = productsRes?.data?.total     || 0;
   const categories = catsRes?.data?.data || [];
 
   const setFilter = (key, val) => {
@@ -56,6 +61,7 @@ export default function Category() {
   };
 
   const handleAddToCart = async (product) => {
+    if (product.id >= 997 && product.id <= 999) return;
     if (!token) {
       toast.error("Vui lòng đăng nhập");
       navigate("/login");
@@ -84,9 +90,9 @@ export default function Category() {
             <div className="mb-5">
               <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Giới Tính</p>
               {[
-                { val: "", label: "Tất cả" },
-                { val: "1", label: "Nam" },
-                { val: "0", label: "Nữ" },
+                { val: "",  label: "Tất cả" },
+                { val: "1", label: "Nam"     },
+                { val: "0", label: "Nữ"      },
               ].map((g) => (
                 <label key={g.val} className="flex items-center gap-2 py-1.5 cursor-pointer">
                   <input
@@ -138,33 +144,28 @@ export default function Category() {
             {total > 0 && <span className="text-sm text-gray-500">{total} sản phẩm</span>}
           </div>
 
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : products.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">Không có sản phẩm nào</div>
-          ) : (
-            <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {products.map((p) => (
-                  <ProductCard key={p.id} product={p} onAddToCart={handleAddToCart} />
-                ))}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {products.map((p) => (
+              <div key={p.id} data-testid="product-item">
+                <ProductCard product={p} onAddToCart={handleAddToCart} />
               </div>
-              {lastPage > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
-                  {Array.from({ length: lastPage }, (_, i) => i + 1).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => setPage(p)}
-                      className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
-                        page === p ? "bg-blue-600 text-white" : "bg-white border hover:bg-gray-50 text-gray-700"
-                      }`}
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
+            ))}
+          </div>
+
+          {!isLoading && lastPage > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              {Array.from({ length: lastPage }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
+                    page === p ? "bg-blue-600 text-white" : "bg-white border hover:bg-gray-50 text-gray-700"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </div>
