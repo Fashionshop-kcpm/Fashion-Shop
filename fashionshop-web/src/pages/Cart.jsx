@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
@@ -13,7 +13,6 @@ const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
 
 export default function Cart() {
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const { setCount } = useCartStore();
   const [selected, setSelected] = useState([]);

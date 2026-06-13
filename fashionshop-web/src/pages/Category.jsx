@@ -6,7 +6,6 @@ import { addToCart } from "../api/cartApi";
 import useAuthStore from "../stores/authStore";
 import useCartStore from "../stores/cartStore";
 import ProductCard from "../components/ui/ProductCard";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
 import toast from "react-hot-toast";
 
 const MOCK_PRODUCTS = [
