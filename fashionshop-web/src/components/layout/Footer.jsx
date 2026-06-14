@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-gray-900 text-gray-400 mt-16">
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div>
-          <h3 className="text-white font-bold text-lg mb-3">FashionShop</h3>
+          <p className="text-white font-bold text-lg mb-3">FashionShop</p>
           <p className="text-sm leading-relaxed">
             Thời trang nam &amp; nữ chất lượng cao, phong cách hiện đại.
           </p>

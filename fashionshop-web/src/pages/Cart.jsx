@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 import { getCart, updateCart, removeCartItem } from "../api/cartApi";
-import useCartStore from "../stores/cartStore";
 import { formatCurrency } from "../utils/formatCurrency";
 import { SHIPPING_FEE } from "../utils/constants";
+import useCartStore from "../stores/cartStore";
 
 const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
@@ -14,21 +14,21 @@ const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
 export default function Cart() {
   const qc = useQueryClient();
-  const { setCount } = useCartStore();
+  const setCount = useCartStore((s) => s.setCount);
   const [selected, setSelected] = useState([]);
   const [deletingIds, setDeletingIds] = useState([]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["cart"],
-    queryFn: async () => {
-      const res = await getCart();
-      setCount(res.data?.data?.length || 0);
-      return res;
-    },
+    queryFn: getCart,
     retry: false,
   });
 
   const items = data?.data?.data || [];
+
+  useEffect(() => {
+    setCount(items.length);
+  }, [items.length, setCount]);
 
   const subtotal = items.reduce((s, i) => s + (i.product?.gia || 0) * i.quantity, 0);
   const total = subtotal + (SHIPPING_FEE || 30000);

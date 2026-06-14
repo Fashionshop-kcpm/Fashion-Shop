@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -32,15 +32,26 @@ export default function ProductDetail() {
   const [size, setSize] = useState("M");
   const [qty, setQty] = useState(1);
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewsReady, setReviewsReady] = useState(false);
 
   const { data: productRes, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: () => getProduct(id),
+    retry: false,
   });
+
+  const hasProduct = !!productRes?.data;
+  useEffect(() => {
+    if (!hasProduct) return;
+    const timer = setTimeout(() => setReviewsReady(true), 4000);
+    return () => clearTimeout(timer);
+  }, [hasProduct]);
 
   const { data: reviewsRes, refetch: refetchReviews } = useQuery({
     queryKey: ["reviews", id],
     queryFn: () => getProductReviews(id),
+    enabled: reviewsReady,
+    retry: false,
   });
 
   // Product detail trả về trực tiếp (không wrap)
@@ -165,7 +176,7 @@ export default function ProductDetail() {
               onClick={() => handleAddToCart(false)}
               className="flex-1 flex items-center justify-center gap-2 border-2 border-blue-600 text-blue-600 font-semibold py-3 rounded-xl hover:bg-blue-50 transition-colors"
             >
-              <ShoppingCart size={18} /> Thêm Giỏ
+              <ShoppingCart size={18} /> Thêm Vào Giỏ
             </button>
             <button
               onClick={() => handleAddToCart(true)}

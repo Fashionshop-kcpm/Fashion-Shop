@@ -11,7 +11,6 @@ import { placeOrder } from "../api/orderApi";
 import useCartStore from "../stores/cartStore";
 import { formatCurrency } from "../utils/formatCurrency";
 import { SHIPPING_FEE } from "../utils/constants";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 const IMG_BASE = "http://127.0.0.1:8000/storage/";
 
@@ -30,11 +29,14 @@ export default function Checkout() {
   const { data: cartData, isLoading: cartLoading } = useQuery({
     queryKey: ["cart"],
     queryFn: getCart,
+    retry: false,
   });
 
   const { data: addrData } = useQuery({
     queryKey: ["addresses"],
     queryFn: getAddresses,
+    enabled: !!cartData,
+    retry: false,
   });
 
   // Cart: direct array
@@ -73,8 +75,6 @@ export default function Checkout() {
       setLoading(false);
     }
   };
-
-  if (cartLoading) return <LoadingSpinner />;
 
   if (!cartLoading && items.length === 0) {
     return (
@@ -151,10 +151,10 @@ export default function Checkout() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={cartLoading || loading}
               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3.5 rounded-xl transition-colors"
             >
-              {loading ? "Đang đặt hàng..." : `Đặt Hàng — ${formatCurrency(total)}`}
+              {loading ? "Đang đặt hàng..." : cartLoading ? "Đang tải..." : `Đặt Hàng — ${formatCurrency(total)}`}
             </button>
           </form>
         </div>

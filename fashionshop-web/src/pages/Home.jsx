@@ -25,13 +25,20 @@ const SERVICES = [
 
 export default function Home() {
   const [tab, setTab] = useState("featured");
+  const [queryReady, setQueryReady] = useState(false);
   const navigate = useNavigate();
   const { token } = useAuthStore();
   const { count, setCount } = useCartStore();
 
+  useEffect(() => {
+    const timer = setTimeout(() => setQueryReady(true), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { data: productsRes, isLoading } = useQuery({
     queryKey: ["products", tab],
     queryFn: () => getProducts({ tab, per_page: 8 }),
+    enabled: queryReady,
   });
 
   // Backend trả về standard Laravel paginate: { current_page, data: [...], total }

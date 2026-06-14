@@ -30,11 +30,11 @@ export default function ProductCard({ product, onAddToCart }) {
       </Link>
 
       <div className="p-3">
-        <Link to={`/products/${product.id}`}>
-          <h3 className="text-sm font-medium text-gray-800 line-clamp-2 hover:text-blue-600 mb-1">
+        <h3 className="text-sm font-medium text-gray-800 line-clamp-2 mb-1">
+          <Link to={`/products/${product.id}`} className="hover:text-blue-600">
             {product.ten_sp}
-          </h3>
-        </Link>
+          </Link>
+        </h3>
 
         {avgRating > 0 && (
           <div className="mb-1">
