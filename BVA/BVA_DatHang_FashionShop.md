@@ -1,22 +1,7 @@
 # Kiểm Thử Chức Năng Đặt Hàng — Fashion Shop
 
-**Thời lượng:** 90 phút  
-**Chủ đề:** Phân hoạch lớp tương đương, phân tích giá trị biên, thiết kế test case và kiểm thử tự động  
-**Mức độ:** Cơ bản đến trung bình  
-**Hình thức:** Cá nhân  
-**Tổng điểm:** 10 điểm
-
----
-
-## Mục tiêu bài tập
-
-1. Xác định được **điều kiện kiểm thử** từ đặc tả yêu cầu của hệ thống Fashion Shop.
-2. Áp dụng được kỹ thuật **phân hoạch lớp tương đương** để chia miền dữ liệu đầu vào thành các lớp hợp lệ và không hợp lệ.
-3. Áp dụng được kỹ thuật **phân tích giá trị biên** để chọn các dữ liệu kiểm thử nằm gần ranh giới giữa vùng hợp lệ và không hợp lệ.
-4. Thiết kế được bảng **test case** có đầy đủ input, expected result và tag bao phủ.
-5. Viết được hàm kiểm tra logic và một số **unit test** cho các trường hợp biên.
-
----
+**Chức năng:** Gửi đánh giá sản phẩm (`POST /api/v1/orders`)  
+**File liên quan:** `fashionshop-web/src/pages/Orders.jsx`, `fashionshop-api/app/Http/Controllers/Api/OrderController.php`
 
 ## Mô tả bài toán
 
@@ -42,7 +27,7 @@ Hệ thống trả về:
 - `True` hoặc thông báo **Hợp lệ** nếu tất cả điều kiện đều đúng.
 - `False` hoặc thông báo **Không hợp lệ** nếu có ít nhất một điều kiện sai.
 
-## Công thức logic tổng quát
+## Công thức logic 
 
 $$
 Valid =
@@ -57,25 +42,9 @@ $$
 
 ---
 
-## Giả định của bài toán
 
-1. Chỉ xét dữ liệu đầu vào là số nguyên đại diện cho **độ dài** chuỗi hoặc giá trị số lượng.
-2. Không xét dữ liệu `null`, rỗng, chuỗi ký tự hoặc định dạng sai.
-3. `fullname`, `phone`, `address` là số nguyên đại diện cho số ký tự / chữ số thực tế của chuỗi.
-4. `quantity` là số nguyên đại diện cho số lượng sản phẩm.
-5. Một yêu cầu đặt hàng hợp lệ khi và chỉ khi **tất cả** biến đầu vào nằm trong miền hợp lệ.
+## Câu 1. Lớp tương đương
 
----
-
-# PHẦN A. ĐỀ BÀI
-
----
-
-## Câu 1. Xác định lớp tương đương
-
-**Điểm:** 2 điểm
-
-### Bảng lớp tương đương
 
 | Biến đầu vào | Lớp hợp lệ | Tag | Lớp không hợp lệ | Tag |
 |---|---|---|---|---|
@@ -98,8 +67,6 @@ $$
 ---
 
 ## Câu 2. Phân tích giá trị biên
-
-**Điểm:** 2 điểm
 
 Áp dụng kỹ thuật **Standard Boundary Value Analysis**, với mỗi biến có miền `[min, max]` xác định 5 giá trị kiểm thử:
 
@@ -149,10 +116,6 @@ $$
 
 ## Câu 3. Thiết kế test case
 
-**Điểm:** 3 điểm
-
-Dựa trên kết quả Câu 1 và Câu 2, thiết kế bảng test case kiểm thử chức năng đặt hàng:
-
 | STT | Tên test case | fullname (ký tự) | phone (chữ số) | address (ký tự) | quantity | Kết quả mong đợi | Tag được bao phủ |
 |---:|---|---:|---:|---:|---:|---|---|
 | 1 | Tất cả đầu vào hợp lệ — giá trị đại diện | 128 | 10 | 252 | 50 | **Hợp lệ** | V1, V2, V3, V4, B3, B7, B11, B16 |
@@ -176,9 +139,8 @@ Dựa trên kết quả Câu 1 và Câu 2, thiết kế bảng test case kiểm 
 
 ## Câu 4. Triển khai kiểm thử tự động
 
-**Điểm:** 3 điểm
 
-### 4.1 Hàm kiểm tra logic
+### Hàm kiểm tra logic
 
 ```python
 def validate_dat_hang(fullname: int, phone: int, address: int, quantity: int) -> bool:
@@ -205,16 +167,11 @@ def validate_dat_hang(fullname: int, phone: int, address: int, quantity: int) ->
 
 ---
 
-### 4.2 Unit Test — Framework: `pytest`
+### Unit Test — Framework: `pytest`
 
 ```python
 import pytest
 from validate_dat_hang import validate_dat_hang
-
-
-# ──────────────────────────────────────────────
-# NHÓM 1: Test hợp lệ tại biên
-# ──────────────────────────────────────────────
 
 class TestHopLeTaiBien:
 
@@ -263,10 +220,6 @@ class TestHopLeTaiBien:
         assert validate_dat_hang(255, 11, 500, 100) is True
 
 
-# ──────────────────────────────────────────────
-# NHÓM 2: Test không hợp lệ ngoài biên (X class)
-# ──────────────────────────────────────────────
-
 class TestKhongHopLe:
 
     def test_tc12_fullname_duoi_min(self):
@@ -310,125 +263,17 @@ class TestKhongHopLe:
         assert validate_dat_hang(1, 8, 4, 0) is False
 ```
 
----
-
-### 4.3 Hướng dẫn chạy test
+### Hướng dẫn chạy test
 
 ```bash
-# Cài đặt pytest (nếu chưa có)
 pip install pytest
 
-# Đặt cả hai file vào cùng thư mục:
-#   validate_dat_hang.py  — chứa hàm validate_dat_hang
-#   test_dat_hang.py      — chứa các unit test
-
 # Chạy toàn bộ test
-pytest test_dat_hang.py -v
+python -m pytest test_dat_hang.py -v
 
 # Chạy chỉ nhóm test hợp lệ
-pytest test_dat_hang.py::TestHopLeTaiBien -v
+python -m pytest test_dat_hang.py::TestHopLeTaiBien -v
 
 # Chạy chỉ nhóm test không hợp lệ
-pytest test_dat_hang.py::TestKhongHopLe -v
+python -m pytest test_dat_hang.py::TestKhongHopLe -v
 ```
-
----
-
-# PHẦN B. BẢNG CHẤM ĐIỂM CHI TIẾT
-
----
-
-## Câu 1. Lớp tương đương: 2 điểm
-
-| Tiêu chí | Điểm |
-|---|---:|
-| Xác định đúng lớp hợp lệ cho 4 biến (V1–V4) | 0.8 |
-| Xác định đúng lớp không hợp lệ nhỏ hơn min (X1, X3, X5, X7) | 0.4 |
-| Xác định đúng lớp không hợp lệ lớn hơn max (X2, X4, X6, X8) | 0.4 |
-| Có đặt tag rõ ràng cho các lớp | 0.4 |
-| **Tổng** | **2.0** |
-
----
-
-## Câu 2. Giá trị biên: 2 điểm
-
-| Tiêu chí | Điểm |
-|---|---:|
-| Xác định đúng biên cho fullname (B1–B5) | 0.5 |
-| Xác định đúng biên cho phone (B6–B8) | 0.5 |
-| Xác định đúng biên cho address (B9–B13) | 0.5 |
-| Xác định đúng biên cho quantity (B14–B18) | 0.5 |
-| **Tổng** | **2.0** |
-
----
-
-## Câu 3. Test case: 3 điểm
-
-| Tiêu chí | Điểm |
-|---|---:|
-| Có tối thiểu 8 test case | 0.5 |
-| Có test case hợp lệ (TC01–TC08) | 0.5 |
-| Có test case không hợp lệ (TC09–TC16) | 0.5 |
-| Có test case tại biên hoặc gần biên | 0.5 |
-| Expected result rõ ràng, có lý do khi không hợp lệ | 0.5 |
-| Có tag được bao phủ | 0.5 |
-| **Tổng** | **3.0** |
-
----
-
-## Câu 4. Unit test: 3 điểm
-
-| Tiêu chí | Điểm |
-|---|---:|
-| Viết đúng hàm `validate_dat_hang` | 1.0 |
-| Có sử dụng framework unit test (pytest) | 0.5 |
-| Có ít nhất 2 test case biên | 0.5 |
-| Có ít nhất 1 case hợp lệ tại biên | 0.5 |
-| Có ít nhất 1 case không hợp lệ ngoài biên | 0.5 |
-| **Tổng** | **3.0** |
-
----
-
-# PHẦN C. NHẬN XÉT
-
-## 1. Tổng kết bao phủ
-
-| Tag | Ý nghĩa | Test case bao phủ |
-|---|---|---|
-| V1 | fullname hợp lệ [2, 255] | TC01–TC08 |
-| V2 | phone hợp lệ [9, 11] | TC01–TC08 |
-| V3 | address hợp lệ [5, 500] | TC01–TC08 |
-| V4 | quantity hợp lệ [1, 100] | TC01–TC08 |
-| X1 | fullname < 2 | TC09 |
-| X2 | fullname > 255 | TC10 |
-| X3 | phone < 9 | TC11 |
-| X4 | phone > 11 | TC12 |
-| X5 | address < 5 | TC13 |
-| X6 | address > 500 | (TC17 trong unit test) |
-| X7 | quantity < 1 | TC14, TC15 |
-| X8 | quantity > 100 | TC15 |
-| B1 | fullname = 2 (min) | TC02 |
-| B5 | fullname = 255 (max) | TC03 |
-| B6 | phone = 9 (min) | TC04 |
-| B8 | phone = 11 (max) | TC05 |
-| B9 | address = 5 (min) | TC08 |
-| B13 | address = 500 (max) | (TC07 trong unit test) |
-| B14 | quantity = 1 (min) | TC06 |
-| B18 | quantity = 100 (max) | TC07 |
-
-## 2. Tại sao chọn chức năng Đặt Hàng?
-
-Chức năng Đặt Hàng (Checkout) của Fashion Shop có 4 biến đầu vào được xác thực tại cả hai lớp:
-- **Frontend** (Zod schema trong `Checkout.jsx`): `fullname.min(2)`, `phone.regex(/^\d{9,11}$/)`, `address.min(5)`
-- **Backend** (Laravel validation trong `OrderController.php`): `string|max:255`, `regex:/^[0-9]{9,11}$/`, `integer|min:1`
-
-Đây là chức năng nghiệp vụ cốt lõi của hệ thống thương mại điện tử, có ràng buộc số rõ ràng phù hợp nhất để áp dụng BVA.
-
-## 3. Liên hệ với source code thực tế
-
-| File | Dòng quan trọng |
-|---|---|
-| `fashionshop-web/src/pages/Checkout.jsx` | Zod schema: `fullname`, `phone`, `address`, `payment` |
-| `fashionshop-api/app/Http/Controllers/Api/CartController.php` | `'quantity' => 'required|integer|min:1'` |
-| `fashionshop-api/app/Http/Controllers/Api/OrderController.php` | Validation rules cho order |
-| `fashionshop-api/database/migrations/..._create_orders_table.php` | Cột `text address`, `string phone`, `string fullname` |

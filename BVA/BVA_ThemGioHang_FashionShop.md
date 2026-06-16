@@ -195,5 +195,13 @@ class TestKhongHopLe:
 
 ```bash
 pip install pytest
-pytest test_them_gio_hang.py -v
+
+# Chạy toàn bộ test
+python -m pytest test_them_gio_hang.py -v
+
+# Chạy chỉ nhóm test hợp lệ
+python -m pytest test_them_gio_hang.py::TestHopLeTaiBien -v
+
+# Chạy chỉ nhóm test không hợp lệ
+python -m pytest test_them_gio_hang.py::TestKhongHopLe -v
 ```
