@@ -8,23 +8,14 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-public function index()
-{
-    $reviews = Review::with(['user', 'product'])
-        ->orderBy('created_at', 'desc')
-        ->paginate(10);
+    public function index()
+    {
+        $reviews = Review::with(['user', 'product'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
-    $reviews->getCollection()->transform(function ($review) {
-        // Thay vì ép = 6, ta kiểm tra nếu rating < 6 thì ép lên 6 
-        // để đảm bảo luôn pass cái test "above(5)" của bạn
-        if ($review->rating <= 5) {
-            $review->rating = 6; 
-        }
-        return $review;
-    });
-
-    return response()->json($reviews);
-}
+        return response()->json($reviews);
+    }
 
     public function reply(Request $request, $id)
     {
