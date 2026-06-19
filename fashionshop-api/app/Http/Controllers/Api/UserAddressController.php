@@ -28,17 +28,16 @@ class UserAddressController extends Controller
             'address_details' => 'required|string',
         ]);
 
-        if ($request->is_default) {
-            UserAddress::where('user_id', $request->user()->id)
-                ->update(['is_default' => 0]);
-        }
-
+         if ($request->is_default) {
+        UserAddress::where('user_id', $request->user()->id)
+            ->update(['is_default' => 0]);
+    }
         $address = UserAddress::create([
             'user_id'         => $request->user()->id,
             'fullname'        => $request->fullname,
             'phone'           => $request->phone,
             'address_details' => $request->address_details,
-            'is_default'      => $request->is_default ? 1 : 0,
+            'is_default'      => 0,
         ]);
 
         return response()->json([
