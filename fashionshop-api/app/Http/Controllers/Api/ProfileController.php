@@ -60,6 +60,7 @@ class ProfileController extends Controller
         return response()->json([
             'message' => 'Đổi mật khẩu thành công',
             'token'   => $newToken,
+            'updated_at' => $request->user()->fresh()->updated_at
         ]);
     }
 }
