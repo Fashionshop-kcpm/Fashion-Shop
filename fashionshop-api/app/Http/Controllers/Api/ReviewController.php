@@ -19,22 +19,23 @@ class ReviewController extends Controller
     }
 
     public function store(Request $request, $id)
-    {
-        $request->validate([
-            'rating'  => 'required|integer|min:1|max:5',
-            'comment' => 'required|string',
-        ]);
+        {
+            $request->validate([
+                'rating'  => 'required|integer|min:1|max:5',
+                'comment' => 'required|string',
+            ]);
 
-    $review = Review::create([
-    'product_id' => $id,
-    'user_id'    => $request->user()->id,
-    'rating'     => $request->rating,
-    'comment'    => $request->comment,
-]);     
-    
+        $review = Review::create([
+        'product_id' => $id,
+        'user_id'    => $request->user()->id,
+        'rating'     => $request->rating,
+        'comment'    => $request->comment,
+    ]);     
+        
 
-$review->load('user');
+    $review->load('user');
+    $review->rating_text = $review->rating . ' sao';
 
-        return response()->json(['message' => 'Đã gửi đánh giá', 'review' => $review], 201);
-    }
+            return response()->json(['message' => 'Đã gửi đánh giá', 'review' => $review], 201);
+        }
 }
