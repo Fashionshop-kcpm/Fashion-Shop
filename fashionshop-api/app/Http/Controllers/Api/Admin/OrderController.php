@@ -26,19 +26,21 @@ class OrderController extends Controller
         return response()->json($query->paginate(10));
     }
 
+
     public function show($id)
     {
         $order = Order::with(['user', 'details.product'])->findOrFail($id);
         $order->details->each(function ($detail) {
             if ($detail->product) {
                 $detail->product->name = $detail->product->ten_sp;
-                
-                $detail->product->makeHidden('ten_sp');
+                $detail->product->current_price = $detail->product->gia; // ← đặt tên rõ ràng
+                $detail->product->makeHidden(['ten_sp', 'gia', 'gia_cu']);
             }
         });
 
         return response()->json($order);
     }
+
 
 
     public function updateStatus(Request $request, $id)
