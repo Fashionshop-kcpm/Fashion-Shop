@@ -19,6 +19,7 @@ class ProfileController extends Controller
             'fullname' => $user->fullname,
             'email'    => $user->email,
             'phone'    => $user->phone,
+            'gender' => $user->gender
         ]);
     }
 
