@@ -49,50 +49,30 @@
 | U-02 | Đổi mật khẩu (nhập mật khẩu cũ, mật khẩu mới, xác nhận) |
 | U-03 | Xem danh sách địa chỉ giao hàng đã lưu: 
 
-        - Trả về HTTP 200 khi lấy danh sách địa chỉ thành công.
-        - Dữ liệu trả về có message và data.
-        - data phải là một mảng danh sách địa chỉ.
-        - Mỗi địa chỉ phải có đầy đủ thông tin:
-            id
-            fullname
-            phone
-            address_details
-            is_default
-            Dữ liệu trả về có trường total.
-        - Giá trị total phải bằng số lượng phần tử trong data.  |
+        - Người dùng có thể xem danh sách địa chỉ giao hàng đã lưu của mình.
+        - Hệ thống hiển thị thông tin từng địa chỉ bao gồm: mã địa chỉ, họ tên người nhận, số điện thoại, địa chỉ chi tiết và trạng thái mặc định.
+        - Danh sách trả về có tổng số lượng địa chỉ tương ứng với số bản ghi thực tế.  |
 
 
 | U-04 | Thêm địa chỉ giao hàng mới: 
 
-        - Trả về kết quả thành công với success = true khi tạo địa chỉ mới.
-        - Dữ liệu trả về có message.
-        - Dữ liệu trả về có thông tin địa chỉ (address).
-        - Khi tạo mới, trường is_default phải bằng 0.
-        - Hệ thống phải trả về id của địa chỉ mới (có thể nằm trong address.id, data.id hoặc id).  |
+        - Người dùng có thể thêm mới một địa chỉ giao hàng vào hệ thống.
+        - Sau khi thêm thành công, hệ thống lưu lại thông tin địa chỉ vừa tạo và trả về kết quả xác nhận.
+        - Địa chỉ mới mặc định không được đặt là địa chỉ chính.  |
 
 
 | U-05 | Xóa địa chỉ giao hàng: 
 
-        - Trả về HTTP 200 khi xóa địa chỉ thành công.
-        - Dữ liệu trả về có message xác nhận xóa và nội dung message có chứa từ “xóa”.
-        - Dữ liệu trả về có thông tin địa chỉ đã xóa (address).
-        - Trong address phải có id và fullname.
-        - Sau khi xóa, địa chỉ này không được còn trạng thái is_default = 1.  |
+        - Người dùng có thể xóa một địa chỉ giao hàng đã lưu trong hệ thống.
+        - Sau khi xóa thành công, hệ thống trả về thông tin xác nhận và thông tin của địa chỉ vừa bị xóa.
+        - Địa chỉ đã xóa không được còn trạng thái mặc định. |
 
 
 | U-06 | Đặt một địa chỉ làm mặc định:
 
-        - Trả về HTTP 200 khi đặt địa chỉ mặc định thành công.
-        - Dữ liệu trả về có data.
-        - Trong data phải có đầy đủ thông tin địa chỉ:
-            id
-            user_id
-            fullname
-            phone
-            address_details
-            is_default
-        - Sau khi cập nhật, is_default phải bằng 1.
-        - Hệ thống phải đảm bảo chỉ một địa chỉ được đặt làm mặc định (sync_all_addresses = true).  |
+        - Người dùng có thể chọn một địa chỉ giao hàng và đặt làm địa chỉ mặc định trong hệ thống.
+        - Hệ thống trả về thông tin địa chỉ sau khi cập nhật(id, user_id, fullname, phone, address_details, is_default)
+        - Khi thao tác thành công, hệ thống cập nhật lại trạng thái mặc định của địa chỉ được chọn và đảm bảo chỉ tồn tại một địa chỉ mặc định tại một thời điểm.  |
 
 
 | U-07 | Đăng xuất |
@@ -115,37 +95,30 @@
 | U-14 | Chọn phương thức thanh toán: **COD (Thanh toán khi nhận hàng)** |
 | U-15 | Xem tóm tắt đơn hàng trước khi xác nhận (sản phẩm, phí ship 30.000đ, tổng):
 
-        - Trả về HTTP 200 hoặc 201 khi lấy dữ liệu tóm tắt đơn hàng.
-        - Dữ liệu có order id (trong order.id).
-        - Dữ liệu có details (danh sách sản phẩm).
-        - Dữ liệu có shipping_fee = 30000.
-        - Nếu không có thông tin đơn hàng thì xem là lỗi hệ thống.  |
+        - Người dùng có thể xem thông tin tóm tắt đơn hàng trước khi tiến hành xác nhận đặt hàng.
+        - Thông tin tóm tắt bao gồm mã đơn hàng, danh sách sản phẩm trong đơn và phí vận chuyển.
+        - Hệ thống hiển thị phí vận chuyển cố định là 30.000đ trong bước tóm tắt đơn hàng.  |
 
 
 | U-16 | Đặt hàng thành công → hiển thị trang xác nhận kèm mã đơn |
 | U-17 | Xem danh sách toàn bộ đơn hàng đã đặt (mã, ngày, tổng, trạng thái):
  
-        - Trả về HTTP 200 khi lấy danh sách đơn hàng.
-        - Mỗi đơn hàng có trạng thái (status).
-        - Mỗi đơn hàng có tổng số lượng sản phẩm (total_quantity).
-        - Mỗi đơn hàng có ngày đặt hàng (order_date).   |
+        Người dùng có thể xem danh sách tất cả đơn hàng đã đặt của mình trong hệ thống.
+        Mỗi đơn hàng hiển thị tổng số lượng sản phẩm đã đặt, mỗi đơn hàng có thông tin ngày đặt hàng.
+        Danh sách đơn hàng bao gồm thông tin cơ bản để theo dõi tình trạng và lịch sử mua hàng.  |
 
 
 | U-18 | Xem chi tiết đơn hàng (từng sản phẩm, size, số lượng, giá): 
 
-        - Trả về HTTP 200 khi lấy chi tiết đơn hàng.
-        - Dữ liệu có danh sách details (chi tiết sản phẩm trong đơn hàng).
-        - Mỗi sản phẩm có quantity và price.
-        - Mỗi sản phẩm có product.size (size nằm trong product).
-        - Mỗi sản phẩm có total = price * quantity.  |
+        - Người dùng có thể xem chi tiết của một đơn hàng, bao gồm danh sách sản phẩm đã mua và thông tin chi tiết của từng sản phẩm trong đơn.
+        - Hệ thống tính đúng thành tiền của từng sản phẩm |
 
 
 | U-19 | Hủy đơn hàng khi trạng thái còn **"Chờ xử lý"** :
 
-        - Trả về HTTP 200 khi hủy đơn hàng thành công.
-        - Trả về thông báo message = "Đã hủy đơn hàng".
-        - Dữ liệu trả về có status của đơn hàng sau khi hủy.
-        - Dữ liệu trả về có updated_at (thời gian cập nhật sau khi hủy).|
+        - Người dùng có thể hủy đơn hàng nếu đơn hàng đang ở trạng thái “Chờ xử lý”.
+        - Hệ thống trả về thông báo xác nhận hủy đơn.
+        - Sau khi hủy thành công, hệ thống cập nhật lại trạng thái đơn hàng và ghi nhận thời gian cập nhật mới nhất. |
 
 
 ### Đánh giá
@@ -166,15 +139,8 @@
 | A-01 | Xem tổng quan: tổng doanh thu (đơn "Hoàn thành"), tổng đơn hàng, tổng khách hàng |
 | A-02 | Xem danh sách 7 đơn hàng mới nhất trên dashboard: 
 
-        - Trả về HTTP 200 khi lấy dữ liệu dashboard thành công.
-        - Dữ liệu dashboard phải có các thống kê tổng quan gồm:
-            total_revenue
-            total_orders
-            total_users
-            total_products
-        - Dữ liệu trả về phải có field data.
-        - Dữ liệu phải có danh sách latest_orders.
-        - Số lượng latest_orders phải đúng bằng 7 đơn hàng mới nhất. |
+        - Admin có thể xem trang dashboard hệ thống, trong đó hiển thị các thống kê tổng quan và danh sách các đơn hàng mới nhất để theo dõi hoạt động kinh doanh.
+        - Hệ thống chỉ hiển thị 7 đơn hàng mới nhất. |
 
 
 ### Quản lý Sản phẩm
