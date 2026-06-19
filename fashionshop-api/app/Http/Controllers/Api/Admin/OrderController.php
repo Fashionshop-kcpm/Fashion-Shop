@@ -16,10 +16,13 @@ class OrderController extends Controller
         $query->where('status', $status);
 
         if ($request->keyword) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('fullname', 'LIKE', "%{$request->keyword}%");
+        $query->where(function ($q) use ($request) {
+            $q->whereHas('user', function ($q2) use ($request) {
+                $q2->where('fullname', 'LIKE', "%{$request->keyword}%");
             })->orWhere('id', $request->keyword);
-        }
+        });
+    }
+
         return response()->json($query->paginate(10));
     }
 
