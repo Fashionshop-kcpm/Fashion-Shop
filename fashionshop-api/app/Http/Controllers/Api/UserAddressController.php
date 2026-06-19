@@ -16,6 +16,7 @@ class UserAddressController extends Controller
 
         return response()->json([
             'message' => 'Lấy danh sách địa chỉ thành công',
+            'total'   => $addresses->count(),
             'data' => $addresses
     ]);
 }
