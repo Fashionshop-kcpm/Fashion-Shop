@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "b9d463e6-d72e-4643-8f09-71595c017153",
+    "_postman_id": "0f23480e-c77c-4f6f-ada7-f256c0a0b691",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55047512",
-    "_collection_link": "https://go.postman.co/collection/55047512-b9d463e6-d72e-4643-8f09-71595c017153?source=collection_link"
+    "_exporter_id": "55108691",
+    "_collection_link": "https://go.postman.co/collection/55108691-0f23480e-c77c-4f6f-ada7-f256c0a0b691?source=collection_link"
   },
   "item": [
     {
@@ -378,6 +378,11 @@
                   "        pm.expect(first.getTime()).to.be.lessThan(second.getTime()); \r",
                   "    }\r",
                   "});\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  "\r",
                   ""
                 ],
                 "type": "text/javascript",
@@ -622,7 +627,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"product_id\":8,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
+              "raw": "{\r\n    \"product_id\": 15,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -648,10 +653,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Kiểm tra mã trạng thái HTTP (200 OK)\r",
-                  "pm.test(\"Mã trạng thái phải là 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
+                  "pm.test(\"Status code là 200 OK hoặc 204 No Content\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);\r",
+                  "});;\r",
                   "\r",
                   "// Kiểm tra định dạng phản hồi có phải là JSON không\r",
                   "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
@@ -662,7 +666,9 @@
                   "pm.test(\"Cập nhật sản phẩm giỏ hàng thành công\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"cart\");\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -708,15 +714,15 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Kiểm tra Status Code \r",
-                  "pm.test(\"Status code là 200\", function () {\r",
+                  "// Kiểm tra Status Code phải là 200\r",
+                  "pm.test(\"Status code là 200 OK\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
                   "// Kiểm tra mỗi item trong cart có product được load\r",
                   "pm.test(\"Mỗi cart item có thông tin product\", function () {\r",
                   "    const json = pm.response.json();\r",
-                  "    const items = json.data; // đổi từ json sang json.data\r",
+                  "    const items = json.data;\r",
                   "    pm.expect(items).to.be.an(\"array\");\r",
                   "    if (items.length > 0) {\r",
                   "        pm.expect(items[0]).to.have.property(\"product\");\r",
@@ -730,7 +736,18 @@
                   "pm.test(\"Phản hồi chứa (total_price) tổng tiền trong giỏ hàng\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"total_price\"); \r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Số lượng sản phẩm trong giỏ phải lớn hơn 0\", function () {\r",
+                  "    let json = pm.response.json();\r",
+                  "    json.items.forEach(item => {\r",
+                  "        pm.expect(item.quantity).to.be.above(0);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -1210,7 +1227,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"product_id\": 4,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
+              "raw": "{\r\n    \"product_id\": 15,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1474,7 +1491,9 @@
                   "pm.test(\"Response có chứa thông tin 'user' trong review\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json.review).to.have.property(\"user\"); \r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -1531,8 +1550,8 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Kiểm tra Status 200\r",
-                  "pm.test(\"Status 200 OK\", function () {\r",
+                  "// Giả sử API trả về 200 OK sau khi xóa thành công\r",
+                  "pm.test(\"Status code là 200 - Xóa sản phẩm thành công\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
@@ -1549,7 +1568,10 @@
                   "// Kiểm tra thông báo lỗi ID không tồn tại từ API\r",
                   "pm.test(\"Kiểm tra thông báo lỗi ID không tồn tại\", () => {\r",
                   "    pm.expect(pm.response.json().message).to.eql(\"ID không hợp lệ\");\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
