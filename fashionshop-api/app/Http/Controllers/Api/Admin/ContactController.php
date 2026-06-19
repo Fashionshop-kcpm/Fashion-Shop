@@ -13,10 +13,10 @@ class ContactController extends Controller
         $contacts = Contact::orderBy('created_at', 'desc')->paginate(10);
 
         return response()->json([
+            'contacts' => $contacts,
             'data' => $contacts->items()
         ]);
     }
-
     public function updateStatus(Request $request, $id)
     {
         $request->validate(['status' => 'required|in:new,read,resolved']);
