@@ -15,7 +15,7 @@ class ProductController extends Controller
             $query->where('ten_sp', 'LIKE', "%{$request->keyword}%");
         }
 
-        $products = $query->paginate(10);
+        $products = $query->paginate(10)->withQueryString();
         return response()->json(array_merge($products->toArray(), ['success' => true]));
         
     }
