@@ -76,6 +76,7 @@ class AuthController extends Controller
         $user->currentAccessToken()->delete();
 
         return response()->json([
+            'status' => true,
             'message' => 'Đăng xuất thành công',
             'user' => $user->only(['id', 'fullname', 'email', 'phone', 'gender'])
         ]);
