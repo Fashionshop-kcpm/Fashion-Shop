@@ -105,10 +105,13 @@ if ($validator->fails()) {
             ], 200);
         }
 
+        $deletedCartId = $cart->id;
+
         $cart->delete();
 
         return response()->json([
-            'message' => 'Đã xóa sản phẩm khỏi giỏ hàng'
+            'message' => 'Đã xóa sản phẩm khỏi giỏ hàng',
+            'deleted_cart_id' => $deletedCartId
         ], 200);
     }
 }
