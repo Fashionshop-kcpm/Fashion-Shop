@@ -69,15 +69,28 @@ if ($validator->fails()) {
 
     public function update(Request $request, $id)
     {
-        $request->validate(['quantity' => 'required|integer|min:1']);
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
 
         $cart = Cart::where('id', $id)
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
 
-        $cart->update(['quantity' => $request->quantity]);
+        $cart->update([
+            'quantity' => $request->quantity
+        ]);
 
-        return response()->json(['message' => 'Đã cập nhật giỏ hàng', 'cart' => $cart]);
+        $total_price = Cart::with('product')
+            ->where('user_id', $request->user()->id)
+            ->get()
+            ->sum(fn($item) => $item->product->price * $item->quantity);
+
+        return response()->json([
+            'message' => 'Đã cập nhật giỏ hàng',
+            'cart' => $cart->fresh(),
+            'total_price' => $total_price
+        ]);
     }
 
     public function destroy(Request $request, $id)

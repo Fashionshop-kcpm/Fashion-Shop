@@ -86,6 +86,6 @@ class ProductController extends Controller
                 'success'=> true,
                 'message' => 'Đã xóa sản phẩm',
                 'id'      => (int) $id,
-            ]);
+                ]);
         }
 }
