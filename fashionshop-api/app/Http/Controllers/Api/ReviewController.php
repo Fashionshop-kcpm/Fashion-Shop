@@ -15,6 +15,10 @@ class ReviewController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
+        $reviews->each(function ($review) {
+            $review->review_date = $review->created_at;
+        });
+
         return response()->json($reviews);
     }
 
