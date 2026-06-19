@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "452c1102-d6a1-4bc0-ac6a-ada573781287",
+    "_postman_id": "94774906-ede9-4c47-885c-5e9231c6c53b",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55108854",
-    "_collection_link": "https://go.postman.co/collection/55108854-452c1102-d6a1-4bc0-ac6a-ada573781287?source=collection_link"
+    "_exporter_id": "55104651",
+    "_collection_link": "https://go.postman.co/collection/55104651-94774906-ede9-4c47-885c-5e9231c6c53b?source=collection_link"
   },
   "item": [
     {
@@ -406,8 +406,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Test 1: Gửi liên hệ thành công\r",
-                  "pm.test(\"Gửi liên hệ thành công - Status 201\", function () {\r",
+                  "pm.test(\"Status code is 201\", function () {\r",
                   "    pm.response.to.have.status(201);\r",
                   "});\r",
                   "\r",
@@ -420,6 +419,11 @@
                   "pm.test(\"Response phải có trường 'token'\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"token\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains email validation error\", function () {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response.message.toLowerCase()).to.include(\"email\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -499,18 +503,17 @@
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
-                  "// Kiểm tra định dạng JSON\r",
+                  "// 2. Kiểm tra định dạng phản hồi có phải là JSON không\r",
                   "pm.test(\"Phản hồi trả về phải ở định dạng JSON\", function () {\r",
                   "    pm.response.to.be.json;\r",
-                  "});\r",
+                  "})\r",
                   "\r",
-                  "// Kiểm tra lỗi size không hợp lệ\r",
+                  "// Kiểm tra lỗi về size không hợp lệ\r",
                   "pm.test(\"Size không hợp lệ\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json.message).to.eql(\"Size không hợp lệ\");\r",
                   "    pm.expect(json.errors.size).to.exist;\r",
-                  "});\r",
-                  ""
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -552,6 +555,17 @@
           "name": "add_cart",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
@@ -570,24 +584,13 @@
                   "    pm.response.to.be.json;\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Thêm giỏ hàng thành công\", function () {\r",
-                  "    let json = pm.response.json();\r",
-                  "    pm.expect(json.message).to.eql(\"Đã thêm vào giỏ hàng\");\r",
-                  "    pm.expect(json.cart).to.exist;\r",
-                  "});\r",
                   "\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
+                  "// Kiểm tra lỗi về size không hợp lệ\r",
+                  "pm.test(\"Size không hợp lệ\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.message).to.eql(\"Size không hợp lệ\");\r",
+                  "    pm.expect(json.errors.size).to.exist;\r",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -596,9 +599,6 @@
             }
           ],
           "request": {
-            "auth": {
-              "type": "noauth"
-            },
             "method": "POST",
             "header": [
               {
@@ -609,7 +609,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"product_id\": 8,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
+              "raw": "{\r\n    \"product_id\":8,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1172,13 +1172,13 @@
                   "    pm.response.to.be.json;\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Thêm giỏ hàng thành công\", function () {\r",
-                  "    let json = pm.response.json();\r",
-                  "    pm.expect(json.message).to.eql(\"Đã thêm vào giỏ hàng\");\r",
-                  "    pm.expect(json.cart).to.exist;\r",
-                  "});\r",
                   "\r",
-                  ""
+                  "// Kiểm tra lỗi về size không hợp lệ\r",
+                  "pm.test(\"Size không hợp lệ\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.message).to.eql(\"Size không hợp lệ\");\r",
+                  "    pm.expect(json.errors.size).to.exist;\r",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -1197,7 +1197,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"product_id\": 8,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
+              "raw": "{\r\n    \"product_id\": 4,\r\n    \"quantity\": 2,\r\n    \"size\": \"XL\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2393,7 +2393,32 @@
                   "pm.test(\"Phải trả về đúng 20 người dùng\", function () {\r",
                   "    let res = pm.response.json();\r",
                   "    pm.expect(res.data.length).to.eql(20);\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Không bị trùng user giữa page 1 và page 2 (kiểm tra tính ổn định của sort/pagination)\", async function () {\r",
+                  "    const page1Ids = pm.response.json().data.map(u => u.id);\r",
+                  "\r",
+                  "    const currentUrl = pm.request.url.toString();\r",
+                  "    const nextPageUrl = currentUrl.includes('?') \r",
+                  "        ? `${currentUrl}&page=2` \r",
+                  "        : `${currentUrl}?page=2`;\r",
+                  "\r",
+                  "    const res = await new Promise((resolve, reject) => {\r",
+                  "        pm.sendRequest(nextPageUrl, (err, response) => {\r",
+                  "            if (err) reject(err);\r",
+                  "            else resolve(response);\r",
+                  "        });\r",
+                  "    });\r",
+                  "\r",
+                  "    const page2Ids = res.json().data.map(u => u.id);\r",
+                  "    const overlap = page1Ids.filter(id => page2Ids.includes(id));\r",
+                  "\r",
+                  "    pm.expect(\r",
+                  "        overlap,\r",
+                  "        `Phát hiện ${overlap.length} user bị lặp giữa page 1 và page 2 (id: ${overlap.join(\", \")}) — do ORDER BY created_at thiếu secondary key (id), khiến thứ tự phân trang không ổn định khi nhiều user có cùng created_at`\r",
+                  "    ).to.be.empty;\r",
+                  "});\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2448,6 +2473,18 @@
                   "    pm.expect(res).to.have.property(\"message\"); \r",
                   "});\r",
                   "\r",
+                  "pm.test(\"Khi user không tồn tại, lỗi không nên lộ namespace nội bộ và phải đồng nhất format với response thành công\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    // 1. Không được lộ class path PHP trong message lỗi\r",
+                  "    pm.expect(\r",
+                  "        json.message,\r",
+                  "        `message lỗi hiện tại: \"${json.message}\"`\r",
+                  "    ).to.not.include(\"App\\\\Models\");\r",
+                  "\r",
+                  "    // 2. Response lỗi nên có cấu trúc nhất quán (có field message rõ ràng kiểu tiếng Việt như các API khác)\r",
+                  "    pm.expect(json).to.have.property(\"message\");\r",
+                  "});\r",
                   ""
                 ],
                 "type": "text/javascript",
@@ -2462,6 +2499,11 @@
               {
                 "key": "Authorization",
                 "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
                 "type": "text"
               }
             ],
@@ -2508,12 +2550,18 @@
                   "    });\r",
                   "});\r",
                   "\r",
-                  "// Test 3: FAIL - trạng thái liên hệ phải là 'closed'\r",
-                  "pm.test(\"Tất cả liên hệ phải có trạng thái 'closed'\", function () {\r",
+                  "\r",
+                  "pm.test(\"Trạng thái liên hệ hợp lệ\", function () {\r",
                   "    const json = pm.response.json();\r",
+                  "\r",
                   "    json.data.forEach(contact => {\r",
-                  "        pm.expect(contact.status).to.equal(\"closed\");\r",
+                  "        pm.expect([\"new\", \"read\", \"resolved\"]).to.include(contact.status);\r",
                   "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response phải chứa trường contacts\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.contacts).to.exist;\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -2571,6 +2619,10 @@
                   "pm.test(\"Message phản hồi phải là tiếng Anh\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json.message).to.equal(\"Status updated successfully\");\r",
+                  "});\r",
+                  "pm.test(\"Response phải chứa trường updated_status\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.updated_status).to.exist;\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -2651,7 +2703,24 @@
                   "            pm.expect(o.status).to.equal(\"pending\");\r",
                   "        });\r",
                   "    }\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Total trả về phải khớp với (tổng tiền sản phẩm + phí ship cố định)\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    const SHIPPING_FEE = 30000; // phí ship cố định, đã confirm với backend\r",
+                  "\r",
+                  "    const computedSubtotal = json.details.reduce((sum, item) => {\r",
+                  "        return sum + (item.quantity * item.price);\r",
+                  "    }, 0);\r",
+                  "\r",
+                  "    const expectedTotal = computedSubtotal + SHIPPING_FEE;\r",
+                  "\r",
+                  "    pm.expect(\r",
+                  "        json.total,\r",
+                  "        `total API = ${json.total}, nhưng subtotal (${computedSubtotal}) + ship (${SHIPPING_FEE}) = ${expectedTotal}`\r",
+                  "    ).to.equal(expectedTotal);\r",
+                  "});\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2710,7 +2779,32 @@
                   "        pm.expect(item.product, `item ${i}`).to.have.property(\"name\");\r",
                   "        pm.expect(item.product).to.not.have.property(\"ten_sp\");\r",
                   "    });\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "pm.test(\"detail.price (giá mua) và product.current_price (giá hiện tại) phải được phân biệt rõ ràng, không được bằng nhau khi giá đã thay đổi\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.details).to.be.an(\"array\").that.is.not.empty;\r",
+                  "\r",
+                  "    json.details.forEach(function(item, i) {\r",
+                  "        // 1. Phải có đủ 2 field rõ ràng\r",
+                  "        pm.expect(item, `detail[${i}] thiếu field price`)\r",
+                  "            .to.have.property(\"price\");\r",
+                  "        pm.expect(item.product, `detail[${i}].product thiếu field current_price`)\r",
+                  "            .to.have.property(\"current_price\");\r",
+                  "\r",
+                  "        // 2. Không được còn field 'gia' thô (raw tiếng Việt) trong product\r",
+                  "        pm.expect(item.product, `detail[${i}].product vẫn còn expose field 'gia' thô`)\r",
+                  "            .to.not.have.property(\"gia\");\r",
+                  "\r",
+                  "        // 3. Khi giá đã thay đổi, 2 field phải khác nhau — đây là điểm fail chính\r",
+                  "        pm.expect(\r",
+                  "            item.price,\r",
+                  "            `detail[${i}]: price lúc mua (${item.price}) không được bằng current_price (${item.product.current_price}) vì giá sản phẩm đã thay đổi`\r",
+                  "        ).to.not.equal(item.product.current_price);\r",
+                  "    });\r",
+                  "});\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2763,7 +2857,19 @@
                   "    if (json.order) {\r",
                   "        pm.expect(json.order.status).to.equal(\"shipping\");\r",
                   "    }\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Bug: Cho phép set status NGƯỢC (completed -> pending), vi phạm luồng pending -> shipping -> completed/cancelled\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    // Mong đợi đúng: đơn đang 'completed' (trạng thái cuối) thì KHÔNG được phép\r",
+                  "    // quay ngược về 'pending'. API phải từ chối (4xx), không phải trả 200 và đổi status.\r",
+                  "    pm.expect(\r",
+                  "        json.order && json.order.status,\r",
+                  "        \"Order id=8 đang là 'completed' nhưng bị đổi ngược về 'pending' — API không có validate luồng chuyển trạng thái\"\r",
+                  "    ).to.not.equal(\"pending\");\r",
+                  "});\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2846,14 +2952,19 @@
                   "    pm.expect(json.data.length).to.be.above(0);\r",
                   "});\r",
                   "\r",
-                  "// Test 3: FAIL - rating phải lớn hơn 5\r",
-                  "pm.test(\"Rating không được vượt quá 5\", function () {\r",
+                  "pm.test(\"Rating hợp lệ\", function () {\r",
                   "    const json = pm.response.json();\r",
+                  "\r",
                   "    json.data.forEach(review => {\r",
-                  "        pm.expect(review.rating).to.be.above(5);\r",
+                  "        pm.expect(review).to.have.property(\"rating\");\r",
+                  "        pm.expect(Number(review.rating)).to.be.at.most(5);\r",
                   "    });\r",
                   "});\r",
-                  ""
+                  "\r",
+                  "pm.test(\"Response contains reviews field\", function () {\r",
+                  "    const response = pm.response.json();\r",
+                  "    pm.expect(response.reviews).to.exist;\r",
+                  "});"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -2922,6 +3033,12 @@
                   "pm.test(\"Response phải trả về id của đánh giá\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"id\");\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Response phải chứa trường reply_message\", function () {\r",
+                  "const json = pm.response.json();\r",
+                  "pm.expect(json.reply_message).to.exist;\r",
                   "});\r",
                   ""
                 ],
@@ -2994,7 +3111,13 @@
                   "    pm.expect(json.data).to.not.be.null;\r",
                   "});\r",
                   "\r",
-                  "pm.environment.unset(\"order_id\");"
+                  "pm.environment.unset(\"order_id\");\r",
+                  "\r",
+                  "pm.test(\"Response phải chứa trường deleted_at\", function () {\r",
+                  "const json = pm.response.json();\r",
+                  "pm.expect(json.deleted_at).to.exist;\r",
+                  "});\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -3053,6 +3176,11 @@
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"token_revoked\");\r",
                   "    pm.expect(json.token_revoked).to.equal(true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response phải trả về user_id sau khi logout\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.user_id).to.exist;\r",
                   "});"
                 ],
                 "type": "text/javascript",
