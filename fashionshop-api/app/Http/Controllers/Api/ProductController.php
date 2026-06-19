@@ -46,6 +46,12 @@ class ProductController extends Controller
 
         $product->name = $product->ten_sp;
         $reviews = $product->reviews->sortBy('created_at')->values();
+        $product->sizes = [
+            ['id' => 1, 'size_name' => 'S'],
+            ['id' => 2, 'size_name' => 'M'],
+            ['id' => 3, 'size_name' => 'L'],
+            ['id' => 4, 'size_name' => 'XL']
+        ];
 
         return response()->json($product);
     }
