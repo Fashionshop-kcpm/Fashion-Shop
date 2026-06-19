@@ -109,7 +109,8 @@ class OrderController extends Controller
 
     return response()->json([
         'message' => 'Đã hủy đơn hàng',
-        'status'  => 'cancelled'
+        'status'  => 'cancelled',
+        'updated_at' => $order->updated_at
     ], 200);
     }
 }
