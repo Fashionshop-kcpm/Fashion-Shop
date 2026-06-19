@@ -12,6 +12,7 @@ class CartController extends Controller
     {
         $cart = Cart::with('product')
             ->where('user_id', $request->user()->id)
+            ->where('quantity', '>', 0)
             ->get();
 
         $total_price = $cart->sum(
@@ -19,6 +20,7 @@ class CartController extends Controller
         );
 
         return response()->json([
+            'items' => $cart,
             'data' => $cart,
             'total_price' => $total_price,
         ]);
