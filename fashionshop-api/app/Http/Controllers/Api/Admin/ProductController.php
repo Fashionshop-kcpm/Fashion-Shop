@@ -49,7 +49,8 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
             'hinh_anh'    => $hinh_anh,
         ]);
-
+        
+        $product->load('category');
         return response()->json(['success' => true, 'message' => 'Đã thêm sản phẩm', 'product' => $product], 201);
 
     }
