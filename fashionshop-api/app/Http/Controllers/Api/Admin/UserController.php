@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::orderBy('created_at', 'desc');
+    $query = User::orderBy('created_at', 'desc')->orderBy('id', 'desc');
 
         if ($request->keyword) {
             $query->where('fullname', 'LIKE', "%{$request->keyword}%")
