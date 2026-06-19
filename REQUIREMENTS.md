@@ -127,6 +127,7 @@
 |---|---|
 | U-20 | Viết đánh giá sản phẩm (1–5 sao + bình luận văn bản) |
 | U-21 | Xem phản hồi của shop trên bình luận của mình |
+| U-22 | Xem đánh giá sản phẩm |
 
 ---
 
@@ -141,6 +142,10 @@
 
         - Admin có thể xem trang dashboard hệ thống, trong đó hiển thị các thống kê tổng quan và danh sách các đơn hàng mới nhất để theo dõi hoạt động kinh doanh.
         - Hệ thống chỉ hiển thị 7 đơn hàng mới nhất. |
+
+        
+| A-03 | Đăng xuất | 
+
 
 
 ### Quản lý Sản phẩm

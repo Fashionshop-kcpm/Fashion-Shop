@@ -26,8 +26,14 @@ class ProductController extends Controller
         }
 
         $products = $query->paginate(10);
-
-        return response()->json($products);
+        $response = $products->toArray();
+        // Bắt lại các tham số user đã gửi lên để Frontend tiện theo dõi
+        $response['applied_filters'] = [
+        'keyword' => $request->keyword ?? null,
+        'category_id' => $request->category_id ?? null,
+        'gioi_tinh' => $request->gioi_tinh ?? null
+    ];
+        return response()->json($response);
     }
 
     public function show($id)
