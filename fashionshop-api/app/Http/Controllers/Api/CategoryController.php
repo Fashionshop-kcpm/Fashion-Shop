@@ -12,6 +12,7 @@ class CategoryController extends Controller
         $categories = Category::paginate(10);
 
         return response()->json([
+            'message' => 'Lấy danh sách danh mục thành công',
             'data' => $categories->items(),
             'pagination' => [
                 'current_page' => $categories->currentPage(),
