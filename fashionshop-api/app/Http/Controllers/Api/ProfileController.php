@@ -33,6 +33,7 @@ class ProfileController extends Controller
         $request->user()->update($request->only('email', 'phone', 'gender'));
 
         return response()->json([
+            'status'  => true,
             'message' => 'Cập nhật thành công',
             'user'    => $request->user() // Thêm dòng này để thỏa mãn pm.expect(json).to.have.property("user")
         ]);
