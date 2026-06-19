@@ -9,13 +9,17 @@ use Illuminate\Http\Request;
 class ReviewController extends Controller
 {
     public function index()
-    {
+        {
         $reviews = Review::with(['user', 'product'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return response()->json($reviews);
-    }
+        return response()->json([
+            'reviews' => $reviews,
+            'data' => $reviews->items()
+        ]);
+
+}
 
     public function reply(Request $request, $id)
     {
