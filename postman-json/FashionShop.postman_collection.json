@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "0f23480e-c77c-4f6f-ada7-f256c0a0b691",
+    "_postman_id": "8cd6b7b9-8faf-4c60-ba63-1e61f46d3c16",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55108691",
-    "_collection_link": "https://go.postman.co/collection/55108691-0f23480e-c77c-4f6f-ada7-f256c0a0b691?source=collection_link"
+    "_exporter_id": "55104620",
+    "_collection_link": "https://go.postman.co/collection/55104620-8cd6b7b9-8faf-4c60-ba63-1e61f46d3c16?source=collection_link"
   },
   "item": [
     {
@@ -36,6 +36,12 @@
                   "pm.test(\"User có field 'name'\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json.user).to.have.property(\"name\"); // ❌ sai: field đúng là 'fullname'\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response phải trả về mật khẩu vừa đăng ký\", function () {\r",
+                  "    let json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json.user).to.have.property(\"password\");\r",
                   "});\r",
                   ""
                 ],
@@ -1694,7 +1700,15 @@
                   "pm.test(\" User có field 'name'\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"name\"); // ❌ field đúng là 'fullname'\r",
-                  "});"
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response phải chứa gender\", function () {\r",
+                  "    let json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json).to.have.property(\"gender\");\r",
+                  "});\r",
+                  "\r",
+                  ""
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -1752,6 +1766,12 @@
                   "pm.test(\"Response trả về user đã cập nhật\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"user\"); // ❌ controller chỉ trả message\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response phải chứa status\", function () {\r",
+                  "    let json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json).to.have.property(\"status\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -1812,6 +1832,12 @@
                   "pm.test(\" Response trả về token mới sau khi đổi mật khẩu\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"token\"); // ❌ controller chỉ trả message, không cấp token mới\r",
+                  "});\r",
+                  "\r",
+                  "const json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Response phải chứa updated_at\", function () {\r",
+                  "    pm.expect(json).to.have.property(\"updated_at\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -1951,6 +1977,12 @@
                   "pm.test(\"Response có field 'user'\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"user\"); // ❌ logout chỉ trả message, không có 'user'\r",
+                  "});\r",
+                  "\r",
+                  "let json = pm.response.json();\r",
+                  "\r",
+                  "pm.test(\"Response phải chứa status\", function () {\r",
+                  "    pm.expect(json).to.have.property(\"status\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
