@@ -26,6 +26,7 @@ class DashboardController extends Controller
         'total_users'    => $totalUsers,
         'total_products' => $totalProducts,
         'recent_orders'  => $recentOrders,
+        'latest_orders'  => $recentOrders,
     ];
 
     return response()->json(array_merge($data, ['data' => $data]));
