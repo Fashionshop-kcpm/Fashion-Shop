@@ -18,6 +18,7 @@ class OrderController extends Controller
             ->get()
             ->map(function ($order) {
         $order->total_quantity = $order->details->sum('quantity');
+        $order->order_date = $order->created_at;
         return $order;
     });
         return response()->json($orders);
