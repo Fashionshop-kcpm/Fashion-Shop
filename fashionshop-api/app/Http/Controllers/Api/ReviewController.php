@@ -12,7 +12,7 @@ class ReviewController extends Controller
     {
         $reviews = Review::with('user')
             ->where('product_id', $id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->get();
 
         return response()->json($reviews);
