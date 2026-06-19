@@ -24,7 +24,14 @@ class ReviewController extends Controller
         $review = Review::findOrFail($id);
         $review->update(['shop_reply' => $request->shop_reply]);
 
-        return response()->json($review->fresh());
+        $review = $review->fresh();
+
+        return response()->json([
+            'id' => $review->id,
+            'shop_reply' => $review->shop_reply,
+            'reply_message' => 'Đã phản hồi đánh giá thành công',
+            'data' => $review
+        ]);
     }
 
     public function destroy($id)

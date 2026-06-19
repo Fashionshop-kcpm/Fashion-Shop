@@ -22,6 +22,12 @@ class UserController extends Controller
 
     public function show($id)
     {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Không tìm thấy khách hàng'], 404);
+        }
+
         return response()->json([
             'message' => 'Lấy user thành công',
             'data' => User::findOrFail($id)
