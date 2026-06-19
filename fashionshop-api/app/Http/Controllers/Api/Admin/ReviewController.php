@@ -29,20 +29,27 @@ class ReviewController extends Controller
 
     public function destroy($id)
     {
-        $review = Review::find($id);
-        
-        if (!$review) {
-            return response()->json([
-                'message' => 'Không tìm thấy đánh giá',
-                'data' => null
-            ], 404);
-        }
-        
-        $review->delete();
-        
+    $review = Review::find($id);
+
+    if (!$review) {
         return response()->json([
-            'message' => 'Đã xóa đánh giá',
-            'data' => ['id' => $id, 'deleted' => true]
-        ]);
+            'message' => 'Không tìm thấy đánh giá',
+            'data' => null
+        ], 404);
+    }
+
+    $deletedAt = now()->toDateTimeString();
+
+    $review->delete();
+
+    return response()->json([
+        'message' => 'Đã xóa đánh giá',
+        'deleted_at' => $deletedAt,
+        'data' => [
+            'id' => $id,
+            'deleted' => true
+        ]
+    ]);
+
     }
 }
