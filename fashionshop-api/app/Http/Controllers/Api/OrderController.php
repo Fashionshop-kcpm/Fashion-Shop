@@ -79,8 +79,16 @@ class OrderController extends Controller
 
         Cart::where('user_id', $request->user()->id)->delete();
 
-         return response()->json(['message' => 'Đặt hàng thành công', 'order' => $order->load('details')], 200);
-    }
+    $shippingFee = 30000;
+
+    $total = $cartItems->sum(
+        fn($item) => $item->product->gia * $item->quantity
+    ) + $shippingFee;         return response()->json([
+        'message' => 'Đặt hàng thành công',
+        'shipping_fee' => $shippingFee,
+        'order' => $order->load('details')
+    ], 200);
+        }
 
     public function cancel(Request $request, $id)
     {
