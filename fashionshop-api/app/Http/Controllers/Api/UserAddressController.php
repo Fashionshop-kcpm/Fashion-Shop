@@ -66,6 +66,8 @@ class UserAddressController extends Controller
         // Xóa địa chỉ
         $address->delete();
 
+         $deletedAddress['is_default'] = 0;
+
         // Trả về thông tin địa chỉ đã xóa
         return response()->json([
             'message' => 'Đã xóa địa chỉ',
