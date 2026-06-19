@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "94774906-ede9-4c47-885c-5e9231c6c53b",
+    "_postman_id": "b9d463e6-d72e-4643-8f09-71595c017153",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55104651",
-    "_collection_link": "https://go.postman.co/collection/55104651-94774906-ede9-4c47-885c-5e9231c6c53b?source=collection_link"
+    "_exporter_id": "55047512",
+    "_collection_link": "https://go.postman.co/collection/55047512-b9d463e6-d72e-4643-8f09-71595c017153?source=collection_link"
   },
   "item": [
     {
@@ -176,6 +176,11 @@
                   "pm.test(\"Response có phân trang\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"pagination\"); \r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response có trả về key 'message'\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"message\"); \r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -237,6 +242,13 @@
                   "pm.test(\"Mỗi trang có 10 sản phẩm\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json.per_page).to.equal(10);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response có 'applied_filters' và ghi nhận đúng bộ lọc 'category_id'\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"applied_filters\");\r",
+                  "    pm.expect(json.applied_filters).to.be.an(\"object\");\r",
+                  "    pm.expect(json.applied_filters).to.have.property(\"category_id\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -258,22 +270,12 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/products?keyword=áo&page=1",
+              "raw": "{{base_url}}/products",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "products"
-              ],
-              "query": [
-                {
-                  "key": "keyword",
-                  "value": "áo"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                }
               ]
             }
           },
@@ -300,6 +302,12 @@
                   "pm.test(\"Sản phẩm có field 'name'\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"name\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Sản phẩm chứa đầy đủ thông tin (kích cỡ)\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"sizes\");\r",
+                  "    pm.expect(json.sizes).to.be.an(\"array\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -317,6 +325,11 @@
               {
                 "key": "Authorization",
                 "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
                 "type": "text"
               }
             ],
@@ -2110,6 +2123,14 @@
                   "pm.test(\"API phải có cờ 'success' = true để báo hiệu thành công cho Frontend\", function () {\r",
                   "    const responseData = pm.response.json();\r",
                   "    pm.expect(responseData).to.have.property('success', true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Khi chuyển sang trang 2, kết quả phân trang vẫn phải giữ bộ lọc theo keyword\", function () {\r",
+                  "    const responseData = pm.response.json();\r",
+                  "    pm.expect(responseData).to.have.property('success', true);\r",
+                  "    if (responseData.next_page_url) {\r",
+                  "        pm.expect(responseData.next_page_url).to.include('keyword=', \"Lỗi: Link phân trang bị mất tham số keyword khi chuyển trang!\");\r",
+                  "    }\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -2160,6 +2181,12 @@
                   "pm.test(\"API cần trả về cờ 'success': true để đồng bộ cấu trúc\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"success\", true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Sản phẩm trả về phải đính kèm object 'category'\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.product).to.have.property(\"category\");\r",
+                  "    pm.expect(json.product.category).to.be.an(\"object\");\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -2215,6 +2242,12 @@
                   "value": "Áo sơ mi đen trơn đẹp, phong cánh kiểu Hàn",
                   "type": "text",
                   "uuid": "5f13cdf4-73bb-4cdf-b250-37c91231ab86"
+                },
+                {
+                  "key": "category_id",
+                  "value": "1",
+                  "type": "text",
+                  "uuid": "6b7743f7-d8ab-4c03-be2c-cbae507a8b8b"
                 }
               ]
             },
@@ -2249,6 +2282,15 @@
                   "pm.test(\"API cần trả về cờ 'success': true để đồng bộ toàn hệ thống\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"success\", true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Sản phẩm sau khi sửa phải đính kèm object 'category' mới nhất\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"product\");\r",
+                  "    pm.expect(json.product).to.have.property(\"category\");\r",
+                  "    if (json.product.category !== null) {\r",
+                  "        pm.expect(json.product.category).to.be.an(\"object\");\r",
+                  "    }\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -2264,6 +2306,11 @@
                 "key": "Authorization",
                 "value": "Bearer {{admin_token}}",
                 "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
               }
             ],
             "body": {
@@ -2277,13 +2324,13 @@
                 },
                 {
                   "key": "gia",
-                  "value": "220000",
+                  "value": "230000",
                   "type": "text",
                   "uuid": "705d1bca-9a40-4526-8145-7c4d9d0fe300"
                 },
                 {
                   "key": "so_luong",
-                  "value": "11",
+                  "value": "112",
                   "type": "text",
                   "uuid": "a64a434b-ca41-4da9-983d-8793bde2fac6"
                 },
@@ -2334,6 +2381,11 @@
                   "pm.test(\"API phải trả về 'id' của sản phẩm vừa xóa cho Frontend\", function () {\r",
                   "    const json = pm.response.json();\r",
                   "    pm.expect(json).to.have.property(\"id\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"API cần trả về cờ 'success': true để đồng bộ toàn hệ thống\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property(\"success\", true);\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -2348,6 +2400,11 @@
               {
                 "key": "Authorization",
                 "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
                 "type": "text"
               }
             ],
