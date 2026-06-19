@@ -51,6 +51,19 @@ class OrderController extends Controller
 
     // 1. Tìm đơn hàng và cập nhật trạng thái mới
     $order = Order::findOrFail($id);
+    $allowedTransitions = [
+    'pending'   => ['shipping', 'cancelled'],
+    'shipping'  => ['completed', 'cancelled'],
+    'completed' => [],
+    'cancelled' => [],
+];
+
+if (!in_array($request->status, $allowedTransitions[$order->status] ?? [])) {
+    return response()->json([
+        'message' => "Không thể chuyển từ '{$order->status}' sang '{$request->status}'"
+    ], 422);
+}
+
     $order->update(['status' => $request->status]);
 
     // 2. Load các quan hệ (user, details, product) vào đối tượng $order vừa cập nhật
