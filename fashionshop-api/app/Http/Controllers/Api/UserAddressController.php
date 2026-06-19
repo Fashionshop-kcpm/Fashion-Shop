@@ -97,7 +97,8 @@ class UserAddressController extends Controller
 
         return response()->json([
             'message' => 'Đã đặt địa chỉ mặc định',
-            'data' => $address->fresh()
+            'data' => $address->fresh(),
+            'sync_all_addresses' => true
         ], 200);
     }
 }
