@@ -11,13 +11,22 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $query = Product::with('category');
-        if ($request->keyword) {
+
+        if ($request->filled('keyword')) {
             $query->where('ten_sp', 'LIKE', "%{$request->keyword}%");
         }
 
-        $products = $query->paginate(10)->withQueryString();
-        return response()->json(array_merge($products->toArray(), ['success' => true]));
-        
+        $products = $query->paginate(10);
+
+        $products->appends([
+            'keyword' => $request->keyword ?? ''
+        ]);
+
+        return response()->json(
+            array_merge($products->toArray(), [
+                'success' => true
+            ])
+        );
     }
 
 
