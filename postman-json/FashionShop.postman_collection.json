@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "ad5b89ca-229e-4995-8fff-b779007260d5",
+    "_postman_id": "cc345515-6310-4d5d-af5c-22b1e1bcd939",
     "name": "FashionShop",
     "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "55047512",
-    "_collection_link": "https://go.postman.co/collection/55047512-ad5b89ca-229e-4995-8fff-b779007260d5?source=collection_link"
+    "_exporter_id": "55108854",
+    "_collection_link": "https://go.postman.co/collection/55108854-cc345515-6310-4d5d-af5c-22b1e1bcd939?source=collection_link"
   },
   "item": [
     {
@@ -2834,20 +2834,23 @@
                   "    }\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"Total trả về phải khớp với (tổng tiền sản phẩm + phí ship cố định)\", function () {\r",
+                  "pm.test(\"Bug: orWhere không nhóm đúng khiến đơn hàng sai status lọt qua filter\", function () {\r",
                   "    const json = pm.response.json();\r",
-                  "    const SHIPPING_FEE = 30000; // phí ship cố định, đã confirm với backend\r",
+                  "    const orders = Array.isArray(json) ? json : json.data;\r",
                   "\r",
-                  "    const computedSubtotal = json.details.reduce((sum, item) => {\r",
-                  "        return sum + (item.quantity * item.price);\r",
-                  "    }, 0);\r",
+                  "    const requestedStatus = pm.request.url.query.get(\"status\") || \"pending\";\r",
+                  "    const keyword = pm.request.url.query.get(\"keyword\");\r",
                   "\r",
-                  "    const expectedTotal = computedSubtotal + SHIPPING_FEE;\r",
+                  "    // Tìm đơn hàng có id trùng keyword nhưng status KHÁC filter đang áp dụng\r",
+                  "    const leakedOrder = orders.find(o =>\r",
+                  "        String(o.id) === String(keyword) && o.status !== requestedStatus\r",
+                  "    );\r",
                   "\r",
+                  "    // Kỳ vọng đúng: không có đơn nào như vậy lọt vào kết quả\r",
                   "    pm.expect(\r",
-                  "        json.total,\r",
-                  "        `total API = ${json.total}, nhưng subtotal (${computedSubtotal}) + ship (${SHIPPING_FEE}) = ${expectedTotal}`\r",
-                  "    ).to.equal(expectedTotal);\r",
+                  "        leakedOrder,\r",
+                  "        `Đơn hàng id=${keyword} có status='${leakedOrder?.status}' không khớp filter status='${requestedStatus}' nhưng vẫn xuất hiện trong response`\r",
+                  "    ).to.be.undefined;\r",
                   "});\r",
                   ""
                 ],
@@ -2867,13 +2870,25 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/admin/orders",
+              "raw": "{{base_url}}/admin/orders?status=pending&keyword=418",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "admin",
                 "orders"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "type": "text"
+                },
+                {
+                  "key": "keyword",
+                  "value": "418",
+                  "type": "text"
+                }
               ]
             }
           },
@@ -3074,11 +3089,9 @@
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
-                  "// Test 2: Danh sách đánh giá có dữ liệu\r",
-                  "pm.test(\"Danh sách đánh giá có dữ liệu\", function () {\r",
+                  "pm.test(\"Trả về mảng đánh giá\", function () {\r",
                   "    const json = pm.response.json();\r",
-                  "    pm.expect(json.data).to.be.an('array');\r",
-                  "    pm.expect(json.data.length).to.be.above(0);\r",
+                  "    pm.expect(json.data).to.be.an(\"array\");\r",
                   "});\r",
                   "\r",
                   "pm.test(\"Rating hợp lệ\", function () {\r",

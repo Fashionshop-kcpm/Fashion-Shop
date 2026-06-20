@@ -22,7 +22,6 @@ class OrderController extends Controller
             })->orWhere('id', $request->keyword);
         });
     }
-
         return response()->json($query->paginate(10));
     }
 
@@ -40,6 +39,7 @@ class OrderController extends Controller
 
         return response()->json($order);
     }
+
 
 
 

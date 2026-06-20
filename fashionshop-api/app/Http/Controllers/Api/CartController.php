@@ -103,7 +103,8 @@ if ($validator->fails()) {
 
         if (!$cart) {
             return response()->json([
-                'message' => 'ID không hợp lệ'
+                'message' => 'ID không hợp lệ',
+                'deleted_cart_id' => null
             ], 200);
         }
 
