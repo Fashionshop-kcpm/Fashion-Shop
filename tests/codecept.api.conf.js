@@ -8,10 +8,12 @@ exports.config = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
+      timeout: 30000,
     },
   },
   include: {
     I: './steps_file.js',
   },
   name: 'FashionShop API Tests',
+  timeout: 60,
 };
