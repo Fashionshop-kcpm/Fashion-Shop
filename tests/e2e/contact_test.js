@@ -1,8 +1,12 @@
 Feature('Trang Liên Hệ @e2e');
 
-Scenario('Trang liên hệ hiển thị form', async ({ I }) => {
+Before(async ({ I }) => {
   I.amOnPage('/contact');
-  await I.waitForElement('[name="fullname"]', 8);
+  await I.waitForElement('form', 8);
+});
+
+Scenario('Trang liên hệ hiển thị form', async ({ I }) => {
+  await I.waitForElement('[name="fullname"]', 5);
 
   I.see('Liên Hệ');
   I.seeElement('[name="fullname"]');
@@ -12,8 +16,7 @@ Scenario('Trang liên hệ hiển thị form', async ({ I }) => {
 });
 
 Scenario('Gửi liên hệ thành công', async ({ I }) => {
-  I.amOnPage('/contact');
-  await I.waitForElement('[name="fullname"]', 8);
+  await I.waitForElement('[name="fullname"]', 5);
 
   I.fillField('[name="fullname"]', 'Nguyễn Văn A');
   I.fillField('[name="email"]', 'contact@test.com');
@@ -24,9 +27,6 @@ Scenario('Gửi liên hệ thành công', async ({ I }) => {
 });
 
 Scenario('Lỗi validation khi để trống tên', async ({ I }) => {
-  I.amOnPage('/contact');
-  await I.waitForElement('form', 8);
-
   await I.disableNativeValidation();
 
   I.fillField('[name="email"]', 'test@gmail.com');
@@ -37,9 +37,6 @@ Scenario('Lỗi validation khi để trống tên', async ({ I }) => {
 });
 
 Scenario('Lỗi validation khi email không hợp lệ', async ({ I }) => {
-  I.amOnPage('/contact');
-  await I.waitForElement('form', 8);
-
   await I.disableNativeValidation();
 
   I.fillField('[name="fullname"]', 'Test User');
@@ -51,9 +48,6 @@ Scenario('Lỗi validation khi email không hợp lệ', async ({ I }) => {
 });
 
 Scenario('Lỗi validation khi nội dung quá ngắn', async ({ I }) => {
-  I.amOnPage('/contact');
-  await I.waitForElement('form', 8);
-
   await I.disableNativeValidation();
 
   I.fillField('[name="fullname"]', 'Test User');

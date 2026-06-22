@@ -1,8 +1,12 @@
 Feature('Trang Đăng Ký @e2e');
 
-Scenario('Trang register hiển thị đúng form', async ({ I }) => {
+Before(async ({ I }) => {
   I.amOnPage('/register');
-  await I.waitForElement('[name="fullname"]', 8);
+  await I.waitForElement('form', 8);
+});
+
+Scenario('Trang register hiển thị đúng form', async ({ I }) => {
+  await I.waitForElement('[name="fullname"]', 5);
 
   I.see('Đăng Ký');
   I.seeElement('[name="fullname"]');
@@ -16,8 +20,7 @@ Scenario('Trang register hiển thị đúng form', async ({ I }) => {
 Scenario('Đăng ký thành công và chuyển về trang chủ', async ({ I }) => {
   const email = `test_${Date.now()}@example.com`;
 
-  I.amOnPage('/register');
-  await I.waitForElement('[name="fullname"]', 8);
+  await I.waitForElement('[name="fullname"]', 5);
 
   I.fillField('[name="fullname"]', 'Nguyễn Văn Test');
   I.fillField('[name="email"]', email);
@@ -32,10 +35,6 @@ Scenario('Đăng ký thành công và chuyển về trang chủ', async ({ I }) 
 });
 
 Scenario('Đăng ký thất bại - email không hợp lệ', async ({ I }) => {
-  I.amOnPage('/register');
-  await I.waitForElement('form', 8);
-
-  // Tắt HTML5 native validation để Zod xử lý
   await I.disableNativeValidation();
 
   I.fillField('[name="fullname"]', 'Test User');
@@ -52,8 +51,7 @@ Scenario('Đăng ký thất bại - email không hợp lệ', async ({ I }) => {
 Scenario('Đăng ký thất bại - mật khẩu không khớp', async ({ I }) => {
   const email = `mismatch_${Date.now()}@example.com`;
 
-  I.amOnPage('/register');
-  await I.waitForElement('[name="fullname"]', 8);
+  await I.waitForElement('[name="fullname"]', 5);
 
   I.fillField('[name="fullname"]', 'Test User');
   I.fillField('[name="email"]', email);
@@ -66,7 +64,6 @@ Scenario('Đăng ký thất bại - mật khẩu không khớp', async ({ I }) =
 });
 
 Scenario('Chuyển sang trang đăng nhập khi bấm link', async ({ I }) => {
-  I.amOnPage('/register');
   await I.waitForElement('a[href="/login"]', 5);
   I.click('a[href="/login"]');
   await I.waitForURL('http://localhost:5173/login', 5);

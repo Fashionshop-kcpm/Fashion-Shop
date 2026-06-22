@@ -109,6 +109,15 @@ module.exports = function steps() {
       return res.data.data[0].id;
     },
 
+    // ─── API ADDRESS HELPER ──────────────────────────────────────
+    createAddress: async function (token, fullname, addressDetails, isDefault = false) {
+      const res = await this.sendPostRequest('/addresses',
+        { fullname, phone: '0901234567', address_details: addressDetails, is_default: isDefault },
+        { Authorization: `Bearer ${token}` }
+      );
+      return res.data.address?.id;
+    },
+
     // ─── E2E CART HELPER ─────────────────────────────────────────
     addToCartViaApi: async function (size = 'M') {
       const productId = await this.getFirstProductId();

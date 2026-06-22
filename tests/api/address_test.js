@@ -69,11 +69,7 @@ Scenario('[BUG] GET /addresses - Response phải có trường message', async (
 // ─── ĐẶT LÀM ĐỊA CHỈ MẶC ĐỊNH ─────────────────────────────────────
 
 Scenario('PATCH /addresses/:id/default - Kiểm tra status code phải là 200', async ({ I }) => {
-  const addRes = await I.sendPostRequest('/addresses',
-    { fullname: 'Test User', phone: '0901234567', address_details: '789 ABC St', is_default: false },
-    { Authorization: `Bearer ${token}` }
-  );
-  const id = addRes.data.address?.id;
+  const id = await I.createAddress(token, 'Test User', '789 ABC St');
 
   const res = await I.sendPatchRequest(`/addresses/${id}/default`, {}, {
     Authorization: `Bearer ${token}`,
@@ -83,11 +79,7 @@ Scenario('PATCH /addresses/:id/default - Kiểm tra status code phải là 200',
 });
 
 Scenario('PATCH /addresses/:id/default - Kiểm tra response có message và data', async ({ I }) => {
-  const addRes = await I.sendPostRequest('/addresses',
-    { fullname: 'Test User 2', phone: '0901234567', address_details: '321 XYZ Ave', is_default: false },
-    { Authorization: `Bearer ${token}` }
-  );
-  const id = addRes.data.address?.id;
+  const id = await I.createAddress(token, 'Test User 2', '321 XYZ Ave');
 
   const res = await I.sendPatchRequest(`/addresses/${id}/default`, {}, {
     Authorization: `Bearer ${token}`,
@@ -100,11 +92,7 @@ Scenario('PATCH /addresses/:id/default - Kiểm tra response có message và dat
 // ─── XÓA ĐỊA CHỈ ──────────────────────────────────────────────────
 
 Scenario('DELETE /addresses/:id - Kiểm tra status code phải là 200', async ({ I }) => {
-  const addRes = await I.sendPostRequest('/addresses',
-    { fullname: 'Delete User', phone: '0901234567', address_details: '999 Del St', is_default: false },
-    { Authorization: `Bearer ${token}` }
-  );
-  const id = addRes.data.address?.id;
+  const id = await I.createAddress(token, 'Delete User', '999 Del St');
 
   const res = await I.sendDeleteRequest(`/addresses/${id}`, {
     Authorization: `Bearer ${token}`,
@@ -114,11 +102,7 @@ Scenario('DELETE /addresses/:id - Kiểm tra status code phải là 200', async 
 });
 
 Scenario('DELETE /addresses/:id - Kiểm tra response có message', async ({ I }) => {
-  const addRes = await I.sendPostRequest('/addresses',
-    { fullname: 'Delete User 2', phone: '0901234567', address_details: '888 Del Ave', is_default: false },
-    { Authorization: `Bearer ${token}` }
-  );
-  const id = addRes.data.address?.id;
+  const id = await I.createAddress(token, 'Delete User 2', '888 Del Ave');
 
   const res = await I.sendDeleteRequest(`/addresses/${id}`, {
     Authorization: `Bearer ${token}`,
@@ -128,11 +112,7 @@ Scenario('DELETE /addresses/:id - Kiểm tra response có message', async ({ I }
 });
 
 Scenario('DELETE /addresses/:id - Response trả về địa chỉ đã xóa', async ({ I }) => {
-  const addRes = await I.sendPostRequest('/addresses',
-    { fullname: 'Delete User 3', phone: '0901234567', address_details: '777 Rem Rd', is_default: false },
-    { Authorization: `Bearer ${token}` }
-  );
-  const id = addRes.data.address?.id;
+  const id = await I.createAddress(token, 'Delete User 3', '777 Rem Rd');
 
   const res = await I.sendDeleteRequest(`/addresses/${id}`, {
     Authorization: `Bearer ${token}`,
