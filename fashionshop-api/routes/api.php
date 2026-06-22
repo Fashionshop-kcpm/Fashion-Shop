@@ -23,7 +23,7 @@ $productById = '/products/{id}';
 $orders = '/orders';
 
 // ==================== PUBLIC ROUTES ====================
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->group(function () use ($products, $productById) {
 
     // Auth
     Route::post('/register', [AuthController::class, 'register']);
@@ -43,7 +43,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/contacts', [ContactController::class, 'store']);
 
 // ==================== USER ROUTES (cần login) ====================
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('auth:sanctum')->group(function () use ($orders) {
 
         // Auth
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -79,7 +79,7 @@ Route::prefix('v1')->group(function () {
     // Admin login (public)
     Route::post('/admin/login', [AdminAuthController::class, 'login']);
 
-    Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::prefix('admin')->middleware(['auth:sanctum', 'admin'])->group(function () use ($products, $productById, $orders) {
 
         // Admin logout
         Route::post('/logout', [AdminAuthController::class, 'logout']);
