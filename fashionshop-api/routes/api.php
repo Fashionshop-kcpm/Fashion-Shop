@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\AdminAuthController;
 
+$products = '/products';
+
 // ==================== PUBLIC ROUTES ====================
 Route::prefix('v1')->group(function () {
 
@@ -26,7 +28,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     // Products
-    Route::get('/products', [ProductController::class, 'index']);
+    Route::get($products, [ProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
 
     // Categories
@@ -84,8 +86,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
 
         // Products
-        Route::get('/products', [AdminProductController::class, 'index']);
-        Route::post('/products', [AdminProductController::class, 'store']);
+        Route::get($products, [AdminProductController::class, 'index']);
+        Route::post($products, [AdminProductController::class, 'store']);
         Route::post('/products/{id}', [AdminProductController::class, 'update']);
         Route::delete('/products/{id}', [AdminProductController::class, 'destroy']);
 
