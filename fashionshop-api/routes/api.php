@@ -18,6 +18,10 @@ use App\Http\Controllers\Api\Admin\ContactController as AdminContactController;
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\AdminAuthController;
 
+$products = '/products';
+$productById = '/products/{id}';
+$orders = '/orders';
+
 // ==================== PUBLIC ROUTES ====================
 Route::prefix('v1')->group(function () {
 
@@ -26,8 +30,8 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     // Products
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::get($products, [ProductController::class, 'index']);
+    Route::get($productById, [ProductController::class, 'show']);
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -62,8 +66,8 @@ Route::prefix('v1')->group(function () {
         Route::delete('/cart/{id}', [CartController::class, 'destroy']);
 
         // Orders
-        Route::get('/orders', [OrderController::class, 'index']);
-        Route::post('/orders', [OrderController::class, 'store']);
+        Route::get($orders, [OrderController::class, 'index']);
+        Route::post($orders, [OrderController::class, 'store']);
         Route::get('/orders/{id}', [OrderController::class, 'show']);
         Route::patch('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 
@@ -84,13 +88,13 @@ Route::prefix('v1')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
 
         // Products
-        Route::get('/products', [AdminProductController::class, 'index']);
-        Route::post('/products', [AdminProductController::class, 'store']);
-        Route::post('/products/{id}', [AdminProductController::class, 'update']);
-        Route::delete('/products/{id}', [AdminProductController::class, 'destroy']);
+        Route::get($products, [AdminProductController::class, 'index']);
+        Route::post($products, [AdminProductController::class, 'store']);
+        Route::post($productById, [AdminProductController::class, 'update']);
+        Route::delete($productById, [AdminProductController::class, 'destroy']);
 
         // Orders
-        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::get($orders, [AdminOrderController::class, 'index']);
         Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
         Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
 
