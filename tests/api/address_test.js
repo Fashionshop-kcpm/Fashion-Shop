@@ -5,15 +5,7 @@ Feature('Address API @api');
 let token = '';
 
 Before(async ({ I }) => {
-  const res = await I.sendPostRequest('/register', {
-    fullname: 'Address User',
-    email: `addr_${Date.now()}@gmail.com`,
-    phone: '0938019655',
-    gender: 'Nam',
-    password: 'Chi123',
-    password_confirmation: 'Chi123',
-  });
-  token = res.data.token;
+  ({ token } = await I.registerApiUser('addr'));
 });
 
 // ─── THÊM ĐỊA CHỈ ─────────────────────────────────────────────────

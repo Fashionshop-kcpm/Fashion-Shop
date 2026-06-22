@@ -13,18 +13,8 @@ const orderPayload = {
 };
 
 Before(async ({ I }) => {
-  const res = await I.sendPostRequest('/register', {
-    fullname: 'Order User',
-    email: `order_${Date.now()}@gmail.com`,
-    phone: '0938019655',
-    gender: 'Nam',
-    password: 'Chi123',
-    password_confirmation: 'Chi123',
-  });
-  token = res.data.token;
-
-  const listRes = await I.sendGetRequest('/products');
-  productId = listRes.data.data[0].id;
+  ({ token } = await I.registerApiUser('order'));
+  productId = await I.getFirstProductId();
 });
 
 // ─── ĐẶT HÀNG ────────────────────────────────────────────────────

@@ -27,14 +27,7 @@ Scenario('Thông báo chưa có đơn hàng khi user mới', async ({ I }) => {
 });
 
 Scenario('Trang checkout hiển thị form đặt hàng', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
-  const token = await I.executeScript(() => localStorage.getItem('token'));
-
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'M' },
-    { Authorization: `Bearer ${token}` }
-  );
+  await I.addToCartViaApi('M');
 
   I.amOnPage('/checkout');
   await I.waitForElement('[name="fullname"]', 8);
@@ -46,14 +39,7 @@ Scenario('Trang checkout hiển thị form đặt hàng', async ({ I }) => {
 });
 
 Scenario('Đặt hàng thành công và chuyển trang order-success', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
-  const token = await I.executeScript(() => localStorage.getItem('token'));
-
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'M' },
-    { Authorization: `Bearer ${token}` }
-  );
+  await I.addToCartViaApi('M');
 
   I.amOnPage('/checkout');
   await I.waitForElement('[name="fullname"]', 8);
@@ -68,14 +54,7 @@ Scenario('Đặt hàng thành công và chuyển trang order-success', async ({ 
 });
 
 Scenario('Lỗi validation khi để trống địa chỉ', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
-  const token = await I.executeScript(() => localStorage.getItem('token'));
-
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'L' },
-    { Authorization: `Bearer ${token}` }
-  );
+  await I.addToCartViaApi('L');
 
   I.amOnPage('/checkout');
   await I.waitForElement('form', 8);
@@ -92,14 +71,9 @@ Scenario('Lỗi validation khi để trống địa chỉ', async ({ I }) => {
 });
 
 Scenario('Xem danh sách đơn hàng sau khi đặt', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
+  await I.addToCartViaApi('S');
   const token = await I.executeScript(() => localStorage.getItem('token'));
 
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'S' },
-    { Authorization: `Bearer ${token}` }
-  );
   await I.sendPostRequest('/orders',
     { fullname: 'Test', phone: '0901234567', address: '123 ABC Street', payment: 'COD' },
     { Authorization: `Bearer ${token}` }
@@ -113,14 +87,9 @@ Scenario('Xem danh sách đơn hàng sau khi đặt', async ({ I }) => {
 });
 
 Scenario('Xem chi tiết đơn hàng', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
+  await I.addToCartViaApi('M');
   const token = await I.executeScript(() => localStorage.getItem('token'));
 
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'M' },
-    { Authorization: `Bearer ${token}` }
-  );
   const orderRes = await I.sendPostRequest('/orders',
     { fullname: 'Test', phone: '0901234567', address: '123 ABC Street', payment: 'COD' },
     { Authorization: `Bearer ${token}` }

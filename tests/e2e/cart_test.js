@@ -42,14 +42,7 @@ Scenario('Thêm sản phẩm vào giỏ từ trang chi tiết', async ({ I }) =>
 });
 
 Scenario('Xem giỏ hàng sau khi thêm sản phẩm qua API', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
-  const token = await I.executeScript(() => localStorage.getItem('token'));
-
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'M' },
-    { Authorization: `Bearer ${token}` }
-  );
+  await I.addToCartViaApi('M');
 
   I.amOnPage('/cart');
   await I.waitForElement('h1', 8);
@@ -58,14 +51,7 @@ Scenario('Xem giỏ hàng sau khi thêm sản phẩm qua API', async ({ I }) => 
 });
 
 Scenario('Tăng số lượng sản phẩm trong giỏ hàng', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
-  const token = await I.executeScript(() => localStorage.getItem('token'));
-
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'L' },
-    { Authorization: `Bearer ${token}` }
-  );
+  await I.addToCartViaApi('L');
 
   I.amOnPage('/cart');
   await I.waitForElement('button', 8);
@@ -78,14 +64,7 @@ Scenario('Tăng số lượng sản phẩm trong giỏ hàng', async ({ I }) => 
 });
 
 Scenario('Nút Tiến hành thanh toán dẫn đến /checkout', async ({ I }) => {
-  const listRes = await I.sendGetRequest('/products');
-  const productId = listRes.data.data[0].id;
-  const token = await I.executeScript(() => localStorage.getItem('token'));
-
-  await I.sendPostRequest('/cart',
-    { product_id: productId, quantity: 1, size: 'S' },
-    { Authorization: `Bearer ${token}` }
-  );
+  await I.addToCartViaApi('S');
 
   I.amOnPage('/cart');
   await I.waitForElement('a[href="/checkout"]', 8);

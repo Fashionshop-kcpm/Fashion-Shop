@@ -8,7 +8,6 @@ module.exports = function steps() {
     loginNewUser: async function () {
       const email = `e2e_${Date.now()}@test.com`;
       const password = 'Chi123';
-
       await this.sendPostRequest('/register', {
         fullname: 'E2E Test User',
         email,
@@ -17,21 +16,9 @@ module.exports = function steps() {
         password,
         password_confirmation: password,
       });
-
       const loginRes = await this.sendPostRequest('/login', { email, password });
       const { token, user } = loginRes.data;
-
-      this.amOnPage('http://localhost:5173/');
-      await this.waitForElement('body', 10);
-
-      await this.executeScript(([t, u]) => {
-        localStorage.setItem('token', t);
-        localStorage.setItem('user', JSON.stringify(u));
-      }, [token, user]);
-
-      this.refreshPage();
-      await this.waitForElement('body', 10);
-
+      await this.applyUserAuth(token, user);
       return { email, password, token };
     },
 
@@ -39,33 +26,32 @@ module.exports = function steps() {
     loginAs: async function (email, password) {
       const loginRes = await this.sendPostRequest('/login', { email, password });
       const { token, user } = loginRes.data;
+      await this.applyUserAuth(token, user);
+      return token;
+    },
 
+    // ─── SET AUTH IN LOCALSTORAGE ─────────────────────────────
+    applyUserAuth: async function (token, user) {
       this.amOnPage('http://localhost:5173/');
       await this.waitForElement('body', 10);
-
       await this.executeScript(([t, u]) => {
         localStorage.setItem('token', t);
         localStorage.setItem('user', JSON.stringify(u));
       }, [token, user]);
-
       this.refreshPage();
       await this.waitForElement('body', 10);
-
-      return token;
     },
 
     // ─── CLEAR USER AUTH ────────────────────────────────────────
     clearAuth: async function () {
-  this.amOnPage('http://localhost:5173/');
-
-  await this.waitForElement('body', 10);
-
-  await this.executeScript(() => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    sessionStorage.clear();
-  });
-},
+      this.amOnPage('http://localhost:5173/');
+      await this.waitForElement('body', 10);
+      await this.executeScript(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        sessionStorage.clear();
+      });
+    },
 
     // ─── ADMIN LOGIN ────────────────────────────────────────────
     adminLoginByApi: async function () {
@@ -73,33 +59,27 @@ module.exports = function steps() {
         email: ADMIN_EMAIL,
         password: ADMIN_PASSWORD,
       });
-
       const { token, admin } = loginRes.data;
-
       this.amOnPage('http://localhost:5174/');
       await this.waitForElement('body', 10);
-
       await this.executeScript(([t, a]) => {
         localStorage.setItem('admin_token', t);
         localStorage.setItem('admin_user', JSON.stringify(a));
-}, [token, admin]);
-
+      }, [token, admin]);
       this.refreshPage();
       await this.waitForElement('body', 10);
     },
 
     // ─── CLEAR ADMIN AUTH ───────────────────────────────────────
-   clearAdminAuth: async function () {
-  this.amOnPage('http://localhost:5174/');
-
-  await this.waitForElement('body', 10);
-
-  await this.executeScript(() => {
-    localStorage.removeItem('admin_token');
-    localStorage.removeItem('admin_user');
-    sessionStorage.clear();
-  });
-},
+    clearAdminAuth: async function () {
+      this.amOnPage('http://localhost:5174/');
+      await this.waitForElement('body', 10);
+      await this.executeScript(() => {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        sessionStorage.clear();
+      });
+    },
 
     // ─── DISABLE VALIDATION ────────────────────────────────────
     disableNativeValidation: async function () {
@@ -107,6 +87,38 @@ module.exports = function steps() {
         const form = document.querySelector('form');
         if (form) form.noValidate = true;
       });
+    },
+
+    // ─── API TEST HELPERS ────────────────────────────────────────
+    registerApiUser: async function (prefix = 'api') {
+      const email = `${prefix}_${Date.now()}@test.com`;
+      const password = 'Chi123';
+      const res = await this.sendPostRequest('/register', {
+        fullname: 'Test User',
+        email,
+        phone: '0938019655',
+        gender: 'Nam',
+        password,
+        password_confirmation: password,
+      });
+      return { token: res.data.token, email, password };
+    },
+
+    getFirstProductId: async function () {
+      const res = await this.sendGetRequest('/products');
+      return res.data.data[0].id;
+    },
+
+    // ─── E2E CART HELPER ─────────────────────────────────────────
+    addToCartViaApi: async function (size = 'M') {
+      const productId = await this.getFirstProductId();
+      const token = await this.executeScript(() => localStorage.getItem('token'));
+      await this.sendPostRequest(
+        '/cart',
+        { product_id: productId, quantity: 1, size },
+        { Authorization: `Bearer ${token}` }
+      );
+      return productId;
     },
 
   });
