@@ -12,11 +12,11 @@ Hệ thống thương mại điện tử bán quần áo thời trang nam/nữ, 
 4. [Kiến trúc hệ thống](#4-kiến-trúc-hệ-thống)
 5. [Cấu trúc thư mục](#5-cấu-trúc-thư-mục)
 6. [Yêu cầu môi trường](#6-yêu-cầu-môi-trường)
-7. [Cài đặt - Laragon (Local Dev)](#7-cài-đặt---laragon-local-dev)
-8. [Cài đặt - Docker (Local)](#8-cài-đặt---docker-local)
-9. [Biến môi trường](#9-biến-môi-trường)
+7. [Cài đặt](#7-cài-đặt)
+8. [Biến môi trường](#8-biến-môi-trường)
+9. [Chạy Tests](#9-chạy-tests)
 10. [API Reference](#10-api-reference)
-11. [CI/CD](#11-cicd)
+11. [CI/CD & SonarCloud](#11-cicd--sonarcloud)
 12. [Postman Collection](#12-postman-collection)
 13. [Database Schema](#13-database-schema)
 
@@ -46,7 +46,7 @@ FashionShop gồm 3 ứng dụng độc lập giao tiếp qua REST API:
 | ORM | Eloquent |
 | Database | MySQL 8 |
 | File Storage | Laravel Storage (`storage/app/public`) |
-| Testing | PHPUnit (SQLite in-memory) |
+| Unit Testing | PHPUnit (SQLite in-memory) |
 | Code Style | Laravel Pint |
 
 ### Frontend — `fashionshop-web` & `fashionshop-admin`
@@ -63,19 +63,28 @@ FashionShop gồm 3 ứng dụng độc lập giao tiếp qua REST API:
 | Icons | Lucide React |
 | Notifications | React Hot Toast |
 
+### Testing
+
+| Thành phần | Công nghệ |
+|---|---|
+| API Testing | CodeceptJS + REST Helper |
+| E2E Testing | CodeceptJS + Playwright |
+| Assertion | Chai |
+
 ### DevOps
 
 | Thành phần | Công nghệ |
 |---|---|
 | CI | GitHub Actions |
-| CD | Docker + Docker Compose |
-| Web Server (container) | Nginx Alpine |
+| Code Quality | SonarCloud |
+| Containerization | Docker + Nginx Unprivileged Alpine |
 
 ---
 
 ## 3. Tính năng
 
 ### Khách chưa đăng nhập (Guest)
+
 - Xem trang chủ với các tab: Nổi Bật, Bán Chạy, Khuyến Mãi
 - Duyệt sản phẩm theo danh mục và giới tính (Nam/Nữ)
 - Tìm kiếm sản phẩm theo tên
@@ -84,6 +93,7 @@ FashionShop gồm 3 ứng dụng độc lập giao tiếp qua REST API:
 - Gửi form liên hệ
 
 ### Khách hàng đã đăng nhập (User)
+
 - Thêm sản phẩm vào giỏ (chọn size S/M/L/XL, số lượng)
 - Quản lý giỏ hàng (cập nhật số lượng, xóa)
 - Đặt hàng với phương thức COD (phí ship 30.000đ)
@@ -94,6 +104,7 @@ FashionShop gồm 3 ứng dụng độc lập giao tiếp qua REST API:
 - Xem và cập nhật hồ sơ cá nhân, đổi mật khẩu
 
 ### Quản trị viên (Admin)
+
 - Dashboard thống kê (doanh thu, tổng đơn, tổng khách hàng)
 - Quản lý sản phẩm: CRUD đầy đủ + upload ảnh (MIME validate, max 5MB)
 - Quản lý đơn hàng: xem danh sách, chi tiết, cập nhật trạng thái
@@ -128,9 +139,9 @@ FashionShop gồm 3 ứng dụng độc lập giao tiếp qua REST API:
 **Luồng xác thực:**
 1. Client gửi `POST /api/v1/login` với email + password
 2. API trả về Bearer token
-3. Client lưu token (localStorage) và gửi kèm mọi request: `Authorization: Bearer {token}`
+3. Client lưu token vào `localStorage` và gửi kèm mọi request: `Authorization: Bearer {token}`
 4. API verify token qua Laravel Sanctum
-5. Middleware `IsAdmin` kiểm tra thêm role cho route admin
+5. Middleware `IsAdmin` kiểm tra thêm role cho các route admin
 
 ---
 
@@ -140,29 +151,28 @@ FashionShop gồm 3 ứng dụng độc lập giao tiếp qua REST API:
 Fashion-Shop/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                  # GitHub Actions CI
+│       └── ci.yml                  # GitHub Actions CI + SonarCloud
 ├── fashionshop-api/                # Laravel 11 Backend
 │   ├── app/
 │   │   ├── Http/
-│   │   │   ├── Controllers/
-│   │   │   │   ├── Api/
-│   │   │   │   │   ├── Admin/
-│   │   │   │   │   │   ├── ContactController.php
-│   │   │   │   │   │   ├── DashboardController.php
-│   │   │   │   │   │   ├── OrderController.php
-│   │   │   │   │   │   ├── ProductController.php
-│   │   │   │   │   │   ├── ReviewController.php
-│   │   │   │   │   │   └── UserController.php
-│   │   │   │   │   ├── AdminAuthController.php
-│   │   │   │   │   ├── AuthController.php
-│   │   │   │   │   ├── CartController.php
-│   │   │   │   │   ├── CategoryController.php
+│   │   │   ├── Controllers/Api/
+│   │   │   │   ├── Admin/
 │   │   │   │   │   ├── ContactController.php
+│   │   │   │   │   ├── DashboardController.php
 │   │   │   │   │   ├── OrderController.php
 │   │   │   │   │   ├── ProductController.php
-│   │   │   │   │   ├── ProfileController.php
 │   │   │   │   │   ├── ReviewController.php
-│   │   │   │   │   └── UserAddressController.php
+│   │   │   │   │   └── UserController.php
+│   │   │   │   ├── AdminAuthController.php
+│   │   │   │   ├── AuthController.php
+│   │   │   │   ├── CartController.php
+│   │   │   │   ├── CategoryController.php
+│   │   │   │   ├── ContactController.php
+│   │   │   │   ├── OrderController.php
+│   │   │   │   ├── ProductController.php
+│   │   │   │   ├── ProfileController.php
+│   │   │   │   ├── ReviewController.php
+│   │   │   │   └── UserAddressController.php
 │   │   │   └── Middleware/
 │   │   │       └── IsAdmin.php
 │   │   └── Models/
@@ -181,104 +191,59 @@ Fashion-Shop/
 │   │   └── seeders/
 │   ├── routes/
 │   │   └── api.php
-│   ├── storage/app/public/products/ # Ảnh sản phẩm
+│   ├── storage/app/public/products/ # Ảnh sản phẩm upload
 │   ├── .env
 │   ├── .env.example
 │   ├── Dockerfile
-│   ├── docker-entrypoint.sh
-│   └── phpunit.xml
+│   └── docker-entrypoint.sh
 │
 ├── fashionshop-web/                # React Storefront
 │   ├── src/
-│   │   ├── api/
-│   │   │   ├── axios.js            # Axios instance + interceptors
-│   │   │   ├── authApi.js
-│   │   │   ├── cartApi.js
-│   │   │   ├── orderApi.js
-│   │   │   ├── productApi.js
-│   │   │   ├── reviewApi.js
-│   │   │   ├── addressApi.js
-│   │   │   ├── profileApi.js
-│   │   │   └── contactApi.js
-│   │   ├── components/
-│   │   │   ├── layout/
-│   │   │   │   ├── Header.jsx
-│   │   │   │   └── Footer.jsx
-│   │   │   └── ui/
-│   │   │       ├── ProductCard.jsx
-│   │   │       ├── StarRating.jsx
-│   │   │       ├── SaleBadge.jsx
-│   │   │       ├── StatusBadge.jsx
-│   │   │       └── LoadingSpinner.jsx
-│   │   ├── pages/
-│   │   │   ├── Home.jsx
-│   │   │   ├── Category.jsx
-│   │   │   ├── ProductDetail.jsx
-│   │   │   ├── Search.jsx
-│   │   │   ├── Cart.jsx
-│   │   │   ├── Checkout.jsx
-│   │   │   ├── OrderSuccess.jsx
-│   │   │   ├── Orders.jsx
-│   │   │   ├── OrderDetail.jsx
-│   │   │   ├── Profile.jsx
-│   │   │   ├── Address.jsx
-│   │   │   ├── Contact.jsx
-│   │   │   ├── Login.jsx
-│   │   │   └── Register.jsx
-│   │   ├── stores/
-│   │   │   ├── authStore.js        # Zustand: token, user
-│   │   │   └── cartStore.js        # Zustand: cart item count
-│   │   └── utils/
-│   │       ├── constants.js        # SIZES, SHIPPING_FEE, ORDER_STATUS, GENDER_MAP
-│   │       └── formatCurrency.js
+│   │   ├── api/                    # Axios instances + API calls
+│   │   ├── components/             # Header, Footer, UI components
+│   │   ├── pages/                  # Home, ProductDetail, Cart, Checkout, Orders, ...
+│   │   ├── stores/                 # Zustand: authStore, cartStore
+│   │   └── utils/                  # constants.js, formatCurrency.js
 │   ├── Dockerfile
 │   └── nginx.conf
 │
 ├── fashionshop-admin/              # React Admin Dashboard
 │   ├── src/
-│   │   ├── api/
-│   │   │   ├── axios.js            # Axios instance admin + interceptors
-│   │   │   ├── authApi.js
-│   │   │   ├── productApi.js
-│   │   │   ├── categoryApi.js
-│   │   │   ├── orderApi.js
-│   │   │   ├── userApi.js
-│   │   │   ├── reviewApi.js
-│   │   │   ├── contactApi.js
-│   │   │   └── dashboardApi.js
-│   │   ├── components/
-│   │   │   ├── layout/
-│   │   │   │   ├── AdminLayout.jsx
-│   │   │   │   └── Sidebar.jsx
-│   │   │   └── ui/
-│   │   │       ├── Pagination.jsx
-│   │   │       ├── Spinner.jsx
-│   │   │       └── StatusBadge.jsx
-│   │   ├── pages/
-│   │   │   ├── Login.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── Products.jsx
-│   │   │   ├── Orders.jsx
-│   │   │   ├── OrderDetail.jsx
-│   │   │   ├── Users.jsx
-│   │   │   ├── Reviews.jsx
-│   │   │   └── Contacts.jsx
-│   │   └── stores/
-│   │       └── authStore.js
+│   │   ├── api/                    # Axios instances + API calls (admin)
+│   │   ├── components/             # AdminLayout, Sidebar, UI components
+│   │   ├── pages/                  # Dashboard, Products, Orders, Users, Reviews, Contacts
+│   │   └── stores/                 # Zustand: authStore
 │   ├── Dockerfile
 │   └── nginx.conf
 │
-├── postman/
-│   └── FashionShop_Collection.postman_collection.json
-├── docker-compose.yml
+├── tests/                          # CodeceptJS — API & E2E Tests
+│   ├── api/
+│   │   ├── products_test.js        # GET /products, /categories, /products/{id}
+│   │   ├── cart_test.js            # GET/POST/PATCH/DELETE /cart
+│   │   ├── orders_test.js          # POST/GET/PATCH /orders
+│   │   ├── reviews_contacts_test.js# POST/GET /reviews, POST /contacts
+│   │   ├── address_test.js         # POST/GET/PATCH/DELETE /addresses
+│   │   ├── profile_test.js         # GET/PUT /profile, PUT /profile/password
+│   │   └── admin_test.js           # Toàn bộ /admin/* endpoints
+│   ├── e2e/
+│   │   ├── cart_test.js
+│   │   ├── orders_test.js
+│   │   ├── contact_test.js
+│   │   └── register_test.js
+│   ├── steps_file.js               # CodeceptJS helpers (registerApiUser, addToCartViaApi, ...)
+│   ├── codecept.api.conf.js        # Config chạy API tests
+│   ├── codecept.e2e.conf.js        # Config chạy E2E tests
+│   └── package.json
+│
+├── postman-json/
+│   └── FashionShop.postman_collection.json
+├── sonar-project.properties        # Cấu hình SonarCloud
 └── README.md
 ```
 
 ---
 
 ## 6. Yêu cầu môi trường
-
-### Chạy với Laragon (khuyến nghị cho dev)
 
 | Công cụ | Phiên bản tối thiểu |
 |---|---|
@@ -288,18 +253,11 @@ Fashion-Shop/
 | npm | 9+ |
 | MySQL | 8.0 |
 
-> **Laragon** tích hợp sẵn PHP, MySQL, Apache. Tải tại [laragon.org](https://laragon.org/download/)
-
-### Chạy với Docker
-
-| Công cụ | Phiên bản tối thiểu |
-|---|---|
-| Docker Desktop | 4.x |
-| Docker Compose | v2 |
+> **Laragon** tích hợp sẵn PHP, MySQL, Apache — khuyến nghị cho dev local. Tải tại [laragon.org](https://laragon.org/download/)
 
 ---
 
-## 7. Cài đặt - Laragon (Local Dev)
+## 7. Cài đặt
 
 ### Bước 1 — Clone project
 
@@ -313,33 +271,26 @@ cd Fashion-Shop
 ```bash
 cd fashionshop-api
 
-# Cài dependencies PHP
 composer install
 
-# Tạo file .env từ mẫu
 cp .env.example .env
-
-# Tạo APP_KEY
 php artisan key:generate
 ```
 
-Cập nhật `.env` với thông tin database của bạn (xem [Biến môi trường](#9-biến-môi-trường)).
+Cập nhật `.env` với thông tin database (xem [Biến môi trường](#8-biến-môi-trường)).
 
 ```bash
-# Tạo symlink để serve ảnh upload
 php artisan storage:link
-
-# Chạy migration
 php artisan migrate
 
 # (Tuỳ chọn) Seed dữ liệu mẫu
 php artisan db:seed
 
-# Khởi động server API tại http://127.0.0.1:8000
+# Khởi động API server tại http://127.0.0.1:8000
 php artisan serve
 ```
 
-### Bước 3 — Cài đặt Web (Storefront)
+### Bước 3 — Cài đặt Storefront
 
 Mở terminal mới:
 
@@ -361,7 +312,7 @@ npm run dev
 # Truy cập: http://localhost:5174
 ```
 
-### Kiểm tra
+### Kiểm tra nhanh
 
 | URL | Ứng dụng |
 |---|---|
@@ -371,72 +322,19 @@ npm run dev
 
 ---
 
-## 8. Cài đặt - Docker (Local)
-
-Docker Compose sẽ build và chạy cả 3 service cùng lúc. Đảm bảo file `fashionshop-api/.env` đã được cấu hình đúng trước khi chạy.
-
-### Lần đầu (build image)
-
-```bash
-cd Fashion-Shop
-
-docker-compose up --build
-```
-
-Quá trình build lần đầu khoảng 3–5 phút. Container API sẽ tự động:
-- Chạy `php artisan storage:link`
-- Chạy `php artisan migrate --force`
-- Khởi động server tại `0.0.0.0:8000`
-
-### Chạy nền
-
-```bash
-docker-compose up --build -d
-```
-
-### Các lần sau (không thay đổi code)
-
-```bash
-docker-compose up -d
-```
-
-### Tắt
-
-```bash
-docker-compose down
-```
-
-### Xóa toàn bộ (kể cả volume ảnh)
-
-```bash
-docker-compose down -v
-```
-
-### URL sau khi chạy Docker
-
-| URL | Ứng dụng |
-|---|---|
-| `http://localhost:8000` | API |
-| `http://localhost:5173` | Storefront |
-| `http://localhost:5174` | Admin Dashboard |
-
-> **Lưu ý:** Ảnh upload được lưu trong Docker volume `api_storage` — không bị mất khi rebuild container. Chỉ mất khi chạy `docker-compose down -v`.
-
----
-
-## 9. Biến môi trường
+## 8. Biến môi trường
 
 ### `fashionshop-api/.env`
 
 ```env
 APP_NAME=FashionShop
 APP_ENV=local
-APP_KEY=                        # Tự động tạo bằng: php artisan key:generate
+APP_KEY=                        # Tự tạo: php artisan key:generate
 APP_DEBUG=true
 APP_URL=http://127.0.0.1:8000   # Quan trọng: ảnh URL dùng APP_URL
 
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1               # Hoặc host Clever Cloud của bạn
+DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=fashionshop
 DB_USERNAME=root
@@ -445,24 +343,64 @@ DB_PASSWORD=
 FILESYSTEM_DISK=local
 ```
 
-> **Quan trọng:** `APP_URL` phải đúng với địa chỉ bạn chạy API. Nếu dùng `php artisan serve` thì là `http://127.0.0.1:8000`. Nếu dùng Docker thì là `http://localhost:8000`.
+> `APP_URL` phải khớp với địa chỉ thực tế của API. Nếu dùng `php artisan serve` → `http://127.0.0.1:8000`.
 
-### `fashionshop-admin/src/api/axios.js`
+### Frontend axios config
 
+`fashionshop-web/src/api/axios.js`:
+```js
+baseURL: "http://127.0.0.1:8000/api/v1"
+```
+
+`fashionshop-admin/src/api/axios.js`:
 ```js
 baseURL: "http://127.0.0.1:8000/api/v1/admin"
 ```
 
-### `fashionshop-admin/src/utils/constants.js`
+---
 
-```js
-export const IMG_BASE = "http://127.0.0.1:8000/storage/";
+## 9. Chạy Tests
+
+Cài dependencies (chỉ lần đầu):
+
+```bash
+cd tests
+npm install
 ```
 
-### `fashionshop-web/src/api/axios.js`
+### API Tests
 
-```js
-baseURL: "http://127.0.0.1:8000/api/v1"
+> Yêu cầu: `php artisan serve` đang chạy ở terminal khác.
+
+```bash
+# Chạy toàn bộ API tests
+npm run test:api
+
+# Chỉ chạy admin tests
+npm run test:api:admin
+
+# Chạy một file cụ thể
+npx codeceptjs run api/cart_test.js -c codecept.api.conf.js --steps
+```
+
+**Các file API test:**
+
+| File | Endpoint được test |
+|---|---|
+| `products_test.js` | `/products`, `/categories`, `/products/{id}/reviews` |
+| `cart_test.js` | `/cart` (GET/POST/PATCH/DELETE) |
+| `orders_test.js` | `/orders` (POST/GET/PATCH cancel) |
+| `reviews_contacts_test.js` | `/products/{id}/reviews`, `/contacts` |
+| `address_test.js` | `/addresses` (POST/GET/PATCH default/DELETE) |
+| `profile_test.js` | `/profile`, `/profile/password` |
+| `admin_test.js` | Toàn bộ `/admin/*` endpoints |
+
+### E2E Tests
+
+> Yêu cầu: API server + `npm run dev` của cả web và admin đang chạy.
+
+```bash
+npm run test:e2e
 ```
 
 ---
@@ -473,7 +411,7 @@ baseURL: "http://127.0.0.1:8000/api/v1"
 
 **Auth header:** `Authorization: Bearer {token}`
 
-**Format:** `application/json`
+**Format:** `Content-Type: application/json`
 
 ---
 
@@ -497,14 +435,7 @@ baseURL: "http://127.0.0.1:8000/api/v1"
 }
 ```
 
-**POST `/login`**
-```json
-{
-  "email": "user@gmail.com",
-  "password": "password123"
-}
-```
-Response:
+**POST `/login`** → Response:
 ```json
 {
   "message": "Đăng nhập thành công",
@@ -528,29 +459,8 @@ Response:
 
 | Method | Endpoint | Query Params | Mô tả |
 |---|---|---|---|
-| `GET` | `/products` | `page`, `keyword`, `category_id`, `gender` | Danh sách sản phẩm (phân trang 10/trang) |
-| `GET` | `/products/{id}` | — | Chi tiết sản phẩm |
-
-**GET `/products` Response:**
-```json
-{
-  "current_page": 1,
-  "data": [
-    {
-      "id": 1,
-      "ten_sp": "Áo Polo Nam",
-      "gia": 250000,
-      "gia_cu": 300000,
-      "so_luong": 50,
-      "gioi_tinh": 1,
-      "hinh_anh": "products/abc.jpg",
-      "category": { "id": 1, "ten_danh_muc": "Áo Polo" }
-    }
-  ],
-  "total": 45,
-  "per_page": 10
-}
-```
+| `GET` | `/products` | `page`, `keyword`, `category_id`, `gender` | Danh sách sản phẩm (phân trang 8/trang) |
+| `GET` | `/products/{id}` | — | Chi tiết sản phẩm (kèm category + reviews) |
 
 ---
 
@@ -562,7 +472,7 @@ Response:
 
 ---
 
-### Reviews (Public + Auth)
+### Reviews
 
 | Method | Endpoint | Auth | Mô tả |
 |---|---|---|---|
@@ -589,6 +499,7 @@ Response:
 {
   "fullname": "Nguyễn Khách",
   "email": "khach@gmail.com",
+  "phone": "0912345678",
   "message": "Tôi muốn hỏi về sản phẩm"
 }
 ```
@@ -606,9 +517,9 @@ Response:
 **PUT `/profile/password`**
 ```json
 {
-  "current_password": "matkhaucu",
-  "password": "matkhaumoi",
-  "password_confirmation": "matkhaumoi"
+  "old_password": "matkhaucu",
+  "new_password": "matkhaumoi",
+  "new_password_confirmation": "matkhaumoi"
 }
 ```
 
@@ -620,15 +531,16 @@ Response:
 |---|---|---|
 | `GET` | `/addresses` | Danh sách địa chỉ |
 | `POST` | `/addresses` | Thêm địa chỉ mới |
-| `DELETE` | `/addresses/{id}` | Xóa địa chỉ |
 | `PATCH` | `/addresses/{id}/default` | Đặt làm địa chỉ mặc định |
+| `DELETE` | `/addresses/{id}` | Xóa địa chỉ |
 
 **POST `/addresses`**
 ```json
 {
   "fullname": "Nguyễn Văn A",
   "phone": "0912345678",
-  "address": "123 Đường ABC, Quận 1, TP.HCM"
+  "address_details": "123 Đường ABC, Quận 1, TP.HCM",
+  "is_default": false
 }
 ```
 
@@ -652,6 +564,8 @@ Response:
 }
 ```
 
+Size hợp lệ: `S` / `M` / `L` / `XL`
+
 ---
 
 ### Orders (Auth — User)
@@ -661,7 +575,7 @@ Response:
 | `GET` | `/orders` | Lịch sử đơn hàng |
 | `POST` | `/orders` | Đặt hàng (từ giỏ hàng hiện tại) |
 | `GET` | `/orders/{id}` | Chi tiết đơn hàng |
-| `PATCH` | `/orders/{id}/cancel` | Hủy đơn (chỉ khi status=pending) |
+| `PATCH` | `/orders/{id}/cancel` | Hủy đơn (chỉ khi status = pending) |
 
 **POST `/orders`**
 ```json
@@ -673,7 +587,7 @@ Response:
 }
 ```
 
-> Phí ship cộng tự động: **30.000đ**. Giỏ hàng sẽ bị xóa sau khi đặt hàng thành công.
+> Phí ship cộng tự động: **30.000đ**. Giỏ hàng bị xóa sau khi đặt hàng thành công.
 
 ---
 
@@ -681,7 +595,7 @@ Response:
 
 | Method | Endpoint | Mô tả |
 |---|---|---|
-| `GET` | `/admin/dashboard` | Thống kê tổng quan |
+| `GET` | `/admin/dashboard` | Thống kê tổng quan (doanh thu, đơn hàng, users, sản phẩm) |
 
 ---
 
@@ -689,23 +603,23 @@ Response:
 
 | Method | Endpoint | Mô tả |
 |---|---|---|
-| `GET` | `/admin/products` | Danh sách sản phẩm (page, keyword) |
+| `GET` | `/admin/products` | Danh sách sản phẩm (`?page=`, `?keyword=`) |
 | `POST` | `/admin/products` | Thêm sản phẩm (`multipart/form-data`) |
 | `POST` | `/admin/products/{id}` | Cập nhật sản phẩm (`multipart/form-data`) |
 | `DELETE` | `/admin/products/{id}` | Xóa sản phẩm |
 
-> **Lưu ý:** Cập nhật sản phẩm dùng `POST` thay vì `PUT` vì PHP không hỗ trợ `multipart/form-data` với `PUT`.
+> Cập nhật dùng `POST` thay vì `PUT` vì PHP không hỗ trợ `multipart/form-data` với `PUT`.
 
-**Form-data fields khi thêm/sửa sản phẩm:**
+**Form-data fields khi thêm/sửa:**
 
 | Field | Type | Bắt buộc | Mô tả |
 |---|---|---|---|
 | `ten_sp` | string | ✅ | Tên sản phẩm |
 | `gia` | integer | ✅ | Giá bán (VNĐ) |
-| `gia_cu` | integer | — | Giá cũ (để hiển thị giảm giá) |
+| `gia_cu` | integer | — | Giá cũ (hiển thị giảm giá) |
 | `mo_ta` | string | — | Mô tả sản phẩm |
 | `so_luong` | integer | ✅ | Số lượng tồn kho |
-| `gioi_tinh` | `0` hoặc `1` | ✅ | `1`=Nam, `0`=Nữ |
+| `gioi_tinh` | `0` hoặc `1` | ✅ | `1` = Nam, `0` = Nữ |
 | `category_id` | integer | — | ID danh mục |
 | `hinh_anh` | file | — | Ảnh (jpg/jpeg/png/webp, max 5MB) |
 
@@ -715,18 +629,16 @@ Response:
 
 | Method | Endpoint | Mô tả |
 |---|---|---|
-| `GET` | `/admin/orders` | Danh sách đơn hàng |
+| `GET` | `/admin/orders` | Danh sách đơn hàng (`?status=`, `?keyword=`) |
 | `GET` | `/admin/orders/{id}` | Chi tiết đơn hàng |
 | `PATCH` | `/admin/orders/{id}/status` | Cập nhật trạng thái |
 
 **PATCH `/admin/orders/{id}/status`**
 ```json
-{
-  "status": "shipping"
-}
+{ "status": "shipping" }
 ```
 
-Các giá trị status hợp lệ: `pending` → `shipping` → `completed` / `cancelled`
+Luồng trạng thái: `pending` → `shipping` → `completed` / `cancelled`
 
 ---
 
@@ -749,9 +661,7 @@ Các giá trị status hợp lệ: `pending` → `shipping` → `completed` / `c
 
 **PATCH `/admin/reviews/{id}/reply`**
 ```json
-{
-  "reply": "Cảm ơn bạn đã đánh giá sản phẩm!"
-}
+{ "shop_reply": "Cảm ơn bạn đã đánh giá sản phẩm!" }
 ```
 
 ---
@@ -765,12 +675,10 @@ Các giá trị status hợp lệ: `pending` → `shipping` → `completed` / `c
 
 **PATCH `/admin/contacts/{id}/status`**
 ```json
-{
-  "status": "read"
-}
+{ "status": "read" }
 ```
 
-Các giá trị: `new` / `read` / `resolved`
+Giá trị hợp lệ: `new` / `read` / `resolved`
 
 ---
 
@@ -789,7 +697,7 @@ Các giá trị: `new` / `read` / `resolved`
 
 ---
 
-## 11. CI/CD
+## 11. CI/CD & SonarCloud
 
 ### CI — GitHub Actions
 
@@ -797,83 +705,50 @@ File: `.github/workflows/ci.yml`
 
 Tự động chạy khi **push lên `main`/`develop`** hoặc **mở Pull Request vào `main`**.
 
-**3 job chạy song song:**
+**4 job:**
 
-| Job | Bước |
-|---|---|
-| `api` (PHP 8.3) | `composer install` → copy `.env.example` → `key:generate` → `php artisan test` (SQLite) |
-| `admin` (Node 20) | `npm ci` → `npm run build` |
-| `web` (Node 20) | `npm ci` → `npm run lint` → `npm run build` |
+| Job | Điều kiện | Bước |
+|---|---|---|
+| `api` (PHP 8.3) | Mọi push/PR | `composer install` → copy `.env.example` → `key:generate` → `php artisan test --coverage` (SQLite) |
+| `admin` (Node 20) | Mọi push/PR | `npm ci` → `npm run build` |
+| `web` (Node 20) | Mọi push/PR | `npm ci` → `npm run lint` → `npm run build` |
+| `sonarcloud` | Sau khi cả 3 job trên pass | Scan code quality, security, duplication |
 
-Xem kết quả CI tại tab **Actions** trên GitHub repository.
+### SonarCloud
 
----
+Cấu hình tại `sonar-project.properties`. Scan các thư mục:
 
-### CD — Docker (Local)
+- **Sources:** `fashionshop-api/app`, `fashionshop-web/src`, `fashionshop-admin/src`
+- **Tests:** `fashionshop-api/tests`, `tests/api`, `tests/e2e`
+- **Coverage:** PHP coverage từ PHPUnit (`coverage.xml`)
 
-Không có auto-deploy lên VPS. Toàn bộ CD chạy trên máy local qua Docker Compose.
-
-**Quy trình phát triển:**
-
-```
-code → git push → GitHub Actions CI (pass) → docker-compose up --build (local)
-```
-
-**Các file Docker:**
-
-| File | Mô tả |
-|---|---|
-| `docker-compose.yml` | Orchestrate 3 services |
-| `fashionshop-api/Dockerfile` | PHP 8.3 CLI Alpine + Composer |
-| `fashionshop-api/docker-entrypoint.sh` | Chạy migrate + storage:link khi start |
-| `fashionshop-admin/Dockerfile` | Multi-stage: Node build → Nginx serve |
-| `fashionshop-admin/nginx.conf` | Nginx config cho React SPA |
-| `fashionshop-web/Dockerfile` | Multi-stage: Node build → Nginx serve |
-| `fashionshop-web/nginx.conf` | Nginx config cho React SPA |
+Kết quả xem tại tab **Actions** trên GitHub hoặc dashboard SonarCloud.
 
 ---
 
 ## 12. Postman Collection
 
-File: `postman/FashionShop_Collection.postman_collection.json`
+File: `postman-json/FashionShop.postman_collection.json`
 
-**Import vào Postman Desktop:**
+**Import vào Postman:**
 
-1. Mở Postman → nhấn **Import**
-2. Kéo thả file `FashionShop_Collection.postman_collection.json`
-3. Nhấn **Import**
+1. Mở Postman → **Import**
+2. Kéo thả file `FashionShop.postman_collection.json`
+3. Tạo Environment với biến `base_url = http://127.0.0.1:8000/api/v1`
 
-**Collection gồm 10 nhóm request với test tự động:**
+**3 nhóm request:**
 
-| Nhóm | Số request |
-|---|---|
-| Auth - User (Register, Login, Logout) | 4 |
-| Auth - Admin | 2 |
-| Products (Public) | 4 |
-| Categories | 1 |
-| Reviews | 2 |
-| Contacts | 1 |
-| Profile | 3 |
-| Addresses | 4 |
-| Cart | 4 |
-| Orders | 4 |
-| Admin - Dashboard | 1 |
-| Admin - Products | 4 |
-| Admin - Orders | 3 |
-| Admin - Users | 2 |
-| Admin - Reviews | 3 |
-| Admin - Contacts | 2 |
-| Bảo mật | 2 |
+| Nhóm | Số request | Mô tả |
+|---|---|---|
+| Public | 7 | Register, Login, Categories, Products, Reviews, Contacts |
+| USER | 21 | Cart, Addresses, Orders, Profile, Password, Logout |
+| ADMIN | 17 | Login, Dashboard, Products, Orders, Users, Reviews, Contacts, Logout |
 
 **Tính năng tự động:**
-- Login/Register → token tự lưu vào `{{user_token}}`
+- Login/Register → token tự lưu vào `{{token}}`
 - Admin Login → token tự lưu vào `{{admin_token}}`
-- Tất cả request sau tự dùng token, không cần điền tay
-- ID (product, order, cart...) tự lưu từ response trước sang request sau
-
-**Chạy toàn bộ collection:**
-
-`Chuột phải vào "FashionShop API"` → `Run collection` → `Run FashionShop API`
+- ID (product, order, cart, address...) tự truyền giữa các request
+- Có test script kiểm tra response ở từng request (bao gồm cả test BUG có chủ ý)
 
 ---
 
@@ -889,7 +764,7 @@ users
 ├── id, fullname, email, phone, gender (Nam/Nữ), password (bcrypt), created_at
 
 user_addresses
-├── id, user_id (FK), fullname, phone, address, is_default, created_at
+├── id, user_id (FK), fullname, phone, address_details, is_default, created_at
 
 categories
 ├── id, ten_danh_muc
@@ -901,33 +776,32 @@ products
 ├── created_at, updated_at
 
 cart
-├── id, user_id (FK), product_id (FK), quantity, size, created_at
+├── id, user_id (FK), product_id (FK), quantity, size (S/M/L/XL), created_at
 
 orders
 ├── id, user_id (FK), fullname, phone, address
-├── payment (COD), total, status
+├── payment (COD), total, shipping_fee
 ├── status: pending | shipping | completed | cancelled
 ├── created_at, updated_at
 
 order_details
 ├── id, order_id (FK), product_id (FK)
-├── quantity, price (snapshot lúc đặt), size
+├── quantity, price (snapshot giá lúc đặt), size
 
 reviews
 ├── id, product_id (FK), user_id (FK)
-├── rating (1-5), comment, shop_reply (nullable)
+├── rating (1–5), comment, shop_reply (nullable)
 ├── created_at
 
 contacts
-├── id, fullname, email, message
+├── id, fullname, email, phone, message
 ├── status: new | read | resolved
 ├── created_at
 ```
 
 **Ảnh sản phẩm:**
 - Lưu tại: `fashionshop-api/storage/app/public/products/`
-- Truy cập qua URL: `http://127.0.0.1:8000/storage/products/{filename}`
-- Cột `hinh_anh` trong bảng `products` lưu path dạng: `products/abc123.jpg`
+- Truy cập qua URL: `{APP_URL}/storage/products/{filename}`
 - Yêu cầu chạy `php artisan storage:link` để tạo symlink
 
 ---
