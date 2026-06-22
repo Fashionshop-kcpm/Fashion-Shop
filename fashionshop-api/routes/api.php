@@ -23,7 +23,7 @@ $productById = '/products/{id}';
 $orders = '/orders';
 
 // ==================== PUBLIC ROUTES ====================
-Route::prefix('v1')->group(function () use ($products, $productById) {
+Route::prefix('v1')->group(function () use ($products, $productById, $orders) {
 
     // Auth
     Route::post('/register', [AuthController::class, 'register']);
