@@ -1,5 +1,5 @@
 const ADMIN_EMAIL = 'admin@fashionshop.vn';
-const ADMIN_PASSWORD = process.env.ADMIN_TEST_PASSWORD || 'Admin123456';
+const ADMIN_PASSWORD = process.env.ADMIN_TEST_PASSWORD;
 
 module.exports = function steps() {
   return actor({
