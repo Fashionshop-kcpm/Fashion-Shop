@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import useAuthStore from "./stores/authStore";
@@ -21,6 +22,10 @@ function PrivateRoute({ children }) {
   const token = useAuthStore((s) => s.token);
   return token ? children : <Navigate to="/login" replace />;
 }
+
+PrivateRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 function AdminRoutes() {
   return (

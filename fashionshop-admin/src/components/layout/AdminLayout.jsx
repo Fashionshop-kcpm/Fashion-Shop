@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 import Sidebar from "./Sidebar";
 
 export default function AdminLayout({ children }) {
@@ -10,3 +11,7 @@ export default function AdminLayout({ children }) {
     </div>
   );
 }
+
+AdminLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
