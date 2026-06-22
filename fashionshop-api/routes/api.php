@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\AdminAuthController;
 
 $products = '/products';
 $productById = '/products/{id}';
+$orders = '/orders';
 
 // ==================== PUBLIC ROUTES ====================
 Route::prefix('v1')->group(function () {
@@ -65,8 +66,8 @@ Route::prefix('v1')->group(function () {
         Route::delete('/cart/{id}', [CartController::class, 'destroy']);
 
         // Orders
-        Route::get('/orders', [OrderController::class, 'index']);
-        Route::post('/orders', [OrderController::class, 'store']);
+        Route::get($orders, [OrderController::class, 'index']);
+        Route::post($orders, [OrderController::class, 'store']);
         Route::get('/orders/{id}', [OrderController::class, 'show']);
         Route::patch('/orders/{id}/cancel', [OrderController::class, 'cancel']);
 
@@ -93,7 +94,7 @@ Route::prefix('v1')->group(function () {
         Route::delete($productById, [AdminProductController::class, 'destroy']);
 
         // Orders
-        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::get($orders, [AdminOrderController::class, 'index']);
         Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
         Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
 
