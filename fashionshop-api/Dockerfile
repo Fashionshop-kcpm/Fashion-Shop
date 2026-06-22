@@ -12,7 +12,11 @@ COPY . .
 RUN composer install --optimize-autoloader --no-interaction --no-dev
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh \
+    && addgroup -S appgroup && adduser -S appuser -G appgroup \
+    && chown -R appuser:appgroup /var/www /docker-entrypoint.sh
+
+USER appuser
 
 EXPOSE 8000
 
