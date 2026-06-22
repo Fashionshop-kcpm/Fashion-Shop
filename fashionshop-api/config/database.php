@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 
-define('DB_DEFAULT_HOST', DB_DEFAULT_HOST);
+define('DB_DEFAULT_HOST', '127.0.0.1');
 
 return [
 
