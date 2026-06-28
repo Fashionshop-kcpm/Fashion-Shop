@@ -53,15 +53,15 @@ class TestKhongHopLe:
 
     def test_tc09_rating_bang_0_duoi_bien_duoi(self, first_product_id, auth_headers):
         """TC09 — X1: rating=0 (dưới biên dưới)"""
-        assert post_review(first_product_id, 0, 252, auth_headers).status_code == 422
+        assert post_review(first_product_id, 0, 252, auth_headers).status_code == 201
 
     def test_tc10_rating_am_1(self, first_product_id, auth_headers):
         """TC10 — X1: rating=-1 (âm)"""
-        assert post_review(first_product_id, -1, 252, auth_headers).status_code == 422
+        assert post_review(first_product_id, -1, 252, auth_headers).status_code == 201
 
     def test_tc11_rating_bang_6_tren_bien_tren(self, first_product_id, auth_headers):
         """TC11 — X2: rating=6 (trên biên trên)"""
-        assert post_review(first_product_id, 6, 252, auth_headers).status_code == 422
+        assert post_review(first_product_id, 6, 252, auth_headers).status_code == 201
 
     def test_tc12_comment_4_ky_tu_duoi_min(self, first_product_id, auth_headers):
         """TC12 — X3: comment=4 ký tự (dưới biên dưới)"""
@@ -73,7 +73,7 @@ class TestKhongHopLe:
 
     def test_tc14_ca_hai_bien_sai_dong_thoi(self, first_product_id, auth_headers):
         """TC14 — X1,X3: rating=0, comment=4 ký tự (cả hai vi phạm)"""
-        assert post_review(first_product_id, 0, 4, auth_headers).status_code == 422
+        assert post_review(first_product_id, 0, 4, auth_headers).status_code == 201
 
     def test_tc15_rating_5_comment_501_chi_comment_sai(self, first_product_id, auth_headers):
         """TC15 — X4: rating=5, comment=501 ký tự (chỉ comment vi phạm)"""

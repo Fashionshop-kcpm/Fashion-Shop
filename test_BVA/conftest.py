@@ -31,7 +31,7 @@ def user_token():
 
 @pytest.fixture(scope="session")
 def auth_headers(user_token):
-    return {"Authorization": f"Bearer {user_token}"}
+    return {"Authorization": f"Bearer {user_token}", "Accept": "application/json"}
 
 
 @pytest.fixture(scope="session")
@@ -46,7 +46,7 @@ def admin_token():
 
 @pytest.fixture(scope="session")
 def admin_headers(admin_token):
-    return {"Authorization": f"Bearer {admin_token}"}
+    return {"Authorization": f"Bearer {admin_token}", "Accept": "application/json"}
 
 
 @pytest.fixture(scope="session")
@@ -77,5 +77,5 @@ def fresh_user():
         "email": email,
         "password": password,
         "token": token,
-        "headers": {"Authorization": f"Bearer {token}"},
+        "headers": {"Authorization": f"Bearer {token}", "Accept": "application/json"},
     }
