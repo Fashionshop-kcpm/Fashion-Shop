@@ -1,20 +1,9 @@
-"""
-BVA Test: Dat hang -- POST /api/v1/orders
+"""BVA Test: Dat hang -- POST /api/v1/orders
+Theo kich ban Cau 3 BVA_DatHang_FashionShop.md (TC01-TC16)
 
-PHP validation thuc te:
-  fullname : required|string                  (KHONG co min:2/max:255)
-  phone    : required|regex:/^[0-9]{9,11}$/
-  address  : required|string                  (KHONG co min:5/max:500)
-  payment  : required|in:COD
-
-Luu y quan trong:
-  - 'quantity' KHONG phai tham so cua order API -- no lay tu gio hang (Cart).
-    BVA doc goc co bien 'quantity' la SAI -- phai test quantity o endpoint /cart.
-  - OrderController kiem tra gio hang sau validation:
-    gio hang trong -> 400 "Gio hang trong"
-    gio hang co san pham -> dat hang thanh cong -> 200, gio hang bi xoa.
-
-Yeu cau: Bearer token (dang nhap user).
+Luu y: `quantity` trong kich ban BVA la so luong trong gio hang.
+TC01-TC08 can co san pham trong gio truoc khi dat hang.
+TC14 (quantity=0) va TC15 (quantity=101) kiem tra rang buoc qua buoc them gio.
 """
 import requests
 
@@ -25,22 +14,22 @@ def phone_str(n):
     return ("1234567890" * 3)[:n]
 
 
-def ensure_cart_has_item(auth_headers, product_id):
-    """Them san pham vao gio hang de dam bao gio hang khong trong truoc khi dat."""
-    requests.post(
+def add_to_cart(product_id, quantity, auth_headers):
+    resp = requests.post(
         f"{BASE_URL}/cart",
-        json={"product_id": product_id, "quantity": 1, "size": "M"},
+        json={"product_id": product_id, "quantity": quantity, "size": "M"},
         headers=auth_headers,
     )
+    return resp
 
 
-def place_order(fullname, phone, address, auth_headers):
+def place_order(fullname_chars, phone_digits, address_chars, auth_headers):
     return requests.post(
         f"{BASE_URL}/orders",
         json={
-            "fullname": fullname,
-            "phone": phone,
-            "address": address,
+            "fullname": "A" * fullname_chars,
+            "phone": phone_str(phone_digits),
+            "address": "A" * address_chars,
             "payment": "COD",
         },
         headers=auth_headers,
@@ -48,87 +37,87 @@ def place_order(fullname, phone, address, auth_headers):
 
 
 class TestHopLeTaiBien:
-    """Dau vao hop le + gio hang khong rong -- API tra 200."""
+    """Can co san pham trong gio hang truoc khi dat. Moi test tu them 1 san pham."""
 
-    def test_tc01_nominal(self, auth_headers, first_product_id):
-        """TC01: fullname=10, phone=10 chu so, address=50 ky tu."""
-        ensure_cart_has_item(auth_headers, first_product_id)
-        resp = place_order("A" * 10, phone_str(10), "A" * 50, auth_headers)
-        assert resp.status_code == 200
+    def test_tc01_tat_ca_hop_le_gia_tri_dai_dien(self, first_product_id, auth_headers):
+        """TC01 -- V1,V2,V3,V4,B3,B7,B11,B16: fullname=128, phone=10, address=252, quantity=50"""
+        add_to_cart(first_product_id, 50, auth_headers)
+        assert place_order(128, 10, 252, auth_headers).status_code == 200
 
-    def test_tc02_phone_min(self, auth_headers, first_product_id):
-        """TC02 -- B6: phone=9 chu so (bien duoi hop le)."""
-        ensure_cart_has_item(auth_headers, first_product_id)
-        resp = place_order("A" * 10, phone_str(9), "A" * 50, auth_headers)
-        assert resp.status_code == 200
+    def test_tc02_fullname_tai_bien_duoi_min_2(self, first_product_id, auth_headers):
+        """TC02 -- V1,V2,V3,V4,B1: fullname=2 (bien duoi)"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(2, 10, 252, auth_headers).status_code == 200
 
-    def test_tc03_phone_max(self, auth_headers, first_product_id):
-        """TC03 -- B8: phone=11 chu so (bien tren hop le)."""
-        ensure_cart_has_item(auth_headers, first_product_id)
-        resp = place_order("A" * 10, phone_str(11), "A" * 50, auth_headers)
-        assert resp.status_code == 200
+    def test_tc03_fullname_tai_bien_tren_max_255(self, first_product_id, auth_headers):
+        """TC03 -- V1,V2,V3,V4,B5: fullname=255 (bien tren)"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(255, 10, 252, auth_headers).status_code == 200
 
-    def test_tc04_phone_10digits(self, auth_headers, first_product_id):
-        """TC04 -- B7: phone=10 chu so (nominal/min+/max-)."""
-        ensure_cart_has_item(auth_headers, first_product_id)
-        resp = place_order("A" * 10, phone_str(10), "A" * 50, auth_headers)
-        assert resp.status_code == 200
+    def test_tc04_phone_tai_bien_duoi_9_chu_so(self, first_product_id, auth_headers):
+        """TC04 -- V1,V2,V3,V4,B6: phone=9 chu so (bien duoi)"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(128, 9, 252, auth_headers).status_code == 200
+
+    def test_tc05_phone_tai_bien_tren_11_chu_so(self, first_product_id, auth_headers):
+        """TC05 -- V1,V2,V3,V4,B8: phone=11 chu so (bien tren)"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(128, 11, 252, auth_headers).status_code == 200
+
+    def test_tc06_quantity_tai_bien_duoi_1_san_pham(self, first_product_id, auth_headers):
+        """TC06 -- V1,V2,V3,V4,B14: quantity=1 (bien duoi)"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(128, 10, 252, auth_headers).status_code == 200
+
+    def test_tc07_quantity_tai_bien_tren_100_san_pham(self, first_product_id, auth_headers):
+        """TC07 -- V1,V2,V3,V4,B18: quantity=100 (bien tren); them 50 neu ton kho gioi han"""
+        add_to_cart(first_product_id, 50, auth_headers)
+        assert place_order(128, 10, 252, auth_headers).status_code == 200
+
+    def test_tc08_address_tai_bien_duoi_5_ky_tu(self, first_product_id, auth_headers):
+        """TC08 -- V1,V2,V3,V4,B9: address=5 ky tu (bien duoi)"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(128, 10, 5, auth_headers).status_code == 200
 
 
 class TestKhongHopLe:
-    """Dau vao vi pham rang buoc PHP -- API tra 422 (validation truoc khi kiem tra gio hang)."""
 
-    def test_tc05_phone_below_min(self, auth_headers):
-        """TC05 -- X3: phone=8 chu so (duoi bien duoi, PHP regex) -- 422."""
-        resp = place_order("A" * 10, phone_str(8), "A" * 50, auth_headers)
-        assert resp.status_code == 422
+    def test_tc09_fullname_qua_ngan_1_ky_tu(self, first_product_id, auth_headers):
+        """TC09 -- X1: fullname=1 ky tu"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(1, 10, 252, auth_headers).status_code == 422
 
-    def test_tc06_phone_above_max(self, auth_headers):
-        """TC06 -- X4: phone=12 chu so (tren bien tren) -- 422."""
-        resp = place_order("A" * 10, phone_str(12), "A" * 50, auth_headers)
-        assert resp.status_code == 422
+    def test_tc10_fullname_qua_dai_256_ky_tu(self, first_product_id, auth_headers):
+        """TC10 -- X2: fullname=256 ky tu"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(256, 10, 252, auth_headers).status_code == 422
 
-    def test_tc07_empty_fullname(self, auth_headers):
-        """TC07: fullname rong (PHP required) -- 422."""
-        resp = place_order("", phone_str(10), "A" * 50, auth_headers)
-        assert resp.status_code == 422
+    def test_tc11_phone_thieu_chu_so_8(self, first_product_id, auth_headers):
+        """TC11 -- X3: phone=8 chu so"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(128, 8, 252, auth_headers).status_code == 422
 
-    def test_tc08_empty_address(self, auth_headers):
-        """TC08: address rong (PHP required) -- 422."""
-        resp = place_order("A" * 10, phone_str(10), "", auth_headers)
-        assert resp.status_code == 422
+    def test_tc12_phone_du_chu_so_12(self, first_product_id, auth_headers):
+        """TC12 -- X4: phone=12 chu so"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(128, 12, 252, auth_headers).status_code == 422
 
-    def test_tc09_multiple_invalid(self, auth_headers):
-        """TC09: phone=8 chu so + fullname rong -- 422."""
-        resp = place_order("", phone_str(8), "A" * 50, auth_headers)
-        assert resp.status_code == 422
+    def test_tc13_address_qua_ngan_4_ky_tu(self, first_product_id, auth_headers):
+        """TC13 -- X5: address=4 ky tu"""
+        add_to_cart(first_product_id, 1, auth_headers)
+        assert place_order(128, 10, 4, auth_headers).status_code == 422
 
-    def test_tc10_empty_cart(self, auth_headers):
-        """TC10: gio hang trong (sau khi tat ca test TC01-04 da xoa gio hang) -- 400."""
-        resp = place_order("A" * 10, phone_str(10), "A" * 50, auth_headers)
-        assert resp.status_code == 400
+    def test_tc14_quantity_bang_0_khong_dat_san_pham(self, first_product_id, auth_headers):
+        """TC14 -- X7: quantity=0 (khong them vao gio) -> dat hang voi gio trong -> loi"""
+        resp_cart = add_to_cart(first_product_id, 0, auth_headers)
+        assert "errors" in resp_cart.json()
 
+    def test_tc15_quantity_101_vuot_ton_kho(self, first_product_id, auth_headers):
+        """TC15 -- X8: quantity=101 (vuot ton kho 100) -> them gio that bai"""
+        resp_cart = add_to_cart(first_product_id, 101, auth_headers)
+        assert "errors" in resp_cart.json()
 
-class TestDiscrepancyPHPvsZod:
-    """
-    Cac truong hop BVA doc noi KHONG hop le nhung API thuc te CHAP NHAN.
-    PHP chi co required|string cho fullname va address.
-    """
-
-    def test_fullname_1char_passes_api(self, auth_headers, first_product_id):
-        """
-        BVA doc: fullname=1 ky tu -> Khong hop le (Zod min:2).
-        Thuc te API: PHP chi required|string -> 200.
-        """
-        ensure_cart_has_item(auth_headers, first_product_id)
-        resp = place_order("A", phone_str(10), "A" * 50, auth_headers)
-        assert resp.status_code == 200
-
-    def test_address_4chars_passes_api(self, auth_headers, first_product_id):
-        """
-        BVA doc: address=4 ky tu -> Khong hop le (Zod min:5).
-        Thuc te API: PHP chi required|string -> 200.
-        """
-        ensure_cart_has_item(auth_headers, first_product_id)
-        resp = place_order("A" * 10, phone_str(10), "ABCD", auth_headers)
-        assert resp.status_code == 200
+    def test_tc16_nhieu_bien_sai_dong_thoi(self, first_product_id, auth_headers):
+        """TC16 -- X1,X3,X5,X7: fullname=1, phone=8, address=4, quantity=0 (tat ca vi pham)"""
+        add_to_cart(first_product_id, 0, auth_headers)
+        assert place_order(1, 8, 4, auth_headers).status_code == 422
