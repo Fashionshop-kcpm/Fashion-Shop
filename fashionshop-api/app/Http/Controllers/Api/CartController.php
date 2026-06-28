@@ -16,7 +16,7 @@ class CartController extends Controller
             ->get();
 
         $total_price = $cart->sum(
-            fn($item) => $item->product->price * $item->quantity
+            fn($item) => $item->product->gia * $item->quantity
         );
 
         return response()->json([
@@ -86,7 +86,7 @@ if ($validator->fails()) {
         $total_price = Cart::with('product')
             ->where('user_id', $request->user()->id)
             ->get()
-            ->sum(fn($item) => $item->product->price * $item->quantity);
+            ->sum(fn($item) => $item->product->gia * $item->quantity);
 
         return response()->json([
             'message' => 'Đã cập nhật giỏ hàng',
