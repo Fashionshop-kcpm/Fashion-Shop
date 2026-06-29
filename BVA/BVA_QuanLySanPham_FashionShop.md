@@ -102,125 +102,129 @@ $$
 
 ## Câu 4. Triển khai kiểm thử tự động
 
-### Hàm kiểm tra logic
+### Phương pháp: API Test với `requests`
+
+Thay vì mô phỏng logic bằng hàm Python thuần, test gọi **trực tiếp endpoint PHP** qua HTTP và kiểm tra HTTP status code thực tế.
+
+**Endpoint:** `POST /api/v1/admin/products` (yêu cầu đăng nhập Admin)  
+**File test:** `test_BVA/test_san_pham.py` | **Fixtures:** `test_BVA/conftest.py`
+
+### Lưu ý — PHP backend vs Zod/business logic
+
+| Field | Business logic | PHP backend | Ảnh hưởng đến test |
+|---|---|---|---|
+| `ten_sp` | `min:1`, `max:255` | `required\|string` | PHP chấp nhận bất kỳ string nào (giới hạn DB varchar(255)) |
+| `gia` | `0` – `999,999,999` | `required\|integer\|min:0` | gia=1,000,000,000 → PHP **201** (không có max) |
+| `so_luong` | `0` – `10,000` | `required\|integer\|min:0` | so_luong=10,001 → PHP **201** (không có max) |
+
+### API Test — `pytest` + `requests`
+
+> Test dùng fixture `admin_headers` từ `conftest.py` (session-scoped, đăng nhập admin@fashionshop.vn).
 
 ```python
-def validate_san_pham(ten_sp: int, gia: int, so_luong: int) -> bool:
-    """
-    Kiểm tra tính hợp lệ của thông tin sản phẩm trong Fashion Shop Admin.
+"""BVA Test: Quan ly san pham (Admin) -- POST /api/v1/admin/products
+Theo kich ban Cau 3 BVA_QuanLySanPham_FashionShop.md (TC01-TC16)
+"""
+import requests
 
-    Tham số:
-        ten_sp   (int): Số ký tự của tên sản phẩm.
-        gia      (int): Giá bán sản phẩm (VNĐ), phải >= 0.
-        so_luong (int): Số lượng tồn kho, phải >= 0.
+BASE_URL = "http://127.0.0.1:8000/api/v1"
 
-    Trả về:
-        True  nếu tất cả đầu vào hợp lệ.
-        False nếu có ít nhất một đầu vào không hợp lệ.
-    """
-    return (
-        1 <= ten_sp <= 255 and
-        0 <= gia <= 999_999_999 and
-        0 <= so_luong <= 10_000
+
+def create_product(ten_sp_chars, gia, so_luong, admin_headers):
+    return requests.post(
+        f"{BASE_URL}/admin/products",
+        json={
+            "ten_sp": "A" * ten_sp_chars if ten_sp_chars > 0 else "",
+            "gia": gia,
+            "gia_cu": None,
+            "so_luong": so_luong,
+            "gioi_tinh": 0,
+            "mo_ta": "Mo ta san pham test BVA",
+        },
+        headers=admin_headers,
     )
-```
-
-### Unit Test — Framework: `pytest`
-
-```python
-import pytest
-from validate_san_pham import validate_san_pham
 
 
 class TestHopLeTaiBien:
 
-    def test_tc01_nominal(self):
-        """TC01: Tất cả giá trị đại diện — hợp lệ."""
-        assert validate_san_pham(128, 500_000_000, 5_000) is True
+    def test_tc01_tat_ca_hop_le_gia_tri_dai_dien(self, admin_headers):
+        """TC01 -- V1,V2,V3,B3,B8,B13: ten_sp=128, gia=500000000, so_luong=5000"""
+        assert create_product(128, 500_000_000, 5000, admin_headers).status_code == 201
 
-    def test_tc02_ten_sp_min(self):
-        """TC02 — B1: ten_sp = 1 ký tự (biên dưới hợp lệ)."""
-        assert validate_san_pham(1, 500_000_000, 5_000) is True
+    def test_tc02_ten_sp_tai_bien_duoi_min_1(self, admin_headers):
+        """TC02 -- V1,V2,V3,B1: ten_sp=1 ky tu (bien duoi)"""
+        assert create_product(1, 500_000_000, 5000, admin_headers).status_code == 201
 
-    def test_tc03_ten_sp_max(self):
-        """TC03 — B5: ten_sp = 255 ký tự (biên trên hợp lệ)."""
-        assert validate_san_pham(255, 500_000_000, 5_000) is True
+    def test_tc03_ten_sp_tai_bien_tren_max_255(self, admin_headers):
+        """TC03 -- V1,V2,V3,B5: ten_sp=255 ky tu (bien tren)"""
+        assert create_product(255, 500_000_000, 5000, admin_headers).status_code == 201
 
-    def test_tc04_gia_min(self):
-        """TC04 — B6: gia = 0 (sản phẩm miễn phí / tặng kèm)."""
-        assert validate_san_pham(128, 0, 5_000) is True
+    def test_tc04_gia_bang_0_san_pham_mien_phi(self, admin_headers):
+        """TC04 -- V1,V2,V3,B6: gia=0 (bien duoi, san pham mien phi)"""
+        assert create_product(128, 0, 5000, admin_headers).status_code == 201
 
-    def test_tc05_gia_max(self):
-        """TC05 — B10: gia = 999.999.999 (biên trên hợp lệ)."""
-        assert validate_san_pham(128, 999_999_999, 5_000) is True
+    def test_tc05_gia_tai_bien_tren_999_999_999(self, admin_headers):
+        """TC05 -- V1,V2,V3,B10: gia=999999999 (bien tren)"""
+        assert create_product(128, 999_999_999, 5000, admin_headers).status_code == 201
 
-    def test_tc06_so_luong_min(self):
-        """TC06 — B11: so_luong = 0 (hết hàng — vẫn hợp lệ)."""
-        assert validate_san_pham(128, 500_000_000, 0) is True
+    def test_tc06_so_luong_bang_0_het_hang(self, admin_headers):
+        """TC06 -- V1,V2,V3,B11: so_luong=0 (bien duoi, het hang)"""
+        assert create_product(128, 500_000_000, 0, admin_headers).status_code == 201
 
-    def test_tc07_so_luong_max(self):
-        """TC07 — B15: so_luong = 10.000 (biên trên hợp lệ)."""
-        assert validate_san_pham(128, 500_000_000, 10_000) is True
+    def test_tc07_so_luong_tai_bien_tren_10000(self, admin_headers):
+        """TC07 -- V1,V2,V3,B15: so_luong=10000 (bien tren)"""
+        assert create_product(128, 500_000_000, 10000, admin_headers).status_code == 201
 
-    def test_tc08_tat_ca_bien_min(self):
-        """TC08: Tất cả biến tại min hợp lệ."""
-        assert validate_san_pham(1, 0, 0) is True
+    def test_tc08_tat_ca_tai_bien_duoi_hop_le(self, admin_headers):
+        """TC08 -- V1,V2,V3,B1,B6,B11: ten_sp=1, gia=0, so_luong=0 (tat ca tai min)"""
+        assert create_product(1, 0, 0, admin_headers).status_code == 201
 
-    def test_tc09_tat_ca_bien_max(self):
-        """TC09: Tất cả biến tại max hợp lệ."""
-        assert validate_san_pham(255, 999_999_999, 10_000) is True
+    def test_tc16_gia_minplus_so_luong_minplus(self, admin_headers):
+        """TC16 -- V1,V2,V3,B7,B12: ten_sp=128, gia=1 (min+), so_luong=1 (min+)"""
+        assert create_product(128, 1, 1, admin_headers).status_code == 201
 
 
 class TestKhongHopLe:
 
-    def test_tc10_ten_sp_rong(self):
-        """TC10 — X1: ten_sp = 0 (rỗng, dưới biên dưới)."""
-        assert validate_san_pham(0, 500_000_000, 5_000) is False
+    def test_tc09_ten_sp_rong_0_ky_tu(self, admin_headers):
+        """TC09 -- X1: ten_sp rong (0 ky tu, PHP required)"""
+        assert create_product(0, 500_000_000, 5000, admin_headers).status_code == 422
 
-    def test_tc11_ten_sp_tren_max(self):
-        """TC11 — X2: ten_sp = 256 (trên biên trên)."""
-        assert validate_san_pham(256, 500_000_000, 5_000) is False
+    def test_tc10_ten_sp_qua_dai_256_ky_tu(self, admin_headers):
+        """TC10 -- X2: ten_sp=256 ky tu (tren bien tren)"""
+        assert create_product(256, 500_000_000, 5000, admin_headers).status_code == 422
 
-    def test_tc12_gia_am(self):
-        """TC12 — X3: gia = -1 (giá âm)."""
-        assert validate_san_pham(128, -1, 5_000) is False
+    def test_tc11_gia_am_1(self, admin_headers):
+        """TC11 -- X3: gia=-1 (am, PHP min:0)"""
+        assert create_product(128, -1, 5000, admin_headers).status_code == 422
 
-    def test_tc13_gia_vuot_gioi_han(self):
-        """TC13 — X4: gia = 1.000.000.000 (vượt giới hạn)."""
-        assert validate_san_pham(128, 1_000_000_000, 5_000) is False
+    def test_tc12_gia_vuot_gioi_han_1_ty(self, admin_headers):
+        """TC12 -- X4: gia=1000000000 (vuot gioi han 999999999)"""
+        assert create_product(128, 1_000_000_000, 5000, admin_headers).status_code == 422
 
-    def test_tc14_so_luong_am(self):
-        """TC14 — X5: so_luong = -1 (tồn kho âm)."""
-        assert validate_san_pham(128, 500_000_000, -1) is False
+    def test_tc13_so_luong_am_1(self, admin_headers):
+        """TC13 -- X5: so_luong=-1 (am, PHP min:0)"""
+        assert create_product(128, 500_000_000, -1, admin_headers).status_code == 422
 
-    def test_tc15_so_luong_vuot_gioi_han(self):
-        """TC15 — X6: so_luong = 10.001 (vượt tồn kho tối đa)."""
-        assert validate_san_pham(128, 500_000_000, 10_001) is False
+    def test_tc14_so_luong_vuot_gioi_han_10001(self, admin_headers):
+        """TC14 -- X6: so_luong=10001 (vuot gioi han 10000)"""
+        assert create_product(128, 500_000_000, 10001, admin_headers).status_code == 422
 
-    def test_tc16_nhieu_bien_sai(self):
-        """TC16 — X1, X3, X5: tất cả biến đều vi phạm."""
-        assert validate_san_pham(0, -1, -1) is False
-
-    def test_tc17_gia_bien_duoi_vi_pham(self):
-        """TC17 — X3: gia = -1 (ngay dưới biên dưới)."""
-        assert validate_san_pham(128, -1, 5_000) is False
-
-    def test_tc18_so_luong_bien_tren_vi_pham(self):
-        """TC18 — X6: so_luong = 10.001 (ngay trên biên trên)."""
-        assert validate_san_pham(128, 500_000_000, 10_001) is False
+    def test_tc15_tat_ca_bien_sai_dong_thoi(self, admin_headers):
+        """TC15 -- X1,X3,X5: ten_sp rong, gia=-1, so_luong=-1 (tat ca vi pham)"""
+        assert create_product(0, -1, -1, admin_headers).status_code == 422
 ```
 
 ### Hướng dẫn chạy
 
 ```bash
-pip install pytest
+# Bước 1: Khởi động PHP server
+cd fashionshop-api && php artisan serve
 
-# Chạy toàn bộ test
+# Bước 2: Cài thư viện (nếu chưa có)
+pip install pytest requests
+
+# Bước 3: Chạy test
+cd test_BVA
 python -m pytest test_san_pham.py -v
-
-# Chạy chỉ nhóm test hợp lệ
-python -m pytest test_san_pham.py::TestHopLeTaiBien -v
-
-# Chạy chỉ nhóm test không hợp lệ
-python -m pytest test_san_pham.py::TestKhongHopLe -v
 ```

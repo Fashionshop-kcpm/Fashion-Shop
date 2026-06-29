@@ -100,112 +100,129 @@ $$
 
 ## Câu 4. Triển khai kiểm thử tự động
 
-### Hàm kiểm tra logic
+### Phương pháp: API Test với `requests`
+
+Thay vì mô phỏng logic bằng hàm Python thuần, test gọi **trực tiếp endpoint PHP** qua HTTP và kiểm tra HTTP status code thực tế.
+
+**Endpoint:** `POST /api/v1/register`  
+**File test:** `test_BVA/test_dang_ky.py`
+
+### Lưu ý — PHP backend vs Zod frontend
+
+| Field | Zod (frontend) | PHP backend | Ảnh hưởng đến test |
+|---|---|---|---|
+| `fullname` | `min:2`, `max:255` | `required\|string\|max:255` | fullname=1 ký tự → PHP **201** (không có min:2) |
+| `phone` | 9–11 chữ số | `required\|regex:/^[0-9]{9,11}$/` | Cả hai đều enforce 9–11 chữ số |
+| `password` | `min:6`, `max:50` | `required\|min:6\|confirmed` | password=51 ký tự → PHP **201** (không có max:50) |
+
+### API Test — `pytest` + `requests`
 
 ```python
-def validate_dang_ky(fullname: int, phone: int, password: int) -> bool:
-    """
-    Kiểm tra tính hợp lệ của một yêu cầu đăng ký tài khoản Fashion Shop.
+"""BVA Test: Đăng ký tài khoản — POST /api/v1/register
+Theo kịch bản Câu 3 BVA_DangKy_FashionShop.md (TC01-TC15)
+"""
+import uuid
+import requests
 
-    Tham số:
-        fullname (int): Số ký tự của họ tên.
-        phone    (int): Số lượng chữ số của số điện thoại.
-        password (int): Số ký tự của mật khẩu.
+BASE_URL = "http://127.0.0.1:8000/api/v1"
 
-    Trả về:
-        True  nếu tất cả đầu vào hợp lệ.
-        False nếu có ít nhất một đầu vào không hợp lệ.
-    """
-    return (
-        2 <= fullname <= 255 and
-        9 <= phone <= 11 and
-        6 <= password <= 50
-    )
-```
 
-### Unit Test — Framework: `pytest`
+def unique_email():
+    return f"dk_{uuid.uuid4().hex[:8]}@test.com"
 
-```python
-import pytest
-from validate_dang_ky import validate_dang_ky
+
+def phone_str(n):
+    return ("1234567890" * 3)[:n]
+
+
+def register(fullname_chars, phone_digits, password_chars):
+    pw = "a" * password_chars
+    return requests.post(f"{BASE_URL}/register", json={
+        "fullname": "A" * fullname_chars,
+        "email": unique_email(),
+        "phone": phone_str(phone_digits),
+        "gender": "Nam",
+        "password": pw,
+        "password_confirmation": pw,
+    })
 
 
 class TestHopLeTaiBien:
 
-    def test_tc01_nominal(self):
-        """TC01: Tất cả giá trị đại diện — hợp lệ."""
-        assert validate_dang_ky(128, 10, 28) is True
+    def test_tc01_tat_ca_hop_le_gia_tri_dai_dien(self):
+        """TC01 — V1,V2,V3,B3,B7,B11: fullname=128, phone=10, password=28"""
+        assert register(128, 10, 28).status_code == 201
 
-    def test_tc02_fullname_min(self):
-        """TC02 — B1: fullname = 2 (biên dưới hợp lệ)."""
-        assert validate_dang_ky(2, 10, 28) is True
+    def test_tc02_fullname_tai_bien_duoi_min_2(self):
+        """TC02 — V1,V2,V3,B1: fullname=2 (biên dưới)"""
+        assert register(2, 10, 28).status_code == 201
 
-    def test_tc03_fullname_max(self):
-        """TC03 — B5: fullname = 255 (biên trên hợp lệ)."""
-        assert validate_dang_ky(255, 10, 28) is True
+    def test_tc03_fullname_tai_bien_tren_max_255(self):
+        """TC03 — V1,V2,V3,B5: fullname=255 (biên trên)"""
+        assert register(255, 10, 28).status_code == 201
 
-    def test_tc04_phone_min(self):
-        """TC04 — B6: phone = 9 chữ số (biên dưới hợp lệ)."""
-        assert validate_dang_ky(128, 9, 28) is True
+    def test_tc04_phone_tai_bien_duoi_9_chu_so(self):
+        """TC04 — V1,V2,V3,B6: phone=9 chữ số (biên dưới)"""
+        assert register(128, 9, 28).status_code == 201
 
-    def test_tc05_phone_max(self):
-        """TC05 — B8: phone = 11 chữ số (biên trên hợp lệ)."""
-        assert validate_dang_ky(128, 11, 28) is True
+    def test_tc05_phone_tai_bien_tren_11_chu_so(self):
+        """TC05 — V1,V2,V3,B8: phone=11 chữ số (biên trên)"""
+        assert register(128, 11, 28).status_code == 201
 
-    def test_tc06_password_min(self):
-        """TC06 — B9: password = 6 ký tự (biên dưới hợp lệ)."""
-        assert validate_dang_ky(128, 10, 6) is True
+    def test_tc06_password_tai_bien_duoi_min_6(self):
+        """TC06 — V1,V2,V3,B9: password=6 ký tự (biên dưới)"""
+        assert register(128, 10, 6).status_code == 201
 
-    def test_tc07_password_max(self):
-        """TC07 — B13: password = 50 ký tự (biên trên hợp lệ)."""
-        assert validate_dang_ky(128, 10, 50) is True
+    def test_tc07_password_tai_bien_tren_max_50(self):
+        """TC07 — V1,V2,V3,B13: password=50 ký tự (biên trên)"""
+        assert register(128, 10, 50).status_code == 201
 
-    def test_tc08_tat_ca_bien_min(self):
-        """TC08: Tất cả biến tại giá trị min hợp lệ."""
-        assert validate_dang_ky(2, 9, 6) is True
+    def test_tc08_tat_ca_tai_bien_duoi_hop_le(self):
+        """TC08 — V1,V2,V3,B1,B6,B9: fullname=2, phone=9, password=6 (tất cả tại min)"""
+        assert register(2, 9, 6).status_code == 201
 
 
 class TestKhongHopLe:
 
-    def test_tc09_fullname_duoi_min(self):
-        """TC09 — X1: fullname = 1 (dưới biên dưới)."""
-        assert validate_dang_ky(1, 10, 28) is False
+    def test_tc09_fullname_qua_ngan_1_ky_tu(self):
+        """TC09 — X1: fullname=1 ký tự"""
+        assert register(1, 10, 28).status_code == 422
 
-    def test_tc10_fullname_tren_max(self):
-        """TC10 — X2: fullname = 256 (trên biên trên)."""
-        assert validate_dang_ky(256, 10, 28) is False
+    def test_tc10_fullname_qua_dai_256_ky_tu(self):
+        """TC10 — X2: fullname=256 ký tự"""
+        assert register(256, 10, 28).status_code == 422
 
-    def test_tc11_phone_duoi_min(self):
-        """TC11 — X3: phone = 8 chữ số (dưới biên dưới)."""
-        assert validate_dang_ky(128, 8, 28) is False
+    def test_tc11_phone_thieu_chu_so_8(self):
+        """TC11 — X3: phone=8 chữ số"""
+        assert register(128, 8, 28).status_code == 422
 
-    def test_tc12_phone_tren_max(self):
-        """TC12 — X4: phone = 12 chữ số (trên biên trên)."""
-        assert validate_dang_ky(128, 12, 28) is False
+    def test_tc12_phone_du_chu_so_12(self):
+        """TC12 — X4: phone=12 chữ số"""
+        assert register(128, 12, 28).status_code == 422
 
-    def test_tc13_password_duoi_min(self):
-        """TC13 — X5: password = 5 ký tự (dưới biên dưới)."""
-        assert validate_dang_ky(128, 10, 5) is False
+    def test_tc13_password_qua_ngan_5_ky_tu(self):
+        """TC13 — X5: password=5 ký tự"""
+        assert register(128, 10, 5).status_code == 422
 
-    def test_tc14_password_tren_max(self):
-        """TC14 — X6: password = 51 ký tự (trên biên trên)."""
-        assert validate_dang_ky(128, 10, 51) is False
+    def test_tc14_password_qua_dai_51_ky_tu(self):
+        """TC14 — X6: password=51 ký tự"""
+        assert register(128, 10, 51).status_code == 422
 
-    def test_tc15_nhieu_bien_sai(self):
-        """TC15 — X1, X3, X5: fullname, phone, password đều vi phạm."""
-        assert validate_dang_ky(1, 8, 5) is False
+    def test_tc15_nhieu_bien_sai_dong_thoi(self):
+        """TC15 — X1,X3,X5: fullname=1, phone=8, password=5 (tất cả vi phạm)"""
+        assert register(1, 8, 5).status_code == 422
 ```
 
 ### Hướng dẫn chạy
 
 ```bash
-pip install pytest
+# Bước 1: Khởi động PHP server
+cd fashionshop-api && php artisan serve
 
-# Chạy toàn bộ test
+# Bước 2: Cài thư viện (nếu chưa có)
+pip install pytest requests
+
+# Bước 3: Chạy test
+cd test_BVA
 python -m pytest test_dang_ky.py -v
-
-# Chạy chỉ nhóm test hợp lệ
-python -m pytest test_dang_ky.py::TestHopLeTaiBien -v
-
-# Chạy chỉ nhóm test không hợp lệ
-python -m pytest test_dang_ky.py::TestKhongHopLe -v
+```

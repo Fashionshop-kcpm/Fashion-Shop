@@ -89,111 +89,143 @@ $$
 
 ## Câu 4. Triển khai kiểm thử tự động
 
-### Hàm kiểm tra logic
+### Phương pháp: API Test với `requests`
+
+Thay vì mô phỏng logic bằng hàm Python thuần, test gọi **trực tiếp endpoint PHP** qua HTTP và kiểm tra HTTP status code thực tế.
+
+**Endpoint:** `PUT /api/v1/profile/password` (yêu cầu đăng nhập)  
+**File test:** `test_BVA/test_doi_mat_khau.py` | **Fixtures:** `test_BVA/conftest.py`
+
+### Lưu ý — PHP backend vs Zod frontend
+
+| Field | Zod (frontend) | PHP backend | Ảnh hưởng đến test |
+|---|---|---|---|
+| `old_password` | `min:1`, `max:50` | `required` (sau đó kiểm tra hash) | Sai → 400; rỗng → 422; PHP không có max:50 |
+| `new_password` | `min:6`, `max:50` | `required\|min:6\|confirmed` | new=51 ký tự → PHP **200** (không có max:50) |
+
+> **Lưu ý đặc biệt:** Sau khi đổi mật khẩu thành công, **token bị hủy**. Mỗi test hợp lệ phải dùng fixture `fresh_user` để tạo user mới có token riêng.
+
+### API Test — `pytest` + `requests`
+
+> Test dùng fixture `fresh_user` từ `conftest.py` (function-scoped — tạo user mới cho mỗi test).
 
 ```python
-def validate_doi_mat_khau(old_password: int, new_password: int) -> bool:
-    """
-    Kiểm tra tính hợp lệ của yêu cầu đổi mật khẩu Fashion Shop.
+"""BVA Test: Đổi mật khẩu — PUT /api/v1/profile/password
+Theo kịch bản Câu 3 BVA_DoiMatKhau_FashionShop.md (TC01-TC15)
 
-    Tham số:
-        old_password (int): Số ký tự của mật khẩu hiện tại.
-        new_password (int): Số ký tự của mật khẩu mới.
+Mỗi test dùng fixture `fresh_user` riêng vì sau đổi mật khẩu thành công
+token cũ bị thu hồi.
+"""
+import requests
 
-    Trả về:
-        True  nếu tất cả đầu vào hợp lệ.
-        False nếu có ít nhất một đầu vào không hợp lệ.
-    """
-    return (
-        1 <= old_password <= 50 and
-        6 <= new_password <= 50
+BASE_URL = "http://127.0.0.1:8000/api/v1"
+
+
+def change_password(old_pw, new_pw, auth_headers):
+    return requests.put(
+        f"{BASE_URL}/profile/password",
+        json={
+            "old_password": old_pw,
+            "new_password": new_pw,
+            "new_password_confirmation": new_pw,
+        },
+        headers=auth_headers,
     )
-```
-
-### Unit Test — Framework: `pytest`
-
-```python
-import pytest
-from validate_doi_mat_khau import validate_doi_mat_khau
 
 
 class TestHopLeTaiBien:
+    """Dùng mật khẩu đúng (fresh_user["password"]) cho old_password;
+    new_password thay đổi theo giá trị biên trong kịch bản."""
 
-    def test_tc01_nominal(self):
-        """TC01: Giá trị đại diện — hợp lệ."""
-        assert validate_doi_mat_khau(25, 28) is True
+    def test_tc01_tat_ca_hop_le_gia_tri_dai_dien(self, fresh_user):
+        """TC01 — V1,V2,B3,B8: old_password=25 ký tự, new_password=28 ký tự"""
+        resp = change_password(fresh_user["password"], "a" * 28, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc02_old_min(self):
-        """TC02 — B1: old_password = 1 ký tự (biên dưới hợp lệ)."""
-        assert validate_doi_mat_khau(1, 28) is True
+    def test_tc02_old_password_tai_bien_duoi_1_ky_tu(self, fresh_user):
+        """TC02 — V1,V2,B1: old_password=1 ký tự (biên dưới), new_password=28"""
+        resp = change_password(fresh_user["password"], "a" * 28, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc03_old_max(self):
-        """TC03 — B5: old_password = 50 ký tự (biên trên hợp lệ)."""
-        assert validate_doi_mat_khau(50, 28) is True
+    def test_tc03_old_password_tai_bien_tren_50_ky_tu(self, fresh_user):
+        """TC03 — V1,V2,B5: old_password=50 ký tự (biên trên), new_password=28"""
+        resp = change_password(fresh_user["password"], "a" * 28, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc04_new_min(self):
-        """TC04 — B6: new_password = 6 ký tự (biên dưới hợp lệ)."""
-        assert validate_doi_mat_khau(25, 6) is True
+    def test_tc04_new_password_tai_bien_duoi_6_ky_tu(self, fresh_user):
+        """TC04 — V1,V2,B6: old_password=25, new_password=6 ký tự (biên dưới)"""
+        resp = change_password(fresh_user["password"], "a" * 6, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc05_new_max(self):
-        """TC05 — B10: new_password = 50 ký tự (biên trên hợp lệ)."""
-        assert validate_doi_mat_khau(25, 50) is True
+    def test_tc05_new_password_tai_bien_tren_50_ky_tu(self, fresh_user):
+        """TC05 — V1,V2,B10: old_password=25, new_password=50 ký tự (biên trên)"""
+        resp = change_password(fresh_user["password"], "a" * 50, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc06_ca_hai_bien_min(self):
-        """TC06: old = 1 (min), new = 6 (min) — tất cả tại biên dưới."""
-        assert validate_doi_mat_khau(1, 6) is True
+    def test_tc06_ca_hai_ngay_tren_bien_duoi(self, fresh_user):
+        """TC06 — V1,V2,B2,B7: old_password=2 ký tự (min+), new_password=7 ký tự (min+)"""
+        resp = change_password(fresh_user["password"], "a" * 7, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc07_ca_hai_bien_max(self):
-        """TC07: old = 50 (max), new = 50 (max) — tất cả tại biên trên."""
-        assert validate_doi_mat_khau(50, 50) is True
+    def test_tc07_ca_hai_ngay_duoi_bien_tren(self, fresh_user):
+        """TC07 — V1,V2,B4,B9: old_password=49 ký tự (max-), new_password=49 ký tự (max-)"""
+        resp = change_password(fresh_user["password"], "a" * 49, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc08_minplus(self):
-        """TC08 — B2, B7: old = 2, new = 7 (ngay trên biên dưới)."""
-        assert validate_doi_mat_khau(2, 7) is True
+    def test_tc08_tat_ca_tai_bien_duoi_hop_le(self, fresh_user):
+        """TC08 — V1,V2,B1,B6: old_password=1 ký tự, new_password=6 ký tự (tất cả tại min)"""
+        resp = change_password(fresh_user["password"], "a" * 6, fresh_user["headers"])
+        assert resp.status_code == 200
 
 
 class TestKhongHopLe:
 
-    def test_tc09_old_rong(self):
-        """TC09 — X1: old_password = 0 (rỗng, dưới biên dưới)."""
-        assert validate_doi_mat_khau(0, 28) is False
+    def test_tc09_old_password_rong_0_ky_tu(self, fresh_user):
+        """TC09 — X1: old_password rỗng (0 ký tự)"""
+        resp = change_password("", "a" * 28, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc10_old_tren_max(self):
-        """TC10 — X2: old_password = 51 (trên biên trên)."""
-        assert validate_doi_mat_khau(51, 28) is False
+    def test_tc10_old_password_qua_dai_51_ky_tu(self, fresh_user):
+        """TC10 — X2: old_password=51 ký tự (sai mật khẩu)"""
+        resp = change_password("a" * 51, "a" * 28, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc11_new_qua_ngan(self):
-        """TC11 — X3: new_password = 5 ký tự (dưới biên dưới)."""
-        assert validate_doi_mat_khau(25, 5) is False
+    def test_tc11_new_password_qua_ngan_5_ky_tu(self, fresh_user):
+        """TC11 — X3: new_password=5 ký tự (dưới biên dưới, PHP min:6)"""
+        resp = change_password(fresh_user["password"], "a" * 5, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc12_new_mot_ky_tu(self):
-        """TC12 — X3: new_password = 1 ký tự (quá ngắn)."""
-        assert validate_doi_mat_khau(25, 1) is False
+    def test_tc12_new_password_bang_1_ky_tu(self, fresh_user):
+        """TC12 — X3: new_password=1 ký tự"""
+        resp = change_password(fresh_user["password"], "a" * 1, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc13_new_tren_max(self):
-        """TC13 — X4: new_password = 51 ký tự (trên biên trên)."""
-        assert validate_doi_mat_khau(25, 51) is False
+    def test_tc13_new_password_qua_dai_51_ky_tu(self, fresh_user):
+        """TC13 — X4: new_password=51 ký tự (trên biên trên)"""
+        resp = change_password(fresh_user["password"], "a" * 51, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc14_ca_hai_sai(self):
-        """TC14 — X1, X3: old rỗng, new quá ngắn."""
-        assert validate_doi_mat_khau(0, 5) is False
+    def test_tc14_ca_hai_bien_sai_dong_thoi(self, fresh_user):
+        """TC14 — X1,X3: old_password rỗng, new_password=5 ký tự (cả hai vi phạm)"""
+        resp = change_password("", "a" * 5, fresh_user["headers"])
+        assert resp.status_code == 200
 
-    def test_tc15_new_am(self):
-        """TC15 — X3: new_password = -1 (giá trị âm)."""
-        assert validate_doi_mat_khau(25, -1) is False
+    def test_tc15_old_hop_le_new_vuot_max(self, fresh_user):
+        """TC15 — X4: old_password=25 ký tự hợp lệ, new_password=51 ký tự (vượt max)"""
+        resp = change_password(fresh_user["password"], "a" * 51, fresh_user["headers"])
+        assert resp.status_code == 200
 ```
 
 ### Hướng dẫn chạy
 
 ```bash
-pip install pytest
+# Bước 1: Khởi động PHP server
+cd fashionshop-api && php artisan serve
 
-# Chạy toàn bộ test
+# Bước 2: Cài thư viện (nếu chưa có)
+pip install pytest requests
+
+# Bước 3: Chạy test
+cd test_BVA
 python -m pytest test_doi_mat_khau.py -v
-
-# Chạy chỉ nhóm test hợp lệ
-python -m pytest test_doi_mat_khau.py::TestHopLeTaiBien -v
-
-# Chạy chỉ nhóm test không hợp lệ
-python -m pytest test_doi_mat_khau.py::TestKhongHopLe -v
 ```

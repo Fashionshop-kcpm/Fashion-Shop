@@ -88,111 +88,117 @@ $$
 
 ## Câu 4. Triển khai kiểm thử tự động
 
-### Hàm kiểm tra logic
+### Phương pháp: API Test với `requests`
+
+Thay vì mô phỏng logic bằng hàm Python thuần, test gọi **trực tiếp endpoint PHP** qua HTTP và kiểm tra HTTP status code thực tế.
+
+**Endpoint:** `POST /api/v1/products/{id}/reviews` (yêu cầu đăng nhập)  
+**File test:** `test_BVA/test_danh_gia.py` | **Fixtures:** `test_BVA/conftest.py`
+
+### Lưu ý — PHP backend vs Zod frontend
+
+| Field | Zod (frontend) | PHP backend | Ảnh hưởng đến test |
+|---|---|---|---|
+| `rating` | `min:1`, `max:5` | `required\|integer\|min:1\|max:5` | Cả hai đều enforce 1–5 |
+| `comment` | `min:5`, `max:500` | `required\|string` | comment=4 → PHP **201**; comment=501 → PHP **201** |
+
+### API Test — `pytest` + `requests`
+
+> Test dùng fixture `first_product_id` và `auth_headers` từ `conftest.py` (session-scoped).
 
 ```python
-def validate_danh_gia(rating: int, comment: int) -> bool:
-    """
-    Kiểm tra tính hợp lệ của một đánh giá sản phẩm Fashion Shop.
+"""BVA Test: Đánh giá sản phẩm — POST /api/v1/products/{id}/reviews
+Theo kịch bản Câu 3 BVA_DanhGia_FashionShop.md (TC01-TC15)
+"""
+import requests
 
-    Tham số:
-        rating  (int): Số sao đánh giá (1–5).
-        comment (int): Số ký tự của nội dung nhận xét.
+BASE_URL = "http://127.0.0.1:8000/api/v1"
 
-    Trả về:
-        True  nếu tất cả đầu vào hợp lệ.
-        False nếu có ít nhất một đầu vào không hợp lệ.
-    """
-    return (
-        1 <= rating <= 5 and
-        5 <= comment <= 500
+
+def post_review(product_id, rating, comment_chars, auth_headers):
+    return requests.post(
+        f"{BASE_URL}/products/{product_id}/reviews",
+        json={"rating": rating, "comment": "A" * comment_chars},
+        headers=auth_headers,
     )
-```
-
-### Unit Test — Framework: `pytest`
-
-```python
-import pytest
-from validate_danh_gia import validate_danh_gia
 
 
 class TestHopLeTaiBien:
 
-    def test_tc01_nominal(self):
-        """TC01: Giá trị đại diện — hợp lệ."""
-        assert validate_danh_gia(3, 252) is True
+    def test_tc01_tat_ca_hop_le_gia_tri_dai_dien(self, first_product_id, auth_headers):
+        """TC01 — V1,V2,B3,B8: rating=3, comment=252"""
+        assert post_review(first_product_id, 3, 252, auth_headers).status_code == 201
 
-    def test_tc02_rating_min(self):
-        """TC02 — B1: rating = 1 sao (biên dưới hợp lệ)."""
-        assert validate_danh_gia(1, 252) is True
+    def test_tc02_rating_tai_bien_duoi_1_sao(self, first_product_id, auth_headers):
+        """TC02 — V1,V2,B1: rating=1 (biên dưới)"""
+        assert post_review(first_product_id, 1, 252, auth_headers).status_code == 201
 
-    def test_tc03_rating_max(self):
-        """TC03 — B5: rating = 5 sao (biên trên hợp lệ)."""
-        assert validate_danh_gia(5, 252) is True
+    def test_tc03_rating_tai_bien_tren_5_sao(self, first_product_id, auth_headers):
+        """TC03 — V1,V2,B5: rating=5 (biên trên)"""
+        assert post_review(first_product_id, 5, 252, auth_headers).status_code == 201
 
-    def test_tc04_comment_min(self):
-        """TC04 — B6: comment = 5 ký tự (biên dưới hợp lệ)."""
-        assert validate_danh_gia(3, 5) is True
+    def test_tc04_comment_tai_bien_duoi_5_ky_tu(self, first_product_id, auth_headers):
+        """TC04 — V1,V2,B6: comment=5 ký tự (biên dưới)"""
+        assert post_review(first_product_id, 3, 5, auth_headers).status_code == 201
 
-    def test_tc05_comment_max(self):
-        """TC05 — B10: comment = 500 ký tự (biên trên hợp lệ)."""
-        assert validate_danh_gia(3, 500) is True
+    def test_tc05_comment_tai_bien_tren_500_ky_tu(self, first_product_id, auth_headers):
+        """TC05 — V1,V2,B10: comment=500 ký tự (biên trên)"""
+        assert post_review(first_product_id, 3, 500, auth_headers).status_code == 201
 
-    def test_tc06_ca_hai_bien_min(self):
-        """TC06: Cả hai biến tại min hợp lệ."""
-        assert validate_danh_gia(1, 5) is True
+    def test_tc06_rating_minplus_comment_minplus(self, first_product_id, auth_headers):
+        """TC06 — V1,V2,B2,B7: rating=2 (min+), comment=6 ký tự (min+)"""
+        assert post_review(first_product_id, 2, 6, auth_headers).status_code == 201
 
-    def test_tc07_ca_hai_bien_max(self):
-        """TC07: Cả hai biến tại max hợp lệ."""
-        assert validate_danh_gia(5, 500) is True
+    def test_tc07_rating_maxminus_comment_maxminus(self, first_product_id, auth_headers):
+        """TC07 — V1,V2,B4,B9: rating=4 (max-), comment=499 ký tự (max-)"""
+        assert post_review(first_product_id, 4, 499, auth_headers).status_code == 201
 
-    def test_tc08_rating_minplus_comment_minplus(self):
-        """TC08 — B2, B7: rating = 2, comment = 6 (ngay trên biên dưới)."""
-        assert validate_danh_gia(2, 6) is True
+    def test_tc08_tat_ca_tai_bien_duoi_min(self, first_product_id, auth_headers):
+        """TC08 — V1,V2,B1,B6: rating=1, comment=5 ký tự (tất cả tại min)"""
+        assert post_review(first_product_id, 1, 5, auth_headers).status_code == 201
 
 
 class TestKhongHopLe:
 
-    def test_tc09_rating_bang_khong(self):
-        """TC09 — X1: rating = 0 (dưới biên dưới)."""
-        assert validate_danh_gia(0, 252) is False
+    def test_tc09_rating_bang_0_duoi_bien_duoi(self, first_product_id, auth_headers):
+        """TC09 — X1: rating=0 (dưới biên dưới)"""
+        assert post_review(first_product_id, 0, 252, auth_headers).status_code == 422
 
-    def test_tc10_rating_am(self):
-        """TC10 — X1: rating = -1 (số âm)."""
-        assert validate_danh_gia(-1, 252) is False
+    def test_tc10_rating_am_1(self, first_product_id, auth_headers):
+        """TC10 — X1: rating=-1 (âm)"""
+        assert post_review(first_product_id, -1, 252, auth_headers).status_code == 422
 
-    def test_tc11_rating_tren_max(self):
-        """TC11 — X2: rating = 6 (trên biên trên)."""
-        assert validate_danh_gia(6, 252) is False
+    def test_tc11_rating_bang_6_tren_bien_tren(self, first_product_id, auth_headers):
+        """TC11 — X2: rating=6 (trên biên trên)"""
+        assert post_review(first_product_id, 6, 252, auth_headers).status_code == 422
 
-    def test_tc12_comment_duoi_min(self):
-        """TC12 — X3: comment = 4 ký tự (dưới biên dưới)."""
-        assert validate_danh_gia(3, 4) is False
+    def test_tc12_comment_4_ky_tu_duoi_min(self, first_product_id, auth_headers):
+        """TC12 — X3: comment=4 ký tự (dưới biên dưới)"""
+        assert post_review(first_product_id, 3, 4, auth_headers).status_code == 422
 
-    def test_tc13_comment_tren_max(self):
-        """TC13 — X4: comment = 501 ký tự (trên biên trên)."""
-        assert validate_danh_gia(3, 501) is False
+    def test_tc13_comment_501_ky_tu_tren_max(self, first_product_id, auth_headers):
+        """TC13 — X4: comment=501 ký tự (trên biên trên)"""
+        assert post_review(first_product_id, 3, 501, auth_headers).status_code == 422
 
-    def test_tc14_ca_hai_bien_sai(self):
-        """TC14 — X1, X3: rating và comment đều vi phạm."""
-        assert validate_danh_gia(0, 4) is False
+    def test_tc14_ca_hai_bien_sai_dong_thoi(self, first_product_id, auth_headers):
+        """TC14 — X1,X3: rating=0, comment=4 ký tự (cả hai vi phạm)"""
+        assert post_review(first_product_id, 0, 4, auth_headers).status_code == 422
 
-    def test_tc15_rating_hop_le_comment_sai(self):
-        """TC15 — X4: rating hợp lệ nhưng comment vượt giới hạn."""
-        assert validate_danh_gia(5, 501) is False
+    def test_tc15_rating_5_comment_501_chi_comment_sai(self, first_product_id, auth_headers):
+        """TC15 — X4: rating=5, comment=501 ký tự (chỉ comment vi phạm)"""
+        assert post_review(first_product_id, 5, 501, auth_headers).status_code == 422
 ```
 
 ### Hướng dẫn chạy
 
 ```bash
-pip install pytest
+# Bước 1: Khởi động PHP server
+cd fashionshop-api && php artisan serve
 
-# Chạy toàn bộ test
+# Bước 2: Cài thư viện (nếu chưa có)
+pip install pytest requests
+
+# Bước 3: Chạy test
+cd test_BVA
 python -m pytest test_danh_gia.py -v
-
-# Chạy chỉ nhóm test hợp lệ
-python -m pytest test_danh_gia.py::TestHopLeTaiBien -v
-
-# Chạy chỉ nhóm test không hợp lệ
-python -m pytest test_danh_gia.py::TestKhongHopLe -v
 ```
