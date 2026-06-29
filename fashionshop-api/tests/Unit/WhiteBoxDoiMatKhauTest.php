@@ -90,6 +90,9 @@ class WhiteBoxDoiMatKhauTest extends TestCase
             'password' => Hash::make('123456')
         ]);
 
+        $tokenResult = $user->createToken('auth_token');
+        $user->withAccessToken($tokenResult->accessToken);
+
         $request = $this->makeRequest($user, [
             'old_password' => '123456',
             'new_password' => 'abcdef',

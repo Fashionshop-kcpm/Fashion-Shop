@@ -7,6 +7,8 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Http\Controllers\Api\Admin\ProductController;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class WhiteBoxQuanLySanPhamTest extends TestCase
 {
@@ -283,5 +285,62 @@ class WhiteBoxQuanLySanPhamTest extends TestCase
         $this->assertDatabaseMissing('products', [
             'id' => $product->id
         ]);
+    }
+
+    /**
+     * WB10
+     * Bao phủ nhánh: store() có upload ảnh (hasFile = true)
+     * Kết quả mong đợi: HTTP 201, hinh_anh không null
+     */
+    public function test_wb10_store_with_image()
+    {
+        Storage::fake('public');
+        $file = UploadedFile::fake()->image('product.jpg');
+
+        $request = new \Illuminate\Http\Request(
+            ['ten_sp' => 'Áo Có Ảnh', 'gia' => 200000, 'so_luong' => 10, 'gioi_tinh' => 1],
+            [], [], [],
+            ['hinh_anh' => $file]
+        );
+
+        $response = (new ProductController())->store($request);
+
+        $this->assertEquals(201, $response->status());
+
+        $product = Product::where('ten_sp', 'Áo Có Ảnh')->first();
+        $this->assertNotNull($product->hinh_anh);
+    }
+
+    /**
+     * WB11
+     * Bao phủ nhánh: update() có upload ảnh mới (hasFile = true)
+     * Kết quả mong đợi: HTTP 200, hinh_anh được cập nhật
+     */
+    public function test_wb11_update_with_image()
+    {
+        Storage::fake('public');
+        $file = UploadedFile::fake()->image('updated.jpg');
+
+        $product = Product::create([
+            'ten_sp'      => 'Áo Cũ',
+            'gia'         => 100000,
+            'gia_cu'      => 120000,
+            'mo_ta'       => 'Test',
+            'so_luong'    => 10,
+            'gioi_tinh'   => 1,
+            'category_id' => null,
+            'hinh_anh'    => null,
+        ]);
+
+        $request = new \Illuminate\Http\Request(
+            ['ten_sp' => 'Áo Mới Có Ảnh', 'gia' => 150000, 'so_luong' => 15, 'gioi_tinh' => 1],
+            [], [], [],
+            ['hinh_anh' => $file]
+        );
+
+        $response = (new ProductController())->update($request, $product->id);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertNotNull($product->fresh()->hinh_anh);
     }
 }

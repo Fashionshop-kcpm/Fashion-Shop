@@ -13,9 +13,6 @@ class WhiteBoxLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * Tạo Request
-     */
     private function makeRequest($data = [])
     {
         return new Request($data);
@@ -23,11 +20,8 @@ class WhiteBoxLoginTest extends TestCase
 
     /**
      * WB01
-     * Bao phủ nhánh:
-     * login() validate thất bại
-     *
-     * Kết quả mong đợi:
-     * ValidationException
+     * Bao phủ nhánh: login() validate thất bại
+     * Kết quả mong đợi: ValidationException
      */
     public function test_wb01_login_validation_fail()
     {
@@ -45,11 +39,8 @@ class WhiteBoxLoginTest extends TestCase
 
     /**
      * WB02
-     * Bao phủ nhánh:
-     * Sai email hoặc mật khẩu
-     *
-     * Kết quả mong đợi:
-     * HTTP 401
+     * Bao phủ nhánh: Sai email hoặc mật khẩu
+     * Kết quả mong đợi: HTTP 401
      */
     public function test_wb02_login_failed()
     {
@@ -73,11 +64,8 @@ class WhiteBoxLoginTest extends TestCase
 
     /**
      * WB03
-     * Bao phủ nhánh:
-     * Đăng nhập thành công
-     *
-     * Kết quả mong đợi:
-     * HTTP 200
+     * Bao phủ nhánh: Đăng nhập thành công
+     * Kết quả mong đợi: HTTP 200
      */
     public function test_wb03_login_success()
     {
@@ -106,5 +94,31 @@ class WhiteBoxLoginTest extends TestCase
         );
 
         $this->assertArrayHasKey('token', $json);
+    }
+
+    /**
+     * WB04
+     * Bao phủ nhánh: logout() đăng xuất thành công
+     * Kết quả mong đợi: HTTP 200
+     */
+    public function test_wb04_logout_success()
+    {
+        $user = User::create([
+            'fullname' => 'Nguyen Van A',
+            'email' => 'test@gmail.com',
+            'phone' => '0912345678',
+            'gender' => 'Nam',
+            'password' => Hash::make('123456')
+        ]);
+
+        $tokenResult = $user->createToken('auth_token');
+        $user->withAccessToken($tokenResult->accessToken);
+
+        $request = new Request();
+        $request->setUserResolver(fn () => $user);
+
+        $response = (new AuthController())->logout($request);
+
+        $this->assertEquals(200, $response->status());
     }
 }
